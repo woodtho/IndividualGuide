@@ -48,12 +48,6 @@
         "icon": "assets/icon.ico"
       }
     ],
-    "extraResources": [
-      {
-        "from": "../../build/staging/runtime",
-        "to": "runtime"
-      }
-    ],
     "asar": true,
     "compression": "normal",
     "electronLanguages": [

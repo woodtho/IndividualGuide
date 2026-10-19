@@ -6,6 +6,7 @@
 - Remove build-machine paths and author identity from bundled tutorial snapshots.
 - Add the complete handbook, covering all tasks and worked examples.
 - Publish R source and Windows binary packages plus a rebuilt Windows installer through GitHub Releases, with checksums and source manifests.
+- Package exactly one selected desktop runtime, preventing old staging folders from being merged into a new release.
 - Preserve local audit notes and original private history outside the public repository.
 
 # Responsiveness improvements

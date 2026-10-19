@@ -28,15 +28,7 @@ util.spawnAndWriteWithOutput = (command, args, input, options = {}) => {
   });
 };
 const { build, Platform, Arch } = require('electron-builder');
-const target = process.argv.find(value => value.startsWith('--target='))?.slice('--target='.length) || 'installer';
-const output = process.argv.find(value => value.startsWith('--output='))?.slice('--output='.length);
-const runtime = process.argv.find(value => value.startsWith('--runtime='))?.slice('--runtime='.length);
-const prepackaged = process.argv.find(value => value.startsWith('--prepackaged='))?.slice('--prepackaged='.length);
-if (!['installer', 'portable'].includes(target)) throw new Error(`Unknown desktop target: ${target}`);
+const { target, ...options } = require('./build-options.cjs')();
 build({ targets: Platform.WINDOWS.createTarget([target === 'installer' ? 'nsis' : 'portable'], Arch.x64),
-  ...(prepackaged ? { prepackaged: path.resolve(prepackaged) } : {}),
-  config: {
-    ...(output ? { directories: { output: path.resolve(output) } } : {}),
-    ...(runtime ? { extraResources: [{ from: path.resolve(runtime), to: 'runtime' }] } : {})
-  }, publish: 'never' })
+  ...options, publish: 'never' })
   .catch(error => { console.error(error); process.exitCode = 1; });
