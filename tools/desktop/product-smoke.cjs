@@ -62,11 +62,15 @@ module.exports = async ({ window, pause, state, rendererCommand, appURL }) => {
     dialog.showMessageBox=async(_window,options)=>{if(options.title==='Trust this project?') trustPrompts++;return {response:0};};
     assert.equal(await rendererCommand('open',external),false);assert.equal(window.getTitle(),title);assert.equal(trustPrompts,1);
     dialog.showMessageBox=async(_window,options)=>{if(options.title==='Trust this project?') trustPrompts++;return {response:1};};
-    assert.equal(await rendererCommand('open',external),true);await idle();assert.equal(trustPrompts,2); checks.projectTrustCancelAndOpen=true;
+    assert.equal(await rendererCommand('open',external),true,'trusted project opens');await idle();assert.equal(trustPrompts,2); checks.projectTrustCancelAndOpen=true;
     menu('tasks').click();await wait(()=>js("Boolean(document.querySelector('.modal.show .ig-accessible-task-row'))"),'scaled task list');
     for(const scale of [1.25,1.5,2]) {
-      window.webContents.setZoomFactor(scale);await pause(200);
-      assert.equal(await js("document.documentElement.scrollWidth<=innerWidth && document.querySelector('.modal.show .modal-footer').getBoundingClientRect().bottom<=innerHeight+1"),true);
+      window.webContents.setZoomFactor(scale);
+      // Zoom and modal layout settle asynchronously on a busy Windows runner.
+      // Keep the same visibility requirement, waiting for actual layout rather
+      // than assuming every machine can finish a resize within 200 ms.
+      await wait(()=>js("document.documentElement.scrollWidth<=innerWidth && document.querySelector('.modal.show .modal-footer').getBoundingClientRect().bottom<=innerHeight+1"),'task list layout at zoom '+scale);
+      assert.equal(await js("document.documentElement.scrollWidth<=innerWidth && document.querySelector('.modal.show .modal-footer').getBoundingClientRect().bottom<=innerHeight+1"),true,'task list fits at zoom '+scale);
       fs.writeFileSync(path.join(state,'tasks-zoom-'+scale+'.png'),(await window.webContents.capturePage()).toPNG());
     }
     window.webContents.setZoomFactor(1);await closeModal();checks.desktopDisplayScaling=true;
@@ -78,9 +82,16 @@ module.exports = async ({ window, pause, state, rendererCommand, appURL }) => {
       socket.addEventListener('open',()=>socket.send(JSON.stringify({method:'init',data:{}})));
       socket.addEventListener('close',()=>{clearTimeout(timer);resolve();}); socket.addEventListener('error',()=>{});
     });
-    assert.equal(await js("Shiny.shinyapp.$socket.readyState===1 && typeof require==='undefined' && typeof process==='undefined'"),true); checks.privateDesktopSession=true;
+    assert.equal(await js("Shiny.shinyapp.$socket.readyState===1 && typeof require==='undefined' && typeof process==='undefined'"),true,'private desktop session stays connected and isolated'); checks.privateDesktopSession=true;
     assert.equal(new URL(appURL).hostname,'127.0.0.1'); checks.localhostOnly=true;
     fs.writeFileSync(path.join(state,'product.png'),(await window.webContents.capturePage()).toPNG());
     return {ok:true,checks,project:saved};
+  } catch (error) {
+    error.smokeChecks=checks;
+    try {
+      fs.writeFileSync(path.join(state,'product-failure.png'),(await window.webContents.capturePage()).toPNG());
+      fs.writeFileSync(path.join(state,'product-failure.txt'),await js("document.body.innerText+'\\nLAYOUT '+JSON.stringify({width:innerWidth,height:innerHeight,scrollWidth:document.documentElement.scrollWidth,zoom:devicePixelRatio,footer:document.querySelector('.modal.show .modal-footer')?.getBoundingClientRect().toJSON()})"));
+    } catch (_) { /* Preserve the original assertion if the window disconnected. */ }
+    throw error;
   } finally {dialog.showMessageBox=originalMessage;}
 };

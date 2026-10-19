@@ -26,7 +26,18 @@ function Run-Check([string]$Mode,[string]$Name,[string]$Profile) {
     & (Join-Path $env:SystemRoot 'System32\taskkill.exe') /PID $p.Id /T /F | Out-Null
     throw "Timed out: $Name"
   }
-  if ($p.ExitCode -ne 0 -or !(Test-Path -LiteralPath $result)) { throw "Failed: $Name" }
+  if ($p.ExitCode -ne 0) {
+    # Preserve the failing suite's own diagnostics in the CI evidence artifact.
+    foreach ($relative in @('logs/startup.log','product-failure.png','product-failure.txt')) {
+      $diagnostic = Join-Path $Profile $relative
+      if (Test-Path -LiteralPath $diagnostic) {
+        Copy-Item -LiteralPath $diagnostic -Destination (Join-Path $EvidenceFolder ($Name + '-' + (Split-Path $relative -Leaf))) -Force
+      }
+    }
+    $detail = if (Test-Path -LiteralPath $result) { (Get-Content -LiteralPath $result -Raw -Encoding UTF8 | ConvertFrom-Json).error } else { 'No result file.' }
+    throw "Failed: $Name. $detail"
+  }
+  if (!(Test-Path -LiteralPath $result)) { throw "Failed: $Name. No result file." }
   $value = Get-Content -LiteralPath $result -Raw -Encoding UTF8 | ConvertFrom-Json
   if (!$value.ok) { throw "Failed: $Name. $($value.error)" }
   if (Get-Process -Id $value.desktop.rPid -ErrorAction SilentlyContinue) { throw 'R survived desktop shutdown.' }

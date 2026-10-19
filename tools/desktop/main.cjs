@@ -180,7 +180,8 @@ async function fail(error) {
   if (stopping) return;
   exitCode = 1;
   eventLog('desktop.fatal', error.stack || String(error), 'ERROR');
-  if (smoke) recordSmoke({ ok: false, error: error.message, startupLog: logPath });
+  if (smoke) recordSmoke({ ok: false, error: error.message, stack: error.stack,
+    checks: error.smokeChecks, startupLog: logPath });
   else await dialog.showMessageBox(window, { type: 'error', title: 'Individual Guide could not start',
     message: error.message, detail: `Startup details are saved in:\n${logPath}` });
   app.quit();
