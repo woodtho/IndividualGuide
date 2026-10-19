@@ -87,12 +87,18 @@ try {
     $renderIcon = @($iconInputs | Where-Object { (Get-Item -LiteralPath $_).LastWriteTimeUtc -gt $oldestOutput }).Count -gt 0
   }
   if ($renderIcon) {
+    $electronRenderer = Join-Path $desktopRoot 'node_modules/electron/dist/electron.exe'
+    if (!(Test-Path -LiteralPath $electronRenderer)) {
+      # Electron 44 downloads its binary on demand, rather than during npm ci.
+      Invoke-BuildCommand 'node.exe' @((Join-Path $desktopRoot 'node_modules/electron/install.js'))
+    }
+    if (!(Test-Path -LiteralPath $electronRenderer)) { throw 'The pinned Electron icon renderer was not installed.' }
     $previousElectronNode = $env:ELECTRON_RUN_AS_NODE
     try {
     Remove-Item Env:ELECTRON_RUN_AS_NODE -ErrorAction SilentlyContinue
     $iconOutput = Join-Path $buildRoot 'icon-render.log'
     $iconErrors = Join-Path $buildRoot 'icon-render-errors.log'
-    $iconProcess = Start-Process -FilePath (Join-Path $desktopRoot 'node_modules\electron\dist\electron.exe') -ArgumentList ('"{0}"' -f (Join-Path $desktopRoot 'create-icon.cjs')) -WindowStyle Hidden -Wait -PassThru -RedirectStandardOutput $iconOutput -RedirectStandardError $iconErrors
+    $iconProcess = Start-Process -FilePath $electronRenderer -ArgumentList ('"{0}"' -f (Join-Path $desktopRoot 'create-icon.cjs')) -WindowStyle Hidden -Wait -PassThru -RedirectStandardOutput $iconOutput -RedirectStandardError $iconErrors
     if ($iconProcess.ExitCode -ne 0) { throw ('Creating the application icon failed. ' + (Get-Content -LiteralPath $iconErrors -Raw)) }
     } finally { $env:ELECTRON_RUN_AS_NODE = $previousElectronNode }
   } else { Write-Output 'Reusing unchanged application icon assets.' }
