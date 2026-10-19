@@ -1,149 +1,83 @@
-# A working guide to Individual Guide {#reading-this-book}
+# Welcome to Individual Guide {#reading-this-book}
 
-Individual Guide is a desktop-style workspace for building analytical pipelines in R. A project connects data, transformations, analyses, charts and documents. You configure tasks through forms, inspect their results, and retain the R code behind the workflow. You can begin without writing R and move into scripts when a problem needs more control.
+You can use Individual Guide without knowing R. The app helps you bring in data, clean it, make charts, and share results. You choose settings in forms. The app does the calculations for you.
 
-This book follows that progression. Its first chapters get the application running and build a small project. The middle chapters explain data management and every task in the catalogue. The later chapters cover control flow, logging, reporting, the console, code exports, project review, maintenance and development. The worked-example atlas reconstructs every bundled example from its actual saved task settings.
+Think of a project as a recipe. Your data are the ingredients. Each **task** is one step, such as sorting rows or drawing a chart. A **flow**, also called a pipeline, puts those steps together. You can save the recipe and use it again.
 
-The book is also a reference. Use the table of contents to find a task, the task index to find its example projects, and the parameter appendix when you need the exact saved field names. The HTML edition has a contents search and normal browser text search. The PDF is intended for printing and annotation; the EPUB supports an e-reader's own navigation and search.
+This guide covers **Individual Guide 0.4.0**, with **58 task types** and **22 example projects**. Start with installation and the first project. After that, read the task pages you need. You do not need to read the book from start to finish.
 
-## Edition and feature boundaries
+## Find your starting point
 
-This is the **19 October 2026 release edition**. The R package identifies itself as `IndividualGuide` version **0.4.0**. The project archive format is **0.5.0**. These version numbers describe different things: changing an analysis does not require a new archive format, and a source checkout can contain improvements made after a released installer.
-
-The `IndividualGuide-0.4.0-Setup-Windows-x64.exe` is rebuilt from the 0.4.0 source. It includes the expanded library of **22 example projects**, task/category filters, optional report-log appendices and the latest responsiveness changes. Older 0.3.0 installations may show only three examples; use the new Setup installer to update. Download it from the project's GitHub Releases page.
-
-| Your starting point | What to expect |
+| What you want to do | Where to go |
 | --- | --- |
-| 0.4.0 Setup installer | Self-contained Windows desktop application built from the matching release source |
-| Current source checkout | The full source-edition feature set documented here, including 22 examples and report log appendices |
-| Older 0.2.0 portable executable | An older snapshot with extraction on each launch; some later desktop controls are absent |
-| Generated pipeline `.R` or bundle | An executable analysis script; it requires R, packages and inputs, but not the Individual Guide application |
+| Install the Windows app | [Installation and first launch](#installation) |
+| Try the app with ready-made data | [Your first project](#first-project) |
+| Bring in your own spreadsheet or CSV | [Importing your data](#importing) |
+| Find a task and a matching example | [Task finder](#task-finder) |
+| Make a report with a log | [Reports and files](#reports-and-exports) |
+| Fix a problem | [Troubleshooting](#troubleshooting) |
+| Run the app through R instead | [Optional: install with R](#install-with-r) |
 
-The book calls out source-edition additions where this distinction matters. It does not assume an installer has silently updated itself. Code signing and a public automatic-update service have not been configured for the delivered release.
+## Six words you will see often
 
-## What a project contains
+| Word | Meaning in the app |
+| --- | --- |
+| Project | Your saved work: data, tasks, results, and notes |
+| Table | Data arranged in rows and columns, like a spreadsheet |
+| Task | One step that does a job |
+| Flow | A group of connected tasks |
+| Output | A result from a task, such as a table or chart |
+| Log | A record of what happened when tasks ran |
 
-A project is more than a drawing. It holds named process flows, task definitions and their settings, materialized datasets, retained R objects, report artifacts, layout, preferences, task logs and review information. The `.igpx` file is an archive containing metadata and payloads; complex or larger R values use native R serialization inside that archive. It is not a folder of CSV files with a picture attached.
+For example, a flower project can start with measurements, calculate a mean, draw a chart, and make a report. The arrows show which steps need results from earlier steps.
 
-An ordinary project does not automatically copy every external input file. A portable project export can bundle supported local imports and exported files. A live database connection is neither a frozen copy of a database nor a portable credential. The project chapters explain these differences before you move work between computers.
+![A flow takes data through tasks to results, reports, and a saved log.](assets/workflow.png)
 
-## A vocabulary for the rest of the book
+## How to follow this guide
 
-A **task** is a configured operation. A **table** is a named dataset available to tasks. An **object** is a retained non-table value, such as a model or static plot. An **output** is something a task declares and produces. A **flow** groups tasks into a workflow. A **dependency** means one task requires an output or control decision from another. A **path token** belongs to Branch or Loop and controls whether or how often a downstream task executes.
+Bold words, such as **Run**, name buttons or choices. **File > Save As** means open the File menu, then choose Save As. Text such as `flowers` is a name to type exactly.
 
-The visible task label helps people recognize a step; its internal task ID identifies the saved task. Output names identify data and objects. Renaming a task label and changing an output name are different operations. A label such as “Clean customer ages” can be descriptive, while its output might be the concise name `customers_clean`.
+The Windows app has menus across the top. If you open the app through R in a web browser, use the buttons inside the app for opening and saving projects. Some desktop features, such as restarting the R server from a menu, are only in the Windows app.
 
-**Run** commits results to the project. A supported **Preview** calculates a result without replacing the project's retained result. Neither word means that arbitrary code is prevented from touching the filesystem: a Script or custom database expression can still have external effects. **Save** writes the project archive. **Export** writes a selected result to an external file. **Autosave recovery** writes a recovery snapshot and does not turn an untitled project into your chosen saved file.
-
-## How to learn from the examples
-
-The bundled projects use observations distributed with R, including the `survival` package's lung-cancer dataset. Their scripts sometimes add identifiers, convert types, select complete cases or deliberately duplicate a row to demonstrate cleaning. Those preparations are documented. They are teaching workflows, not claims that a particular statistical model is the best analysis of those data.
-
-Start by opening an example and inspecting its original table. Follow its task inputs and outputs. Read the source task, inspect the custom log events, and open the completed report. Save a separate copy before experimenting. Then change one choice—an input column, filter threshold or model predictor—and run the affected steps again. Compare the changed result with the retained run information rather than assuming a green status proves the new analysis is appropriate.
-
-## What was checked
-
-The task catalogue and parameter appendix are generated from the current R constructors. The example atlas is extracted from the actual bundled `.igpx` archives, including task inputs, settings, output declarations and table dimensions. The documentation build checks that all 58 enabled task types and all 22 example IDs have coverage. Commands and worked calculations have dedicated checks described in the development chapter. The documentation's source map identifies the implementation files used to resolve behavior.
-
-These checks establish that the book describes the inspected application. They do not certify an analysis for a scientific, clinical or commercial decision. Inspect data quality, model assumptions and the meaning of each variable before using results outside a tutorial.
+The HTML book works offline after you download it. Use **Find a chapter or task** in its contents, or press Ctrl+F to search the page. The PDF is useful for printing. EPUB works in an e-reader, and Word lets you add your own notes.
 
 # Installation and first launch {#installation}
 
-There are two main ways to use Individual Guide: install the Windows desktop distribution, or run the R application from an installed package or source checkout. Choose based on what you need to maintain. The desktop package supplies the runtime. The R route gives you direct control over the package library and access to the newest source changes.
+For most Windows users, the Setup installer is the easiest choice. It includes R and the extra software the app needs. **You do not need to install R or RStudio separately.**
 
-## Windows desktop installation
+## Download the public Windows release
 
-The packaged desktop target is **64-bit Windows 10 or 11**. The standalone build includes the Shiny app, a reduced R runtime, its selected package dependencies, Pandoc and an Electron/Chromium browser shell. A normal user does not need a separate R installation, RStudio, Node.js or a web browser to run that package.
+You need a 64-bit Windows 10 or Windows 11 computer. Allow about 1.5 GB for the program, plus space for your projects. You need an internet connection to download Setup. The installed app and its examples can then work offline. Tasks that use an online database still need that connection.
 
-For the inspected release, the installer is named `IndividualGuide-0.4.0-Setup-Windows-x64.exe`. In this repository it is under `build/`. Prefer that Setup build to the older executable carrying the `0.2.0` portable filename. Allow roughly **1.5 GB** for the desktop installation, with additional room for project data, exported results, recovery files and backups. Large analyses can require considerably more working disk space and memory than the program itself.
+1. Open the [public releases page](https://github.com/woodtho/IndividualGuide/releases/latest).
+2. Under **Assets**, download **IndividualGuide-0.4.0-Setup-Windows-x64.exe** for this edition. If a newer release is shown, read its notes before choosing it. Find this book's matching installer on the [0.4.0 release page](https://github.com/woodtho/IndividualGuide/releases/tag/v0.4.0).
+3. Open the downloaded file. You do not need the files called **Source code** to use the desktop app.
+4. Close any running copy of Individual Guide. Double-click Setup and follow its instructions. The usual installation is for your own Windows account.
+5. Open **Individual Guide** from the Start menu or desktop shortcut.
 
-1. Finish or save any work in a currently running copy of the app, then close it.
-2. Run the Setup executable for the release you intend to install.
-3. Complete the per-user installation. Administrator access and a dependency download are not required for the supplied complete installer.
-4. Start **Individual Guide** from the Start menu or its desktop shortcut. The installer does not automatically launch the application.
-5. Wait for the startup stages to finish and the workspace to connect. If a recovery choice appears, deal with it before starting a new project.
+The installer is unsigned. Windows may show an unknown-publisher warning. Check that you downloaded it from **woodtho/IndividualGuide** before deciding whether to continue. If your work or school computer blocks it, ask your support team for help.
 
-Normal launches should use the installed application shortcut. Running Setup again performs installation or updating; it is not the usual way to open the workspace. The application files normally live at:
+## Open the app each day
 
-```text
-%LOCALAPPDATA%\Programs\individual-guide-desktop
-```
+Use the Start menu or desktop shortcut. Setup installs or updates the program; you do not need to run Setup each time.
 
-The installed executable is `IndividualGuide.exe`. Opening another copy of the installed app normally focuses its existing workspace rather than creating a second independent project session. To open a saved project, use File > Open project, a recent-project entry or the installed `.igpx` association in Explorer.
+The first launch may take longer than later launches. Wait while the startup screen shows its progress. Once the workspace appears, start a new project or open an example from Help.
 
-### First-launch speed
+If startup stops with an error, choose **Open startup log**. See [Troubleshooting](#troubleshooting) for the next step. Repeatedly opening more copies usually does not help.
 
-Preparation and first-use costs can make an initial launch feel slower than later ones. The installed distribution extracts its program files during installation and reuses them for later launches. The older portable executable instead extracts a runtime for each launch, so repeated portable startup remains slower. Startup time also depends on disk activity, security scanning, available memory and other work on the machine.
+## Update the app
 
-The startup display and log distinguish preparation, R initialization and connection. A quiet window is not enough evidence that the process has failed. If a stage stops progressing or the app reports failure, use **Open startup log** and follow the troubleshooting chapter. Do not infer a universal startup-time guarantee from the local timing measurements recorded in the repository.
+1. Save your project and close the app.
+2. Visit the [public releases page](https://github.com/woodtho/IndividualGuide/releases/latest).
+3. Download and run the newer Setup installer.
+4. Open the app from its shortcut. Check **Help > About** to see the installed version.
 
-### Updating, uninstalling and user data
+The app does not update itself. Updating keeps saved projects and settings, but keep your own backup of important project files. Uninstalling through Windows removes the program and keeps separately stored user data.
 
-Re-running a newer installer replaces the program snapshot while retaining separately stored user data. The app does not fetch a public update feed in this delivery. Compare the About dialog's build information with the release you were given.
+## Before your first project
 
-Windows Settings > Apps can uninstall the program. Uninstalling preserves its user data. Projects saved in your chosen folders are separate from the installed program. Desktop preferences, recovery information, saved connection settings and diagnostic logs normally live under:
+Create a folder you can find again, such as **Documents > Individual Guide Projects**. Use it for saved projects and files you export. Give each project a clear name, such as `flower-practice.igpx`.
 
-```text
-%APPDATA%\Individual Guide
-```
+The file ending **.igpx** means an Individual Guide project. Open it through **File > Open project**, or double-click it in Windows after installing the app.
 
-Do not delete that profile as a routine repair. It can contain the recovery snapshot you need. Back up important project files independently of the application profile. If you want a separate desktop profile for testing, the desktop executable accepts a data-directory argument:
-
-```powershell
-& "$env:LOCALAPPDATA\Programs\individual-guide-desktop\IndividualGuide.exe" `
-  --data-dir="C:\IG-Test-Profile"
-```
-
-That option changes application state storage, not where all arbitrary R filesystem operations can act. The developer chapter explains the equivalent state-directory environment variable.
-
-## Running from R
-
-The package declares **R 4.1 or newer**. That is a declared minimum, not evidence that every combination of current optional packages has been tested on every historical R release. The inspected Windows development/runtime environment uses a later R version. Use a working R installation compatible with the dependencies you install.
-
-Obtain the source directory, then run the following from that directory in R:
-
-```r
-install.packages("devtools")
-devtools::install_deps(dependencies = TRUE)
-devtools::install()
-IndividualGuide::run_app()
-```
-
-Package installation may need internet access and, for dependencies that must compile, platform build tools. The standalone desktop app avoids that setup for ordinary use by shipping a prepared runtime. Do not confuse installing the R package with rebuilding the desktop installer.
-
-To run the source checkout directly:
-
-```r
-install.packages("pkgload")
-pkgload::load_all()
-IndividualGuide::run_app()
-```
-
-The repository's `app.R` also supports `shiny::runApp()` from the repository root. Calling `run_app()` constructs a Shiny application; printing it in an interactive R session starts it. For a script that must start and keep serving explicitly, use Shiny's runner:
-
-```r
-pkgload::load_all()
-shiny::runApp(IndividualGuide::run_app(), launch.browser = TRUE)
-```
-
-Keep that R process alive while using the browser. Closing its R session stops the server. The standalone shell's Restart R server command is not present in a normal browser launch; restart the R application from the R session instead.
-
-### Which dependencies matter
-
-The package's `DESCRIPTION` is the authoritative dependency list. Core work uses Shiny/bslib, data manipulation and readers, plotting, serialization, process management and reporting support. Optional capabilities include ODBC/DBI drivers, SQLite/DuckDB, survival analysis and the optional `forecast` implementation. A source installation should include the suggested packages needed by the tasks you intend to use. A missing optional package can affect a particular task without preventing every other task from working.
-
-**HTML reporting** can use the application's built-in fallback renderer when Pandoc is unavailable. **Word reporting** requires Pandoc and the reporting packages. For a source installation, make sure R can find Pandoc. The app checks standard locations and `RSTUDIO_PANDOC`; RStudio may already provide a Pandoc path. The bundled desktop runtime supplies its own Pandoc.
-
-ODBC connectivity additionally depends on the database vendor's system driver, network access and permissions. An R package alone does not install every vendor's driver or grant access to a server. A saved database connection in a project cannot substitute for those prerequisites.
-
-## Desktop and normal-browser controls
-
-In the standalone desktop shell, native menus provide the global File, Edit, View, Task, Session and Help actions. The app hides duplicate global Shiny header controls there. In a normal browser, including a launch from R or RStudio, the in-app controls remain visible. Task panels still contain their own settings and task actions in either mode.
-
-If a screenshot shows a File menu that your browser does not have, use the corresponding visible Shiny Save/Open/Settings control. If a screenshot shows header icons that the desktop shell hides, use its native menus. The workflow and `.igpx` format remain the same.
-
-## A first-launch checklist
-
-Open the app, create a fresh project, add one Script task that returns a small table, run it, and save a `.igpx` file in a writable folder. Close and reopen that file, then verify the table is still present. This checks more than seeing the welcome screen: it exercises R execution, result retention, serialization and file access. The next chapter gives the complete exercise.
-
-If the workspace cannot connect, start with diagnostics rather than reinstalling packages at random. If a single Import or model task fails, inspect that task's error and required reader/driver/package. Keep installation problems, project-file problems and analysis problems separate; they have different remedies.
+You are ready to try [your first project](#first-project). The optional R installation steps are near the end of this guide; the Windows app does not need them.

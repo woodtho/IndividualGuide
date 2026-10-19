@@ -1,0 +1,30 @@
+'use strict';
+const test = require('node:test');
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const os = require('node:os');
+const {spawnSync} = require('node:child_process');
+test('publication accepts verified books and rejects altered downloads or stale sources', t => {
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(),'ig-book-site-'));
+  assert.equal(path.dirname(path.resolve(directory)),path.resolve(os.tmpdir()));
+  t.after(()=>fs.rmSync(directory,{recursive:true,force:true}));
+  fs.cpSync(path.join(__dirname,'../docs/handbook'),directory,{recursive:true});
+  const run = () => spawnSync(process.execPath,[path.join(__dirname,'publish-book.cjs'),'--check'],
+    {env:{...process.env,BOOK_SITE_DIR:directory},encoding:'utf8',windowsHide:true});
+  assert.equal(run().status,0);
+  const pdf = path.join(directory,'Individual-Guide-Handbook.pdf');
+  const original = fs.readFileSync(pdf);
+  fs.appendFileSync(pdf,'tampered');
+  let result=run();
+  assert.notEqual(result.status,0);
+  assert.match(result.stderr,/download differs from manifest/);
+  fs.writeFileSync(pdf,original);
+  const manifestFile=path.join(directory,'manifest.json');
+  const manifest=JSON.parse(fs.readFileSync(manifestFile,'utf8'));
+  manifest.inputs['docs/book/chapters/00-reading-this-book.md']='0'.repeat(64);
+  fs.writeFileSync(manifestFile,JSON.stringify(manifest));
+  result=run();
+  assert.notEqual(result.status,0);
+  assert.match(result.stderr,/Published book is stale/);
+});

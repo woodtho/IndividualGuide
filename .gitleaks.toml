@@ -7,3 +7,10 @@ condition = "AND"
 paths = ['^docs/book/data/app-reference\.json$']
 regexTarget = "line"
 regexes = ['"R/mod_task_nonlinear_regression\.R": "[a-f0-9]{32}"']
+
+[[allowlists]]
+description = "Verified SHA256 of the public import-auth source, not an API key"
+condition = "AND"
+paths = ['^docs/handbook/manifest\.json$']
+regexTarget = "line"
+regexes = ['"R/import_auth\.R": "[a-f0-9]{64}"']

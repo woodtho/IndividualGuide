@@ -57,7 +57,7 @@ examples <- lapply(catalog, function(info) {
 })
 paths <- c(list.files("R", full.names = TRUE, pattern = "[.]R$"), "DESCRIPTION",
   "tools/desktop/menus.cjs", "tools/desktop/BUILD-README.md", "tools/example-recipes.R")
-metadata <- list(title = "Individual Guide: The Complete Handbook", edition = "Release edition 0.4.0, 2026-10-19",
+metadata <- list(title = "Individual Guide: A Friendly Guide", edition = "Beginner edition for release 0.4.0, 2026-10-19",
   package_version = as.character(getNamespaceVersion("IndividualGuide")), project_format = get_ig("PROJECT_VERSION"),
   R = R.version.string, task_count = length(registry), registry = registry, examples = examples,
   settings = get_ig("ig_default_settings")(), export_formats = get_ig("IG_EXPORT_FORMATS"),

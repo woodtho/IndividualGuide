@@ -1,126 +1,87 @@
-# Models, comparisons and multivariate analysis {#models}
+# Compare groups and fit models {#models}
 
-The statistical tasks provide reproducible interfaces to specific R calculations. They are not an automatic model-selection service. Choose a method that matches the question, observational unit, outcome type, sampling design and assumptions. The configured predictor selector builds the supported additive formula; use Script when you require interactions, transformations or a different model specification not exposed by the task.
+A model describes a pattern in data. You do not need to write R to use these forms, but you do need to choose a method that fits your question. Start with an example whose question is close to yours.
 
-## Shared analytical settings and outputs
+A **response** is the result you want to explain or predict. **Predictors** are the columns you use to explain it. A **coefficient** describes part of the fitted relationship. A **fitted value** is the model's estimate for a row it used.
 
-Select the input, response and predictors/group as required by the task. Give the primary result a meaningful name. Model tasks expose additional named outputs independently: coefficients or another primary table, model-fit information, fitted values/residuals, optional predictions and the raw model object. PCA/clustering/ANOVA have their own corresponding outputs.
-
-Primary tables and compact fit summaries are commonly enabled by default. Large row-level augment/scores outputs and raw model objects are generally opt-in. If a downstream Script needs the fitted model, enable that object explicitly rather than assuming the displayed coefficient table is the model. If a Report needs fitted values, enable and run that output first.
-
-Prediction-capable tasks take a separate new-data table. It must contain the required predictors with compatible types and factor levels. Enabling the Predictions output without choosing a new-data table is not a valid specification. Confidence intervals for an estimated mean/probability are not automatically individual prediction intervals. Check what the selected task actually returns.
-
-Missing-data handling follows the underlying calculation and current R options unless the task prepares complete cases explicitly. Different models can use different subsets. Inspect the number of observations in the fit, not only the source table's row count. Keep an explicit missing-data audit if this affects interpretation.
+Run the input first. Check missing values and column types before selecting a model. After fitting, read warnings and the number of rows used. Use summaries and charts to check the data as well as the model output.
 
 ## One-Way ANOVA {#task-one_way_anova}
 
-Select a numeric response and a grouping variable. The task treats the group as a factor and fits `aov(response ~ group)`. It returns a tidy ANOVA table, fit information and Tukey HSD comparisons where available, with optional model and new-data predictions.
+Use **One-Way ANOVA** to compare the means of a numeric response across groups.
 
-The PlantGrowth project compares weight across control, treatment 1 and treatment 2. Check that all 30 observations are in the intended groups before interpreting the ANOVA. The omnibus test asks whether the group means are all equal under its model, not which individual pair must differ. Tukey results supply the configured post-hoc comparisons.
+Choose the response and one grouping column, then run the task. Check the group summaries before reading the test table. The p-value helps assess evidence that the group means are not all equal. It does not say which pairs differ or how large those differences are.
 
-Independence, residual behavior and variance assumptions belong to the analysis design. A balanced table does not prove them. Repeated measurements or clustered observations need an appropriate model rather than being treated as unrelated rows. If a group column is a continuous measurement that should have a slope, ANOVA's factor treatment is a different question.
-
-Use the retained model in a Script/console copy for diagnostics when needed. Report the groups, observation counts, comparison method and uncertainty, not only a p-value. Additional covariates or interactions require a different supported model or an explicit Script specification.
+The method assumes a suitable study design and data pattern. Repeated measurements on the same person, for example, need more care than unrelated observations. **Plant growth - compare experimental groups** uses 30 plant weights in three groups. Open it to see the response, group choice, summary, and report together before trying your own comparison.
 
 ## t Test {#task-t_test}
 
-Choose a numeric response. With no group and Paired off, the task runs R's default one-sample `t.test`, whose null mean is **zero**. The UI does not expose a general null-mean or alternative-hypothesis selector; use Script for those custom specifications.
+Use **t Test** to compare a mean with a chosen value or compare two groups, depending on the mode you select.
 
-With a group selected, the task uses the ordinary two-sample formula interface. The grouping must have two usable levels; the default R test is Welch's two-sample test rather than an assumed equal-variance pooled test. In paired mode, choose a second numeric measurement from the same row; the implementation compares the two columns as pairs and requires different columns.
+Choose the input and numeric response. For a two-group test, choose the group column and check that it contains the intended two groups. Leaving the group blank gives a one-sample test against zero. The form does not offer a different comparison value, so use that choice only when zero answers your question.
 
-The ANOVA example creates a two-group table containing control and treatment 2 before its t Test. That is a deliberate comparison, not an instruction to repeatedly test all pairs and select whichever looks most significant.
-
-Check pairing and missingness. Two columns measured on different people do not become paired merely because they occupy the same row count. The output is a tidy test table plus an optional test object. It does not automatically adjust a collection of separately configured t Tests for multiple comparisons.
+Check the paired setting carefully. For paired data, choose the second measurement column; each row must contain a matched pair, such as before and after values from the same person. Two unrelated groups are not paired. Run the task and read the mean difference and interval alongside the p-value. **Plant growth - compare experimental groups** includes a two-group example using a prepared subset.
 
 ## Linear Models {#task-linear_models}
 
-Linear Models fits an additive `lm` using the response and selected predictors. It shares the least-squares engine with Linear Regression. The task's placement in the ANOVA family does not give it a hidden arbitrary-formula editor or automatically introduce interaction terms.
+Use **Linear Models** to explain a numeric response using one or more predictors, including groups.
 
-Use categorical predictors as factors when categories are intended. A numeric dose and a factor dose describe different models. Coefficients, confidence intervals, fit statistics, row-level fitted information, predictions and a model object are available according to enabled outputs.
+Choose the response, then the predictors or model terms the form requests. A group column should be stored as a category when its values name groups. Run the task and check the model terms and number of observations.
 
-The PlantGrowth example fits weight on group. Compare its model terms and fitted group means with the ANOVA representation. A differently formatted result can describe the same underlying least-squares comparison. The reference category and contrasts determine coefficient interpretation, so record them when handing a model to someone else.
-
-If you need a transformed response, create it explicitly or use Script. If you require `response ~ x * group`, splines, offsets or specialized error structures, configure that model in Script rather than typing an operator into a selector that expects a column name. Keep the fitted object and diagnostics when the work will be reviewed.
+Read the coefficient and fit tables together. A coefficient for a group is usually a comparison with a reference group; it is not that group's raw mean in every model. The **Plant growth** example shows a model beside its group comparisons. Keep the model description in your report so a reader knows which predictors you included. A completed fit alone does not show that the model is useful.
 
 ## Linear Regression {#task-linear_regression}
 
-Choose a numeric response and at least one predictor. The task builds an additive least-squares model with `lm`. It returns tidy coefficients with confidence intervals and a compact fit summary; fitted/residual rows, new-data predictions and the raw model can be retained separately.
+Use **Linear Regression** to model a numeric response from selected predictors.
 
-The fuel-economy project fits `mpg ~ wt + hp` on 32 Motor Trend cars. Weight is in thousands of pounds in this dataset. The fitted coefficient on weight is therefore a change per 1,000 pounds at fixed horsepower, not per pound. The model illustrates an observational association, not an intervention effect.
+Choose the response and predictors, then enable the result tables you need. Run the task. Look at the coefficients, overall fit, fitted values, and residuals where offered. A residual is the observed value minus the fitted value.
 
-For predictions, choose a new-data table with the required predictor fields. Confidence bounds are for the model's estimated response where implemented, not a claim that future individual cars must fall within those bounds. Extrapolating outside the observed range adds a modelling assumption that the task cannot validate for you.
-
-Inspect residual patterns, influential observations, rank-deficient terms and the observation count. A green task status and a high R-squared are not substitutes for those checks. Save the model object when a downstream Script or diagnostic workflow needs methods such as `predict()` or residual analysis.
+The **Fuel economy model** example uses 32 cars and predicts fuel economy from weight and horsepower. In that dataset, weight is in thousands of pounds. Check those units before explaining a coefficient. A fit to these observations is not proof that changing one car feature will cause the predicted change. Try removing one predictor in a saved copy and compare both the model and its warnings.
 
 ## Logistic Regression {#task-logistic_regression}
 
-Logistic Regression fits a binomial GLM using the selected response and additive predictors. For a straightforward binary specification, prepare a 0/1 response and document what **1** means. Factor response behavior follows the underlying R binomial model, so do not leave event interpretation implicit.
+Use **Logistic Regression** for a response with two possible outcomes, such as 0 and 1.
 
-Coefficients are on the log-odds scale. They are not probability differences. The result provides tidy coefficients/intervals, fit information and optional fitted values, model and new-data predictions. Prediction helpers return response-scale values for GLMs; optional confidence bounds are formed on the link scale and transformed back.
+Choose the response and predictors. Check which outcome is coded as 1 before fitting. Run the task and inspect the fitted probabilities as well as coefficients. Probabilities range from zero to one. The coefficients use a different scale, so they are not direct percentage-point changes.
 
-The binary car example models manual transmission from mpg. It is intentionally small and educational. Adding predictors can produce separation, unstable estimates or convergence warnings. A successful return with a warning still requires review. The app does not automatically fit a penalized logistic model when ordinary maximum likelihood is unstable.
-
-Check the outcome coding, number of events/non-events, fitted probabilities and residual/fit information. If your response is a count of successes with trial totals, or if you need offsets, weights or interaction terms, use an explicitly appropriate model specification rather than assuming the binary form supplies them.
+**Cars - binary outcome model** treats 1 as manual transmission and 0 as automatic. It is a useful way to check what a probability refers to. Read warnings about convergence or separation. These can mean the model cannot estimate the relationship reliably. A green task status does not make extreme estimates safe to use without checking them.
 
 ## Generalized Linear Models {#task-glm}
 
-Choose a response, additive predictors and one of the exposed families: **gaussian**, **binomial**, **poisson** or **Gamma**. The task passes that family to `glm`, using its usual default link. It exposes the same main broom-style result families as the other regression tasks.
+Use **Generalized Linear Models** when the response needs a model family other than ordinary numeric regression.
 
-Family choice is about the response distribution and mean/variance structure, not a cosmetic alternative to a linear-model label. Poisson expects a count response under its model; Gamma is for suitable positive continuous responses. The interface does not automatically estimate an overdispersion parameter, add an exposure offset or change to a negative-binomial model.
+Choose the response, predictors, and **GLM family**. The family describes the kind of outcome. The form uses that family's standard link, which controls how predictors connect to the expected outcome. You do not choose a separate link here. Use a worked example or an analysis plan to guide the family choice.
 
-The loom-break example fits a Poisson model of break counts using wool and tension. It retains diagnostic information and explicitly notes that overdispersion should be checked before using Poisson inference. Category coding and the study's grouping/design remain part of that review.
-
-For new-data predictions, supply the same predictor schema and inspect whether response-scale output matches your intended quantity. A predicted count is not automatically a rate per exposure unless the model includes that exposure appropriately. More specialized links, offsets and model families can be expressed in Script and retained as model/table outputs.
+**Loom breaks - a count model** uses a Poisson model for 54 counts of loom breaks. Counts are whole numbers of events, not percentages or rates. If exposure time differs between rows, the simple count example may not suit your question. Run the task and read warnings and fit information. A successful fit does not by itself show that the chosen family matches the data.
 
 ## Nonlinear Regression {#task-nonlinear_regression}
 
-Choose a numeric response, a numeric predictor and a curve preset. The task uses the first selected predictor for its one-dimensional curve. Presets are logistic, exponential, power and asymptotic. Logistic/asymptotic use self-starting functions; exponential/power use log-regression starting estimates where applicable.
+Use **Nonlinear Regression** to fit one of the supported curve forms to numeric measurements.
 
-The supported forms are:
+Choose the response, the predictor, and **Curve preset**. The task uses the first selected predictor and prepares its own starting values. Some curves require positive values, so inspect zeros and negative entries before running. Run the task, then compare the curve with the actual points.
 
-| Preset | Form |
-| --- | --- |
-| Logistic | `Asym / (1 + exp((xmid - x) / scal))` |
-| Exponential | `a * exp(b * x)` |
-| Power | `a * x^b` |
-| Asymptotic | `Asym + (R0 - Asym) * exp(-exp(lrc) * x)` |
-
-The power curve requires strictly positive X and Y. At least five complete X/Y pairs are required. A poor range, unsuitable curve or inadequate starting behavior can prevent convergence; selecting another preset is a modelling decision rather than a guaranteed numerical repair.
-
-The Puromycin example filters treated observations and fits a power curve. Its note explains that the preset is a fitting demonstration, not a biochemical mechanism. Outputs include coefficients, fit/fitted information, a fitted-curve plot/static image and an optional `nls` model. The displayed curve is evaluated on a grid over the observed predictor range; it is not a validated extrapolation beyond those data.
+**Puromycin - fit a nonlinear curve** uses positive concentration and reaction-rate values from a prepared subset. It shows a power curve as a teaching example. A different preset changes the model; it is not simply a repair button for a failed fit. If fitting fails, check valid input values and the selected form first. Be cautious about predictions beyond the observed range.
 
 ## Correlations {#task-correlations}
 
-Select at least two numeric variables, or leave the variable choice blank to use eligible numeric columns. The task computes correlations with **pairwise complete observations** and returns a tidy pairs representation plus an optional raw matrix. It is a Pearson correlation calculation, not a UI selector for every possible association measure.
+Use **Correlations** to measure how pairs of numeric columns vary together.
 
-Pairwise completion can use different rows for different pairs. This is useful descriptively but means a matrix is not necessarily based on one common complete-case sample. Constant columns can yield undefined values. Numeric identifiers should not be included merely because they pass a type check.
+Choose the numeric columns and run the task. It calculates Pearson correlations, which describe straight-line relationships. It uses available pairs when values are missing. Compare the table with scatter plots. Values near 1 or -1 show a strong straight-line relationship. Values near zero do not rule out a curved pattern.
 
-The multivariate Iris example selects the four measurements explicitly and excludes the species label. Inspect scatter plots alongside correlations: a coefficient can conceal nonlinear shape, outliers or differences between groups. A high association does not establish direction of causation.
-
-If a downstream method needs a mathematically suitable covariance/correlation matrix, verify that requirement rather than assuming every pairwise-complete matrix satisfies it. Use a Script for alternative methods, pairwise observation counts or a deliberately common analysis subset.
+A correlation does not show that one value causes another. Groups and unusual points can also change the result. **Flowers - multivariate structure** compares the four Iris measurements. Inspect the species groups as well as the combined result. Check the number of usable observations when missing values mean different pairs use different rows.
 
 ## Principal Components {#task-pca}
 
-PCA selects at least two numeric fields, omits incomplete rows across those fields and calls `prcomp(..., scale. = TRUE)`. It returns explained-variance/scree information and loadings, with optional row scores, new-data scores and the fitted `prcomp` object.
+Use **Principal Components** to combine several numeric columns into fewer summary directions. The task is often called PCA.
 
-Scaling is internal to this task. A constant variable can make scaling fail. Blank predictor selection can include every eligible numeric field, including an unwanted row identifier; explicit selection is safer for a documented analysis. Retain an identifier separately if you need to relate scores back to original observations after complete-case omission.
+Choose only the numeric measurements you want to combine. The task scales them before fitting, so you do not need to select a scaling option. Run the task. Check the variance explained, which shows how much of the data's spread each component represents. Loadings show how the original columns contribute.
 
-The Iris multivariate example uses its four measurements. Species is available for interpretation but is not a PCA predictor. Principal components summarize variation under the chosen scaling; they do not automatically identify causal biological dimensions or guarantee a useful predictive model.
-
-For new-data scores, supply the required variables with compatible types. The fitted PCA object's centering/scaling is used rather than independently standardizing each new dataset. Inspect loadings and explained variation together. A component's sign can be arbitrary; interpret relationships and subspaces rather than treating a sign flip as a different scientific finding.
+**Flowers - multivariate structure** uses the four flower measurements and keeps species labels out of that input set. It uses scaling inside PCA. A component is a calculated direction, not a new measurement with a simple original unit. Use its scores to explore patterns, then return to the original columns to explain them.
 
 ## Cluster Analysis {#task-cluster_analysis}
 
-Choose at least two numeric fields, the number of clusters and **k-means** or **hierarchical** clustering. Incomplete rows across selected fields are omitted. K-means uses its configured nonnegative integer seed; hierarchical clustering uses Euclidean distances and a selected linkage: complete, single, average or Ward.D2.
+Use **Cluster Analysis** to group rows with similar numeric measurements.
 
-The task does **not** automatically standardize all inputs. Variables in larger numerical units can dominate distances. Use Standardize Data beforehand when that is appropriate, and document why scaling is or is not desired. PCA and clustering therefore have different default scaling behavior in this app.
+Choose the measurement columns, the method, and the requested number of groups where needed. Set a seed for a repeatable random start. Check whether you need to standardize the inputs first: this task does not automatically put all columns on a common scale.
 
-Outputs include a cluster-summary table, per-row assignments, fit information and an optional model (`kmeans` or `hclust`). Cluster labels are arbitrary identifiers, not ordered quality scores. Changing K, seed, method, scaling or input rows can change assignments.
-
-The Iris example asks for three clusters using measurements, with species held aside. Three clusters need not reproduce the three species perfectly. Evaluate stability and usefulness rather than selecting K solely because you already know the label count. A hierarchical task's cluster summary is not automatically a dendrogram output; use the retained `hclust` model in Script/console for that custom visualization if needed.
-
-## Reviewing a model as part of a project
-
-Retain the input definition and observation count, meaningful model outputs, task configuration and relevant diagnostics. Include uncertainty and assumptions in a report. Use comments/review items to record unresolved analytical questions rather than presenting every generated table as approved.
-
-When comparing runs, distinguish a changed model specification from changed data or package versions. A fresh fit with identical formulas can differ because a file refreshed or factor levels changed. Run records and a saved source table help identify that difference. Generated R carries the configured calculation, but it cannot reconstruct unavailable database contents or unrecorded external preprocessing.
+Run the task and inspect group sizes and assignments. Very small groups or results driven by one large-scale column need attention. **Flowers - multivariate structure** creates three clusters. Three requested clusters do not prove that the data contain three natural groups, and clusters need not match the known species. Compare the result with the source measurements and charts before giving the groups names.

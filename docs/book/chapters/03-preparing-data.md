@@ -1,159 +1,123 @@
-# Preparing and reshaping data {#preparing-data}
+# Clean and reshape your data {#preparing-data}
 
-Data preparation should make a table's meaning clearer. A useful sequence is to inspect the original schema, identify the observational unit, preserve identifiers, handle duplicates/missing values deliberately, derive fields, and check the result. The app gives these operations separate tasks so each decision can be inspected and rerun.
-
-Do not chain tasks only to make every row look complete. A complete-looking table can hide an invalid join, a recoding mistake or imputation that changes the distribution. Keep the raw source and an audit table; give transformed tables new names. The car-cleaning, reshaping and air-quality projects demonstrate this pattern.
+Keep an unchanged input table, then give each cleaned result a new name. This makes it easier to check what changed. After each task, compare row counts, column names, and a few values.
 
 ## Append Table {#task-append_table}
 
-Append stacks two or more tables **row-wise** using `dplyr::bind_rows()`. It is appropriate for combining the same kind of observations from several extracts or groups, not attaching columns by matching a key. Choose the input tables, an output name and, optionally, a source-ID column with readable labels for the contributing tables.
+Use **Append Table** to put rows from one table below rows from another. For example, you could combine January sales with February sales.
 
-Columns are aligned by name. Missing columns in a contributing table are filled with missing values; compatible types are combined according to dplyr's rules. Incompatible column types can fail. A saved `fill` field is retained in the parameter schema, but the execution uses `bind_rows` semantics: do not rely on it as a strict schema-rejection switch.
+Choose the tables and check that matching columns mean the same thing. A column called `amount` should use the same units in both. Choose the output name and run the task. Check the final row count and any blank values caused by columns that were only present in one input.
 
-Check that the resulting row count matches the sum you intended and that identifiers remain meaningful. If two extracts overlap, appending them preserves those overlapping rows; it does not deduplicate them. The Iris reshape example appends setosa and versicolor subsets to produce 100 observations. For monthly extracts, a source-ID column such as `extract_month` makes later investigation much easier.
+Appending adds rows. It does not match customer details across tables; use Query Builder for that. Open **Iris - reshape and compare** to see two species subsets combined into 100 rows.
 
 ## Compare Data {#task-compare_data}
 
-Compare Data uses `waldo::compare()` to produce readable differences between two tables. Select table A and table B, and optionally choose key columns to sort both before comparison. The output is a comparison object, not a reconciled table or a database join.
+Use **Compare Data** to check two tables for differences. It is useful after cleaning, importing a new extract, or reshaping data and changing it back.
 
-Sorting by keys can remove uninteresting row-order differences, but it does not establish record matching when keys are duplicated. Class, column-order, attribute and value differences can remain relevant. Decide which differences matter for your contract before treating an empty comparison as sufficient validation.
+Select the two tables. Review the comparison settings, including any key or row-matching choices offered. Run the task and read the differences rather than only checking whether it finished. A changed row order or column type can matter even when the displayed values look similar.
 
-Use it when replacing a transformation, checking a refreshed extract or round-tripping wide/long data. In the reshape project, compare the original and reconstructed flower measurements. The values may be equivalent while column order or representation differs; inspect the comparison instead of suppressing the evidence.
-
-If you need a row-level exception dataset for downstream reporting, create one with an explicit join or Script. The comparison object is designed for inspection and can be included as printed report content or saved as an R object. It is not a tolerance-based numeric testing framework with a hidden configurable tolerance.
+If the tables have different row counts, first find why. A filter may have removed rows on purpose. The **Iris - reshape and compare** example compares a table before and after a reshape. Use its notes to see which differences are expected.
 
 ## Stack Columns {#task-stack_columns}
 
-Stack Columns converts selected columns from **wide to long** with `tidyr::pivot_longer()`. Choose the input, the columns to stack and names for the new key/value fields. Other columns identify observations and remain available beside the stacked measurements.
+Use **Stack Columns** to turn several measurement columns into rows. This is often called making data long.
 
-For Iris, stack the four measurement columns into `measurement` and `length_cm`. With 150 flowers and four measurements per flower, the result has 600 rows. Add or preserve a flower identifier before pivoting when you will need to reconstruct the original rows. Species alone is not a unique flower identifier.
+Choose the input, the columns to stack, and the columns to keep as identifiers. Set names for the new measurement-name and measurement-value columns. Run the task and check that each original observation can still be identified.
 
-Selected values need compatible types. Pivoting a numeric measurement together with an unrelated character note can fail or create an unsuitable common representation. Keep semantically different fields separate. Missing measurements generally become rows with missing values rather than disappearing without a decision.
-
-Long data is useful for grouped summaries, faceting and comparing distributions across measurement names. Verify both row count and identifiers. A 600-row table is not 600 independent flowers: each original flower contributes multiple measurements, which matters if you later fit a model.
+In **Iris - reshape and compare**, four measurements for each of 150 flowers become 600 rows. A flower identifier shows which rows belong together. Keep that identifier if you may want to turn the table back into columns later. Extra rows are expected here; they do not mean you have more flowers.
 
 ## Split Columns {#task-split_columns}
 
-Split Columns converts **long to wide** with `tidyr::pivot_wider()`. Choose the input, optional ID columns, the field supplying new column names and the field supplying their values. The ID fields define what one output row represents.
+Use **Split Columns** to turn long-form values back into separate columns. This is often called making data wide. Here, Split Columns means reshaping a table; check its settings rather than assuming it splits words at commas.
 
-To reverse the Iris stack, identify rows with `Species` and `flower_id`, take names from `measurement` and values from `length_cm`. The intended result has one row per flower again. If you omit the individual identifier, different flowers can compete for the same species/measurement cell.
+Choose the identifier columns, the column whose values will become column names, and the column containing the measurements. Run it and check the output names and row count.
 
-A single ID/name combination should normally identify one value. Duplicate combinations can create list-valued cells or warnings instead of the numeric scalar columns a later model expects. Aggregate explicitly before widening when multiple observations legitimately belong in one cell; do not assume Split Columns silently chooses a statistically appropriate summary.
-
-Missing combinations can become missing cells. Compare the reconstructed table with the intended original, including classes and column order, before claiming a lossless round trip. Keep a long-form version when it is the natural analytical representation rather than widening solely for appearance.
+Each identifier and new-column pair should describe one value. If several rows claim the same place, inspect those rows before continuing. They may need a summary first. The **Iris - reshape and compare** example shows a full long-to-wide round trip using a flower identifier.
 
 ## Transpose {#task-transpose}
 
-Transpose swaps rows and columns using `t()`. Choose an input and, optionally, an ID column to provide the new column headers. The result is useful for small inspection tables or a matrix-oriented export; it is usually not the correct way to normalize a relational dataset.
+Use **Transpose** to turn rows into columns and columns into rows. It is most useful for a small table that needs a different display shape.
 
-A transposed matrix has one underlying type. Mixing numeric and character fields can coerce the whole result to character. Select only the intended numeric fields first if later calculations require numbers. Also examine the generated names when IDs are missing or duplicated; a label is not automatically a valid unique analytical key.
+Select the input and the columns you want to transpose. Check naming choices, run the task, and inspect the new table. Make sure the new column headings still tell the reader what each value means.
 
-The reshape example deliberately transposes a small numeric subset rather than the full mixed Iris table. It lets you see the orientation change without obscuring the effect of Species or a string identifier on coercion.
-
-Before running a large transpose, consider output width. A table with millions of rows would become an impractically wide result. Stack/Split Columns are generally better for moving between well-defined wide and long observational layouts.
+Start with a few rows. Transposing a large table can create a very wide result that is hard to view or export. Mixing text and numeric values may also change how values are stored. The **Iris - reshape and compare** example deliberately transposes a small numeric subset.
 
 ## Rank {#task-rank}
 
-Rank adds a named ranking field based on one selected column. Available methods are **minimum rank**, **dense rank**, **row number**, **percent rank** and **cumulative distribution**. Optional grouping calculates the ranking within each selected group.
+Use **Rank** to add positions such as first, second, and third based on a column's values.
 
-Minimum rank leaves gaps after ties: values 10, 10, 20 receive ranks 1, 1, 3. Dense rank gives 1, 1, 2. Row number gives each row a position and therefore depends on tie order. Percent rank and cumulative distribution are related but different proportions; do not interchange them merely because both lie on a 0–1 scale in ordinary cases.
+Choose the input and ranking column. Select the order and the method for ties. Ties occur when two rows have equal values. Different methods can give those rows the same rank or leave gaps after them.
 
-The configured column is ranked in its ordinary ascending value order. If “best” means largest, derive an appropriate ranking score or use an explicit expression/task design rather than assuming a Sort task changes the mathematical ranking direction. Sorting affects row presentation; ranking evaluates the column values.
-
-The sampling project adds a dense fuel-economy rank. Check ties and missing values, and name the result field meaningfully, such as `mpg_rank`. Keep the original measure beside it so reviewers can see what the rank represents.
+Run the task with a new output name. Check the highest and lowest values and at least one tie. A rank is a position, not the original measurement. Keep the original column if later work needs its values. The **Cars - rank, scale and sample** example shows ranked fuel economy.
 
 ## Standardize Data {#task-standardize}
 
-Standardize rescales selected numeric columns by **z-score** or **min-max** transformation. Optional group columns apply the transformation within each group. The selected columns are replaced with transformed values in the output table; preserve the raw input under its original name.
+Use **Standardize Data** when numeric columns need a common scale before a later analysis. For example, weight and length can have very different ranges.
 
-Z-scores use centering/scaling behavior from R's `scale()`. Min-max uses the observed range and maps an ordinary nonconstant column to 0–1; a constant column becomes zero under this implementation. Constant/all-missing columns require inspection, and z-score scaling of a constant column can produce nonfinite values. Standardization does not fill missing data or remove outliers automatically.
+Choose the numeric columns and the scaling method. Read the method's label before running it. A common method subtracts the mean and divides by the standard deviation, which measures spread. The result then uses a new scale instead of the original units.
 
-Use the sampling example to inspect the transformation of mpg, weight and horsepower. For a train/test modelling workflow, do not standardize the two partitions independently and call that the same transformation. Learn the transformation on the training data and apply those stored parameters deliberately, usually through a Script when that design is required.
-
-Scaling can materially change clustering or PCA interpretation. Check whether the downstream method already scales internally; applying an additional transformation without a reason can obscure the units and intended analysis.
+Run the task and check the output. Keep the original table for reference. A constant column has no spread, so it needs attention before some scaling methods work. Open **Cars - rank, scale and sample** for an example. Scaling is a choice for a later analysis, not a routine fix for every dataset.
 
 ## Random Sample {#task-random_sample}
 
-Random Sample draws rows by a requested **count** or **proportion**, with optional replacement and seed. Choose one input table and an output name. A fixed nonnegative integer seed makes a given sampling operation reproducible under the same relevant conditions.
+Use **Random Sample** to choose part of a table without simply taking the first rows. It can help you try a flow on less data.
 
-Without replacement, requesting more rows than available follows the underlying row-sampling behavior rather than creating new observations. Proportions and replacement can produce results that differ from an intuitive “exactly this percentage rounded up” expectation; inspect the actual row count. A random sample is not automatically stratified, balanced or suitable for every study design.
+Choose the input, sample size, and any replacement setting. With replacement means the same row may be picked more than once. Set a **seed** if you want to repeat the same random choice with the same data and order.
 
-The sampling project requests ten rows with seed 2026 after ranking and scaling the car data. Rerun it and compare retained rows. Changing data order, seed or input content can change which rows are drawn even when the requested count stays ten.
-
-Use a persistent identifier to track selected records. Row position alone becomes ambiguous after filtering and sorting. If your design requires group-stratified sampling or independent simulation streams, implement that design explicitly rather than inferring it from the presence of a generic seed box.
+Run the task and check the sample count. Do not treat a small practice sample as if it were the full dataset. The **Cars - rank, scale and sample** example picks ten rows with seed 2026. Try a different seed in a saved copy and compare which rows were chosen.
 
 ## Remove Duplicates {#task-remove_dups}
 
-Remove Duplicates uses distinct-row logic. Choose **all columns** for whole-row duplicates, or selected key columns when duplicates mean repeated keys. For a key-based choice, the first retained row supplies the other columns.
+Use **Remove Duplicates** to remove repeated rows based on selected columns.
 
-That “first row wins” rule is a data decision. If the same customer ID has two addresses, removing one does not prove which address is correct. Sort deliberately if the first row is meant to be the latest or preferred record, and keep an exception/audit table when conflicting duplicates need investigation.
+Choose the columns that define a duplicate. All columns means only fully repeated rows match. A smaller key, such as customer number, can also match rows whose other values differ. Check which row will be kept before running.
 
-In the car-cleaning project, the source adds a deliberate duplicate of the first car, giving 33 input rows. Whole-row deduplication restores 32 rows without choosing between conflicting measurements. This is a clear teaching case; a production key conflict may require more work.
-
-Compare counts before/after, inspect which key combinations were repeated and preserve the original source. Deduplicating after a many-to-many join can hide row multiplication rather than repair its cause. Check the join's key relationship first.
+Run the task, then compare the row counts before and after. Inspect a few removed cases if you are unsure. Two rows can look similar and still describe separate events, so do not remove them just to make the table smaller. **Cars - prepare an analysis table** adds one duplicate on purpose: its 33 source rows become 32 after this task.
 
 ## Keep / Drop Columns {#task-keep_drop_cols}
 
-This task selects a set of columns to keep or drop. Choose the input, the action and the column names, then retain the result under a new table name. Keeping a known analysis schema makes dependencies easier to understand and can reduce the amount of data passed to models or reports.
+Use **Keep / Drop Columns** to choose which columns remain in a table.
 
-Dropping an identifier too early can make later joins, comparisons and audit checks difficult. Retain fields that explain the unit of observation and source lineage even if they are not predictors. Conversely, do not pass irrelevant text or sensitive fields to a public report just because they are present in the raw input.
+Select the input, choose Keep or Drop, then select the columns. Keep retains only those selected. Drop removes the selected columns. Give the result a new name and run it.
 
-The car-cleaning project keeps car name, mpg, weight, horsepower and transmission before renaming and deriving fields. Inspect the resulting column order as well as membership; downstream scripts that use position-based indexing can be fragile when order changes.
-
-An empty selection and missing column references are not a useful schema specification. Choose the intended action explicitly and inspect Preview/Results. For dynamically evolving files, a Script may express a deliberate tolerant selection, but that tolerance should be visible rather than assumed in this task.
+Open the result and check its column names. Keep an ID column if later joins or checks need it. Removing a column from this output does not remove it from the unchanged source table. If a later task says a column is missing, check whether this step removed it. The **Cars - prepare an analysis table** example shows a smaller analysis table.
 
 ## Rename Columns {#task-rename_cols}
 
-Rename Columns takes old-to-new pairs. Select each existing field and enter its replacement name. The output preserves values while changing the schema, so downstream configuration must use the new names.
+Use **Rename Columns** to make headings easier to understand.
 
-Prefer names that preserve meaning and units: `weight_1000lb` is clearer than an unexplained `weight` when the source `wt` is measured in thousands of pounds. Avoid duplicate replacement names. Keep original names in a task note when they are needed to relate back to a source specification.
+Choose the input and add each old name with its new name. Use unique names. Short names with letters, numbers, and underscores are easy to use in later formulas. Run the task and check the result's headings.
 
-The car-cleaning project renames `wt` before deriving horsepower per 1,000 pounds. That sequence demonstrates a schema contract: the next task refers to `weight_1000lb`, not the old `wt`. A task label change would not perform this column rename.
-
-Renaming is not type conversion, recoding or unit conversion. Changing `temperature_f` to `temperature_c` without calculating the conversion would mislabel the data. Use Derive Columns for the calculation and name the resulting field accordingly.
+Renaming changes the label, not the values or their units. A weight column does not become kilograms because you call it `weight_kg`. Add a calculation when you need a real conversion. Check later tasks after renaming because their selected columns may need to change too. **Cars - prepare an analysis table** includes a rename you can follow.
 
 ## First / Last N Rows {#task-first_last_n}
 
-Choose first or last and a row count to retain a short subset. This task uses row order, so establish the ordering with Filter and Sort when order has analytical meaning. “First five” is not a random sample or “five best” unless you deliberately made it so.
+Use **First / Last N Rows** to keep a set number of rows from one end of a table.
 
-Use it for a visible spot check, a small export or an ordered tail of a chronological dataset. In the car-cleaning example it produces a five-row inspection table while retaining the complete analysis table separately.
+Choose the input, First or Last, and the number of rows. Run it and check the result. The table's current order decides which rows count as first or last. Sort first if you want, for example, the ten largest sales.
 
-A table imported from a database may not have an inherent stable order. Even if a preview appears sorted today, use an explicit sort before selecting a head/tail subset that must be reproducible. Include a secondary tie-break key when several rows share the primary ordering field.
-
-Do not confuse this retained subset with the result preview's page length. A page-length setting changes how many rows appear on a page, not how many rows a task analyses. First/Last N actually changes the output dataset.
+This task is useful for a quick check or a short display. It is not a random sample. If the first rows all come from one date or group, they may give a poor picture of the whole table. See **Cars - prepare an analysis table** for a small selection.
 
 ## Replace Missing Values {#task-replace_missing}
 
-Select columns, a replacement method and an output name. Methods are a **fixed value**, **mean**, **median** or **mode**. Leaving columns blank selects all columns under the saved configuration, but only type-compatible operations make sense.
+Use **Replace Missing Values** when you have chosen a reason to fill unknown entries.
 
-Mean/median apply to numeric columns and leave unsuitable or entirely unobserved columns unchanged in this implementation. Fixed replacements are converted according to the target class, including numeric, logical, Date and factor handling; an invalid replacement is an error. A factor can gain the replacement as a new level. Mode ties follow the implementation's deterministic sorted-value choice rather than a statistical model of missingness.
+Select the input, the columns, and a replacement method. Depending on the column and method, you may enter a value or choose a calculated value such as a mean. Run it and count how many missing entries remain.
 
-The air-quality example audits missing values first, preserves the raw table, and demonstrates mean imputation on Ozone and Solar.R. This is an illustration, not a default analytical recommendation. Filling values changes distributions and can distort uncertainty and relationships.
-
-Check the missing count afterwards. “The task ran” does not mean every column became complete, particularly an all-missing numeric field. Record which columns were changed and why. For a defensible analysis, choose a missing-data strategy appropriate to the data-generating process and the intended inference.
+Keep the raw data and note the method you chose. Filling a gap does not recover the unknown original value. It can change summaries and models. **Air quality - clean and compare** uses mean replacement to teach the controls. That example is a practice choice, not a recommendation to fill every dataset that way. You can inspect the missing-value audit before changing anything.
 
 ## Recode Values {#task-recode_values}
 
-Choose a source column, a new output-column name and explicit from/to rules. An optional else value handles unmatched entries. A rule whose source is the supported missing-value sentinel can map missing observations. The recoded column is **character**, including when the original column was numeric.
+Use **Recode Values** to replace selected values with new values or labels. For example, you might change 0 and 1 to **Automatic** and **Manual** in a display column.
 
-This character-space behavior avoids pretending that strings such as “Manual” belong in a numeric vector. If a model needs a factor or a numeric 0/1 response, follow with Change Column Types or a deliberate Derive/Script operation. Retain the original field to check the mapping.
+Choose the column and add the old-to-new mappings. Check what should happen to values you did not list. Run the task and count each category to make sure no group was lost or changed by accident.
 
-The car-cleaning project maps transmission code 0 to Automatic and 1 to Manual, then converts the label field to factor. Check a cross-tabulation of original and recoded values. Unexpected categories should be investigated rather than silently folded into an overly broad else label.
-
-Keep rule sources unambiguous. A literal category that looks like a missing sentinel needs special care because the task treats its documented sentinel as missingness. For extensive versioned code lists, a validated lookup join is often easier to maintain than a very long manual rule table.
+Keep the original codes when you may need them for a later model. A model may expect numbers even when a chart is easier to read with words. **Cars - prepare an analysis table** shows labelled transmission values and how they relate to the original codes.
 
 ## Change Column Types {#task-change_types}
 
-Add conversion rows specifying a column and one of numeric, integer, character, logical, factor or Date. Conversions change representation; they do not decide what a category ought to mean. Inspect values and missing counts after converting.
+Use **Change Column Types** when values are stored in the wrong kind of column. Common types are text, number, date, and factor. A factor stores a set of categories.
 
-Numeric conversion of character text can produce missing values for nonnumeric entries. Factor-to-numeric handling uses the represented values rather than blindly treating internal level codes as measurements. Logical conversion uses logical text handling; a business code such as Y/N may require recoding first.
+Select the column and its intended type. For dates, check the date format. Run the task, then inspect both the type and the values. Check for new missing values, which can mean some entries could not be converted.
 
-Date conversion recognizes several common ISO, slash, dash, dotted and compact patterns. Its parser infers a usable format from observed text rather than negotiating every ambiguous date independently. A mixed-format column or ambiguous `03/04/2026` can therefore need an explicit Script/reader format. Validate known dates near month/day boundaries.
-
-The cleaning project converts transmission labels to factor after recoding. That prepares an explanatory category for models and summaries. It does not establish the correct reference level for every intended model; inspect factor levels and model terms when interpretation depends on them.
-
-## Quality checks after preparation
-
-Use Characterize Data to inspect classes, missingness and distinct values. Use Summary Statistics for numerical ranges. Use One-Way Frequencies or Table Analysis to check recodes and categories. Use Compare Data when refactoring a workflow. Log important exclusions or thresholds with a Script so a report can explain what happened.
-
-Finally, check the unit of observation. After stacking columns, repeated measurements from one person are not independent people. After an append, overlapping extracts may contain repeated records. After a join, key multiplicity can multiply contributions. Task success cannot resolve those conceptual questions for you.
+Keep identifiers as text when leading zeros matter. Use numeric types for real measurements and categories for group labels. **Cars - prepare an analysis table** changes a category's type. If a column is absent from a chart or model list, its current type is one of the first things to check.

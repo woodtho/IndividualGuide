@@ -1,223 +1,170 @@
-# Your first complete project {#first-project}
+# Your first project {#first-project}
 
-This exercise builds a small analysis from original observations to a report and audit log. It uses `datasets::iris`, which is distributed with R, so no download or external file is needed. The source-edition Iris example performs the same kind of workflow and can be opened from Help when you want a completed version to compare against.
+Start with an example that already works. You will open flower data, find a chart, check a report, and save your own copy. No typing of R code is needed for this first part.
 
-The goal is to understand what each action commits. You will create a source table, a numeric summary, a species comparison, a chart, a report and external result files. Choose a working folder before beginning, such as `C:\IG-Projects\First-Iris`. Use a folder where you can write files, and keep the same folder available for the export steps.
+## Open the flower example
 
-## Create the source task
+1. Open **Help** in the app and find **Example projects**. In the desktop app, **Help > Application help** opens app help.
+2. Search for **Iris exploration**.
+3. Choose **Open example**. If you already have unsaved work, save it before replacing the current project.
+4. Choose **File > Save As**. Save the project as `flower-practice.igpx` in your projects folder. In a browser, use the app's Save As button and file picker.
 
-Choose a fresh project from the welcome screen, or File > New project in the desktop shell. In a normal browser, use the equivalent in-app action. A new project starts with a process flow. Choose **Add Task**, find **Script** in General and add it.
+Iris is a kind of flower. The example has measurements from **150 flowers** in **three species**, with **50 flowers per species**. Each row is one flower. The four measurement columns use centimetres. `Species` names the flower's group.
 
-Give the task a descriptive label such as “Load original flowers.” In its input/output settings, declare a table output named `flowers`. Enter this code:
+Opening an example gives you a separate working copy. You can change it without changing the example that ships with the app. Save your copy if you want to keep those changes.
+
+## Look around before running anything
+
+The left side lists the project's tasks and data. The **Process Flow** view shows connected steps. Select the source task and read its notes. Open its flower table and look at the column names.
+
+Find **Summary Statistics**, **Summary Tables**, and **Scatter Plot** in the flow. Open each task's Results. The example already contains results, so you can explore before running it again.
+
+For the species summary, the mean petal lengths should be about:
+
+| Species | Mean petal length, in centimetres |
+| --- | ---: |
+| setosa | 1.462 |
+| versicolor | 4.260 |
+| virginica | 5.552 |
+
+You do not need to memorize these values. They give you a way to check that you are viewing the right table and settings.
+
+![The flower example compares sepal length and petal length. Colour shows the species.](assets/iris-chart.png)
+
+## Make one small change
+
+1. Open the **Scatter Plot** task.
+2. Find the Y column setting. Change it from `Petal.Length` to `Petal.Width`.
+3. Update the chart title so it describes petal width.
+4. Click **Run** in the task header. Open Results and check the new chart.
+5. Run the **Report** task again so its chart matches your change.
+6. Save your project.
+
+Changing a setting does not update a saved report by itself. Run the changed task, then the later tasks that use its result. If you want to run everything again, use the flow's play button. Before doing that, check the Export tasks' folders and Overwrite settings.
+
+## Find the report and log
+
+Open **Report**, then open or download the finished document. Check its headings, tables, and chart. In a Report task, **Appearance > Include pipeline log in the report** adds a section called **Pipeline execution log**. Turn it on and run the report again if needed.
+
+Open **Export Log** to see how the example writes its log to a file. Before running this task, choose a destination you can find. Logs can include earlier runs as well as the latest one. Dates and times help you tell them apart.
+
+## Build a small flow yourself
+
+This optional exercise builds the same kinds of results from a new project. It includes one short piece of R code that you can copy exactly. You do not need to understand the code to finish the exercise. Stay with the ready-made examples if you prefer.
+
+Choose **File > New project** and save it as `first-iris.igpx`. Use **Add Task** to find each task below. Task labels help you recognize a step. Output names tell later steps which result to use, so type those names carefully.
+
+### Step 1: load the practice data
+
+Add **Script** from General. In its outputs, add a **table** named `flowers`. Paste this into the Script editor, not the R Console:
 
 ```r
 flowers <- datasets::iris
 log_event(sprintf("Loaded %d flowers", nrow(flowers)), "INFO")
 ```
 
-The Script task runs code in its own execution environment. The declared output tells the app which value to retain. An assignment in the code alone is not a substitute for the output declaration. There is no input table for this first task because it creates its input from a bundled R dataset.
+Click **Run**. Open `flowers` in the project and check for 150 rows and five columns. If it is missing, make sure you added the table output named `flowers`. The name in the output list must match the name in the copied code.
 
-Run the task with its header Run button or its task-specific run action. The project tree should show `flowers`. Open the dataset and check **150 rows** and five columns: four numeric measurements and `Species`. Its species values are `setosa`, `versicolor` and `virginica`, with 50 observations each.
+### Step 2: summarize the measurements
 
-If the task fails, inspect its status message and code before proceeding. Common first mistakes are a mismatch between `flowers` in the code and the declared output name, or placing code in the console instead of the Script task. The console is useful for exploration but does not commit a pipeline output automatically.
+Add **Summary Statistics** from Describe. Select `flowers` as the input. Choose `Sepal.Length`, `Sepal.Width`, `Petal.Length`, and `Petal.Width`. Name the output `measurement_summary`, then run it.
 
-## Add a numeric summary
+Check the mean for `Sepal.Length`. It should be about **5.8433**. A mean is the total divided by the number of values. The app may show fewer decimal places.
 
-Add **Summary Statistics** from Describe. Set the input table to `flowers`, select the four measurement columns and name the result `measurement_summary`. Preview it if that task offers Preview. Then use Run & Save or the task header Run button to retain it.
+### Step 3: compare the three species
 
-You should obtain a row per selected numeric variable, including nonmissing/missing counts, location and spread statistics. A useful reference is the mean of `Sepal.Length`, approximately **5.8433**. The exact number of displayed digits depends on formatting; formatting a number is different from changing the underlying calculation.
+Add **Summary Tables**. Choose these settings:
 
-Notice the connection between the source task's `flowers` output and the summary task. You did not have to draw a line to establish data dependency. The input/output names establish that dependency; the canvas represents it.
+| Setting | Choice |
+| --- | --- |
+| Input table | `flowers` |
+| Row variable | `Species` |
+| Value variable | `Petal.Length` |
+| Statistic | Mean |
+| Output name | `species_summary` |
 
-## Compare species
+Run it and compare the three results with the table earlier in this chapter.
 
-Add **Summary Tables**. Use `flowers` as input, `Species` as the row variable, `Petal.Length` as the value variable and **mean** as the statistic. Name the output `species_summary`.
+### Step 4: draw the chart
 
-The three mean petal lengths should be approximately:
+Add **Scatter Plot**. Select `flowers`, set X to `Sepal.Length`, Y to `Petal.Length`, and the colour or group to `Species`. Set the title to **Iris measurements by species**.
 
-| Species | Mean petal length |
-| --- | ---: |
-| setosa | 1.462 |
-| versicolor | 4.260 |
-| virginica | 5.552 |
+In the output controls, enable a **static image** and name it `iris_scatter_image`. Run the task. A static image is a still chart that you can put in a report or export as PNG.
 
-These are descriptive summaries of the observations in this table. They do not prove why species differ or establish a predictive model. The table is useful for checking both the dataset and your grouping configuration.
+### Step 5: save a table and chart as files
 
-## Make a chart
+Add **Export**. Select `species_summary`, choose CSV, choose your projects folder, and enter `species-summary.csv`. Run the task and check that the file appears in that folder.
 
-Add **Scatter Plot** from Graph. Set input `flowers`, X `Sepal.Length`, Y `Petal.Length` and colour/group `Species`. Use a title such as “Iris measurements by species.” Choose useful output names in the task's output controls.
+Add another Export task for `iris_scatter_image`. Choose PNG, set a filename of `iris-scatter.png`, and use the same folder. Set DPI to 150 for this exercise. DPI controls how many dots are used per inch. Run it and open the image.
 
-Graph tasks distinguish the table of plotting data, the interactive plot and a static image object. Enable a static image output, for example `iris_scatter_image`, if you want to use a PNG Export task later. A static image here is a retained ggplot-style value, not necessarily a PNG file already written to disk.
+If a file already exists, the task may ask you to allow Overwrite. Turn that on only when you want to replace that file. An exported file is separate from your saved project.
 
-Run the task and inspect its Results. Hovering an interactive chart can reveal observations. The static output is better for portable raster export and many report uses. The bundled examples disable retaining interactive widgets where machine-specific font state could make cached widgets less portable; you can enable and regenerate them locally.
+### Step 6: make a report
 
-## Write a results file
+Add **Report**. Under Content, add `measurement_summary`, `species_summary`, and `iris_scatter_image`. Give the items clear headings. Under Appearance, choose HTML and set the title to **First Iris report**.
 
-Add **Export**. Select `species_summary`, choose CSV, select your working folder, and enter a filename such as `species-summary.csv`. Enable Overwrite only if you want reruns to replace that specific file.
+Turn on **Include pipeline log in the report** and leave its minimum level at INFO. Run the task. Open the report and check for the two tables, the chart, and the Pipeline execution log section.
 
-Run the Export task and verify the file exists. Open it in a text editor or spreadsheet application and check the three species rows. Export is a sink: it writes an external file and does not create another transformation table. Saving the project is a separate action.
+### Step 7: save the log
 
-For a chart file, add another Export task, select the static image output and choose PNG. Set dimensions, units and DPI deliberately. Eight inches at 150 DPI is a different raster resolution from eight centimetres at 150 DPI. The graph chapter explains how plot output types determine the available formats.
+Add **Export Log**. Select the preceding tasks, including Report, so it waits for them. Choose CSV and a full destination such as `iris-log.csv` inside your projects folder. Use the folder picker or enter the full path shown for your chosen folder.
 
-## Assemble the report
+Run the flow. Check the log file for **Loaded 150 flowers** and the Report completion entry. The report's own log section is made before the report finishes. The final Export Log can record that later completion.
 
-Add **Report** from Output. In Content, add `measurement_summary`, `species_summary` and the static chart. Give each item a readable heading. In Appearance, choose HTML and provide a title.
+### Step 8: close and reopen your work
 
-In the current source edition, enable **Include pipeline log in the report** and leave minimum severity at INFO for this exercise. This appends retained events recorded before report generation. The report's own completion cannot appear in that pre-generation snapshot; the final log export will capture it.
+Save `first-iris.igpx`, close the project, and open it again. Check that its table, chart, and report are still there. You have made a reusable flow with data, results, a report, and a log.
 
-Generate the report. Open or download it and verify the two tables, chart and log appendix. If you use an older installed snapshot without the appendix option, the result content still works; export a separate task log instead. A Word report is another task setting, but requires Pandoc. HTML has a fallback renderer if Pandoc is unavailable.
+# Find your way around {#workspace}
 
-## Add a final audit export
+The project list, flow diagram, and task panels show the same work in different ways. Use whichever makes the next step easiest to find.
 
-Add **Export Log**. Choose the preceding tasks to include and wait for, select TXT, CSV or JSON, and provide an absolute file path in your working folder. Set Overwrite deliberately. A final audit is often easiest to inspect as CSV, because fields such as task ID, severity, event and elapsed seconds remain separate columns.
+## Open a task or result
 
-Run the full flow using the active flow's play button or Ctrl+Alt+R outside a text editor. The source should run before its consumers. The report should run after the data and chart it uses. Export Log should run after the selected tasks, including the report.
+Select a task in the project list or flow to open its panel. Its settings control what it does. Results show what happened when it last ran. The Log explains messages and errors. Code shows the R instructions behind the task; reading it is optional.
 
-Inspect its file. It should contain the custom “Loaded 150 flowers” event and a report-completion event. It may contain entries from your earlier single-task runs as well. The log is retained history, bounded per task, rather than an automatic one-run-only trace. Use run IDs and timestamps to distinguish executions.
+Closing a task tab hides that panel. It does not delete the task. Use the task's delete action only when you want to remove the step itself.
 
-## Save, reopen and change something
+If the diagram becomes crowded, open **Project tools > Task list**. Search for the step you need and open it from the list. Use **Fit view** to bring the whole flow back into view.
 
-Save the project as `first-iris.igpx`. In the desktop shell, Save As uses a native Windows file dialog. In the browser launch, use the app's file-picker workflow. Reopen the saved file and check that retained tables and the report are available before rerunning.
+## Understand the arrows
 
-Now change the Scatter Plot's Y variable to `Petal.Width`, change its title accordingly, and run it. The old downstream report is no longer a reliable representation of the current chart. Rerun the report and any affected exports. The app's stale/invalidated states make this relationship visible, but they do not update every external document without an execution.
+A later task needs the right input name. For example, a summary that uses `flowers` must wait for the task that creates `flowers`. The app draws the connection from those choices.
 
-Finish by adding a note explaining the change and saving again. You now have an analysis that carries original observations, reproducible configuration, named results, a report and an audit trail. The following chapters explain the choices that become important as this workflow grows.
+Dragging a task to a new place changes the layout. It does not change which tasks run first. To change that, edit its inputs or its branch and loop settings.
 
-## Exercise answers and checks
+## Choose useful names
 
-After the source runs, `nrow(flowers)` is 150 and `table(flowers$Species)` has three counts of 50. The mean-sepal and mean-petal values above can be checked independently in an R console:
+Use a task label that explains the job, such as **Remove repeated customer rows**. Use a short, unique output name, such as `customers_clean`. Avoid giving two outputs the same name.
 
-```r
-mean(datasets::iris$Sepal.Length)
-aggregate(Petal.Length ~ Species, datasets::iris, mean)
-```
+Changing an output name can affect tasks that use it. Check those tasks' inputs and run the flow again after a rename.
 
-If those match but your saved table does not, compare the selected input and grouping fields. If a preview matches but the tree does not, make sure you committed the task with Run rather than stopping at Preview. If an external file does not change, rerun its Export task and check its destination and Overwrite setting. If the project opens but an external source file is missing in another exercise, review normal versus portable project saving.
+# Save, reopen, and share projects {#projects}
 
-# The workspace and its data model {#workspace}
+## Save your project
 
-The workspace gives you three complementary views: a tree for navigation, a flow diagram for relationships and task panels for configuration and results. The permanent Code and R Console tabs support inspection and exploration. None replaces the others.
+Use **File > Save** or Ctrl+S in the desktop app. The first save asks for a name and folder. Use **Save As** to keep a separate copy before a large change.
 
-## Tree, flows and tabs
+In a web browser, use the app's Save controls. Follow its file picker or download prompt and check where the file was saved.
 
-The left sidebar groups data sources and process flows. Expanding a flow reveals datasets and steps, with declared inputs and outputs under tasks. Select a task to open its panel; select a dataset to inspect its values. A project can contain several flows, and one flow can use outputs produced by another. Choose output names that stay unique across the project rather than relying on two flows to hide a naming collision.
+A saved project keeps tasks, settings, available results, notes, and retained task logs. It does not automatically copy every outside file used by your tasks. Keep important input files in a stable folder.
 
-The active flow supplies the visible task list and canvas. Flow actions include run, rename, copy and delete. Copying a flow creates another editable workflow; it is not a way to schedule parallel production runs or isolate writes to identical external filenames. Inspect the copied tasks' output names, dependencies and destinations before execution.
+## Move work to another computer
 
-Each open task has a tab. Closing a task tab closes its panel, not the task definition in the project. Deleting a task removes the task itself and can affect dependent results. The interface distinguishes these actions, and the destructive-action confirmation setting applies to deletion rather than ordinary tab navigation.
+Use the project's files and portability tools to make a **portable project** when you need to bundle supported input files. Check the listed files before exporting. Open the copy on the other computer and check its inputs before running it.
 
-Permanent tabs include Flow, Code and R Console. Switching among panels retains settings. Saved settings can execute even when their task panel has never been opened during the current session. This is why you can load a prepared example and run its flow without visiting every form first.
+Database connections still need access to the database. A Script may refer to a file that the portable export cannot find on its own. If so, include that file separately and update the path. A path is the address of a file or folder on your computer.
 
-## Read the canvas as a dependency diagram
+Reports and files that you already exported are separate copies. Saving the project again does not update those copies. Run the relevant Report or Export task when results change.
 
-Dataset nodes are boxes; task nodes are ellipses. Arrows represent declared relationships. A successful task is indicated with a green state, an error with red and stale results with amber. Hover a node for details such as dataset dimensions, run state or an explanation of staleness.
+## Recover interrupted work
 
-Moving a node changes layout, not analytical order. A task's inputs, outputs and control paths determine what must run first. Use Fit view to bring the graph into view and Re-arrange to tidy it. Manually arranged positions are useful for communicating the workflow, and project saving retains layout information.
+The app keeps recovery information for unsaved work. After a crash or restart, it may offer a recovery copy. Read the prompt, recover the work you need, then save it with a clear filename.
 
-Right-click a task for actions such as notes, Run from here and Run to here. Run from here selects the task and its descendants; Run to here selects its prerequisites and the task. These commands are dependency selections, not “run everything to the left of this shape.” If you create a task later but make it an input producer, it can still execute first.
+Recovery helps after a problem. Keep using Save during normal work. If you need an earlier saved copy, open **Saved versions** from the project tools or File menu. Check the version date before restoring it.
 
-For large graphs, use the tree or **Project tools > Task list**. That list provides searchable, keyboard-operable task opening without requiring you to select a small canvas shape. Reducing graph zoom makes more content visible but does not reduce the dataset's size or calculation cost.
+## Share a project with care
 
-## What a task panel tells you
+A project can contain data, paths, logs, and R code. Share only information you mean to share. Open projects from people or sources you trust, because running tasks can run code and write files.
 
-A common panel header shows the task's identity, status, Run action, Code toggle and delete action. The task label can describe business intent. The task type tells you the operation. The last run time or error indicates the most recent retained execution state, not a statistical assessment of the result.
-
-Most transformation and analysis panels separate Setup from Results. Setup holds input names, columns and options; Results holds tables, plots and previews. Report uses Content and Appearance because its job is to assemble existing outputs. Branch and Loop have their own setup and preview language. Do not expect every task to expose the same footer buttons.
-
-The shared **Logging** section sits with the task. Expand it to inspect/customize event rules and message previews. Leaving it collapsed does not disable log recording; preview work is deferred while hidden. Similarly, switching away from a code view does not change the configured task.
-
-## Finding tasks and inspecting outputs
-
-Add Task opens a searchable catalogue grouped by category. Search for the operation, then select its entry to create a configured task in the active flow. A star adds/removes a task type from favourites; favourites appear near the top and are saved with the project. Favouriting a type does not create another task or change an existing task's parameters.
-
-Opening a dataset from the tree shows its dimensions and a bounded preview, with ad hoc CSV, tab-delimited text, XLSX and RDS download choices. These downloads write the selected retained value, not just the visible ten-row page. They do not add a repeatable Export task to the flow. Use an Export task when the file write must rerun and appear in pipeline execution evidence.
-
-Object previews adapt to the value: a static ggplot can offer PNG, an interactive girafe can offer HTML, and an RDS download preserves the object. The quick static PNG uses the preview action's fixed size of 16 by 10 centimetres at 150 DPI; choose Export for controlled dimensions, units and other formats. For a lazy database result, prefer the supported materialized/Export workflow when a local file is needed rather than assuming every ad hoc reader/writer handles a live connection identically.
-
-Statistical panels can show both a formatted Results view and a Data view, plus Plot/Code where applicable. Formatted p-values, significance stars and rounded estimates are presentation aids. Inspect the retained data/model for the underlying values, and do not interpret a display such as `< .001` as an exactly zero probability. A formatted result is not an independent second analysis.
-
-## Tables, objects and report artifacts
-
-Tables carry rows and columns, including R classes such as factors and dates. A numeric-looking character field is still character until you convert it. A factor carries levels that may affect model coding. A Date is not interchangeable with arbitrary date-looking text. Use Characterize Data and explicit conversion tasks when you need to establish these facts.
-
-Objects carry non-table R values: models, static plots, interactive widgets and comparison results. Model tasks can produce both tables and objects. For example, regression coefficients are a table, while the fitted `lm` value is a model object. Downstream options and export formats depend on the actual value kind.
-
-A Report task produces a document artifact and companion rendering material. Those assets are retained in a saved project so a completed report remains available after reopening. An Export task writes a file to a destination; its file is not a replacement for a named table in the project.
-
-Lazy database tables are another important kind. They describe a query backed by a live connection. Some operations, especially Query Builder, can stay in the database. Other calculations materialize needed values in memory. A preview limit does not imply that the full analytical operation has been limited to that many rows.
-
-## Naming, dependency safety and renaming
-
-Use descriptive, stable output names such as `sales_raw`, `sales_valid`, `sales_monthly` and `sales_model`. Avoid using the same output name for different producers. Keep original inputs separate from cleaned/derived outputs so an error can be traced back to source observations.
-
-Selectors hide a task's own outputs and descendants when those would create a cycle. The store also validates dependency structure. A cycle is a logical problem: task A needs B's result while B needs A's result. Moving shapes or repeatedly pressing Run cannot solve it. Introduce a genuine source or split the calculation into ordered stages.
-
-Changing an output name retires the old retained value. It may also require repairing downstream references. Check the consumer tasks rather than assuming a label edit and a data-name edit are equivalent. Changing a task's descriptive label is usually the right way to improve readability without changing a data contract.
-
-## Keyboard and display behavior
-
-Tab moves through controls, and focused tabs support arrow-key navigation, Home/End and closing task tabs with Delete. Enter or Space activates focused controls where appropriate. App-wide Ctrl+Alt shortcuts are ignored while editing ordinary input fields and code editors, so they do not unexpectedly hijack text entry. Desktop native menu accelerators form a second layer; the shortcut appendix lists both.
-
-Settings provides dark/light appearance and defaults for new graph themes/palettes. Browser/desktop zoom can help with display size. The app has accessible task-list and keyboard workflows, but this book does not claim manual screen-reader certification across every browser and assistive-technology combination. Use the alternative tree/task-list route when a graph interaction is inconvenient.
-
-# Saving, recovery and portable projects {#projects}
-
-A reliable project workflow distinguishes a saved project file, its automatic recovery snapshot, previous saved versions and external files. They protect different kinds of work and are not interchangeable backups.
-
-## Explicit saving
-
-Save writes the current project to its chosen `.igpx` path. Save As chooses another path. Settings in open task panels are synchronized before save, so you do not need to run every task just to preserve a configuration edit. A task can be saved in an unrun or invalidated state.
-
-The archive includes flows, task settings and statuses, materialized tables, supported R objects, report artifacts, layout, favourites, project settings, collaboration records, retained task logs and run records. Data classes are preserved through JSON-compatible or native R payloads. Treat `.igpx` as an application project, not a text interchange format for another analytical tool.
-
-The loader also accepts legacy `.igp` and `.rds` project snapshots through a compatibility path. These are project snapshots, not a promise that an arbitrary RDS data file is a complete project. Open a trusted legacy file, inspect restored flows/settings/results and Save As a new `.igpx` rather than assuming its old filename describes the current archive format.
-
-The serializer stages a replacement and uses verified/atomic replacement logic rather than deliberately overwriting a working archive piecemeal. An explicit save can preserve the previous file as a saved version first. If writing fails, the app should report the failure; do not interpret dismissing a dialog as evidence that a file exists. Verify the destination when storage is unreliable or permissions have changed.
-
-The desktop title and Save menu indicate unsaved changes. A browser launch also warns on closing when relevant. Save/Discard/Cancel protections apply when replacing current work with another project or example. A failed or cancelled save leaves the workspace available. Read the choice literally: Discard means the current in-memory changes will not be kept in the project you are leaving.
-
-## Normal projects and external dependencies
-
-An ordinary saved project can retain computed data even if its original import file is elsewhere. That does not make the original file portable. Reopening a saved result and rerunning its Import task are separate operations. The former may work from the retained payload; the latter needs the configured source.
-
-Relative local paths are resolved in relation to the project where supported by the serializer/loader. Absolute paths identify a specific filesystem location. Neither convention guarantees another computer has the file. A path under a personal Downloads folder is particularly easy to lose or change.
-
-Use **Project tools > Project files and portability** to inspect local imports and missing files. Relinking selects an existing replacement file, with a matching reader/file extension. If the format changes, configure the Import task's reader rather than forcing a CSV reader to consume an Excel workbook. After relinking, rerun the import and check the resulting schema before rerunning its consumers.
-
-Live database connections must be re-established after loading. Passwords entered through the supported session-password fields are not saved in the project. The database server, account permissions and vendor drivers remain external requirements. A custom R connection script can contain arbitrary text, so do not hard-code secrets into that script and assume a password-field protection will remove them.
-
-## Portable project export
-
-Use the portable project download in Project tools when you need a transferable archive. It bundles supported local import files and retained exports, as well as the ordinary saved project content. This is a different product from the portable Windows application executable.
-
-Before handing a portable project to someone else, inspect the files it includes. Bundling makes data easier to share, which also means the recipient receives those data. It does not package every file mentioned inside arbitrary Script code, every installed package, external database contents or vendor drivers. Scripts that read extra paths still need those paths or a deliberate packaging change.
-
-On restoration, bundled imports are copied to owned project assets and exports are restored into writable output locations. Existing destination files are not indiscriminately overwritten by opening an older snapshot. Inspect an Export task's resolved destination before rerunning it, especially when moving work to a different computer.
-
-Opening a bundled example is similarly protective: each opening creates a fresh writable working folder, copies its output guide/files, rebases exports and prepares an editable project. Use Save As for a project you want to keep. Do not rely on the example's original installed location as a working export folder.
-
-## Autosave recovery
-
-Recovery is a periodic snapshot of dirty work. It does not rename your project, clear its dirty marker or replace the meaning of an explicit Save. Recovery can still consume time when substantial data must be serialized and written. A lower-cost compression strategy and reuse of stored layout reduce unnecessary work, but large snapshots are not instant.
-
-When startup offers recovery, choose whether to restore or discard it before opening unrelated work. Restoring gives you a working recovery state to inspect and save. Discard only when you are sure the saved project or another copy is the version you want. If the R server has crashed, do not start deleting profile files before checking the offered snapshot and startup log.
-
-Recovery cannot undo an external side effect. If a Script deleted a file or an Export replaced a CSV before the crash, restoring `.igpx` state does not reconstruct that external file automatically. Keep independent backups of original input data and important deliverables.
-
-## Saved versions
-
-By default, explicit saves retain **20 previous saved versions**. Settings allows a whole number from **0 to 100**. These versions live in the app's backup storage, keyed to the project path. Save As creates another project identity/path rather than moving every previous backup history into a single universal timeline.
-
-Open **Project tools > Saved versions** to choose a retained version. Restoring opens it as an **unsaved working copy** associated with the project; Save commits that state back to the chosen project. If the current project is dirty, deal with its Save/Discard/Cancel protection first. Inspect the restored results before saving over the current version.
-
-These application backups complement a separate file backup strategy. They share the machine/profile's storage risks. Uninstalling the program preserves user data, but deleting the profile or losing the disk can remove the versions as well.
-
-## Concurrency, review and project state
-
-Finish a running flow before switching/relinking project files. Read-only review mode blocks mutation/execution paths that would change the reviewed project. It is a workflow safeguard, not encryption or a filesystem permission boundary. Someone with the archive and R can still inspect its serialized data.
-
-Comments, review items and change history are saved with the project. They are useful context for a handoff: why a variable was recoded, which model needs review, or which output a reviewer questioned. They are not a cloud collaboration service. Coordinate who is editing a shared project file and keep separate copies when making competing changes.
-
-## A dependable handoff
-
-Save your working project. Validate and rerun the intended workflow. Check that external outputs are present and contain the expected results. Export a portable project if local files must travel. Include a completed report, an appropriate log and, when reproducibility matters, the run manifest and generated R bundle. Reopen the delivered copy in a fresh session and verify its inputs/outputs before considering the handoff finished.
+Before sending a project, save it, check its report, and try opening your saved copy. If the recipient only needs the results, send a report or CSV instead of the full project.

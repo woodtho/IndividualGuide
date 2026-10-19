@@ -63,7 +63,7 @@ main <- function() {
   page$Emulation$setEmulatedMedia(media = "print")
   pdf <- page$Page$printToPDF(printBackground = TRUE, preferCSSPageSize = TRUE,
     displayHeaderFooter = TRUE,
-    headerTemplate = '<div style="font-family:Arial;font-size:8px;width:100%;text-align:center;color:#65748b">Individual Guide · Complete Handbook · Source edition</div>',
+    headerTemplate = '<div style="font-family:Arial;font-size:8px;width:100%;text-align:center;color:#65748b">Individual Guide · A Friendly Guide · Release 0.4.0</div>',
     footerTemplate = '<div style="font-family:Arial;font-size:8px;width:100%;text-align:center;color:#65748b"><span class="pageNumber"></span> / <span class="totalPages"></span></div>',
     generateTaggedPDF = TRUE, generateDocumentOutline = TRUE)
   pdf_path <- file.path(output, "Individual-Guide-Handbook.pdf")
@@ -78,7 +78,7 @@ main <- function() {
   checks$pdf$sha256 <- digest::digest(file = pdf_path, algo = "sha256")
   checks$pdf$outline <- pdftools::pdf_toc(pdf_path)
   stopifnot(length(checks$pdf$outline) > 0L)
-  stopifnot(info$pages >= 100L, all(nchar(trimws(texts)) > 80L))
+  stopifnot(info$pages >= 20L, all(nchar(trimws(texts)) > 80L))
   selected <- unique(as.integer(c(1, 3, round(info$pages / 3), round(info$pages * 2/3), info$pages)))
   images <- pdftools::pdf_convert(pdf_path, format = "png", pages = selected, dpi = 80,
     filenames = file.path(output, paste0("pdf-page-", selected, ".png")), verbose = FALSE)

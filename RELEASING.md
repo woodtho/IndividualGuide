@@ -1,7 +1,9 @@
 # Releases
 
 The public repository is https://github.com/woodtho/IndividualGuide.
-Downloads live on its Releases page, rather than in Git history.
+Application downloads live on its Releases page. The handbook editions are
+committed under `docs/handbook` and published at
+https://woodtho.github.io/IndividualGuide/ by the Publish handbook workflow.
 
 ## Release a version
 
@@ -32,6 +34,11 @@ Rscript --vanilla tools/verify-release.R build/release v0.4.0
 ```
 
 Each fresh runtime build uses a new directory under `build/staging`; previous staging folders are preserved. `-SkipRuntime -RuntimeDirectory <path>` reuses an existing runtime only when its installed app, all bundled examples/assets, versions and metadata pass current-source verification. It does not update stale installed R code.
+
+Desktop icons are regenerated from `tools/desktop/assets/icon.svg` using the
+pinned CPU-only resvg renderer. No Electron window or graphics compositor is
+needed for icon generation on a headless build runner. Commit the regenerated
+PNG/ICO assets when changing the SVG so a clean build remains clean.
 
 Do not run `test-clean-machine.ps1` in your normal account. Installation, file-association and uninstall checks require Windows Sandbox or an isolated CI account. Unpacked acceptance uses separate test profiles and does not replace your installed application.
 

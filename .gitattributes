@@ -19,4 +19,8 @@ NAMESPACE text eol=lf
 renv.lock text eol=lf
 *.png binary
 *.ico binary
+*.pdf binary
+*.epub binary
+*.docx binary
+docs/handbook/** linguist-generated=true
 *.woff2 binary

@@ -1,82 +1,60 @@
-# Delivering reports and files {#reports-and-exports}
+# Share reports and files {#reports-and-exports}
 
-A finished analytical result is often a package: a saved project for editing, a report for readers, data/figure exports for other tools, logs for execution evidence and generated code for repeat runs. Choose each artifact deliberately. A single screenshot cannot serve all those purposes.
+Choose what your reader needs. Send a report for reading, a CSV for working with data, or a project for editing the flow. You can send more than one when each has a clear purpose.
 
-## Report reference {#task-report}
+## Report {#task-report}
 
-Report assembles selected tables and objects into **HTML** or **Word**. In Content, add outputs from the available list, reorder items and set each heading, note and render style. The same output can appear more than once with different presentation. In Appearance, set title, subtitle, author, format and the source-edition log-appendix options.
+Use **Report** to bring tables, charts, and notes into an HTML or Word document.
 
-Selected items establish data dependencies, so producers should run before the report. Uncomputed items are marked in the panel and skipped with warnings if no current value is available. A report that generated successfully can therefore still be missing a requested section. Inspect warnings and the document itself.
+1. Add Report from Output.
+2. Under **Content**, select the results to include. Put them in a useful order.
+3. Add clear headings and short notes. Explain the data source, units, and important choices.
+4. Under **Appearance**, choose HTML or Word and enter the report title.
+5. Turn on **Include pipeline log in the report** if you want an execution-log section.
+6. Run the task, then open or download the report.
 
-The output is a retained report artifact with rendering companions, not a general-purpose editable word processor. Download saves the rendered HTML/DOCX. Saving the project preserves the retained report assets so the document can be reopened later. If a source table or plot changes, regenerate the report; opening an old artifact is not an automatic refresh.
+Check the document itself before sharing it. A missing result can lead to a warning and an incomplete section. Run its source task, then regenerate the report. **Iris exploration** shows tables and a chart together. **Cars - a report with an execution audit** focuses on logging.
 
-Use the Iris example for a mixed table/figure report and **Cars - a report with an execution audit** for logging. The appendix and minimum severity are included in release 0.4.0.
+## Choose HTML or Word
 
-## Content render styles
+HTML opens in a web browser. It is a good first choice and can include interactive tables where supported. Download it and check it outside the running app.
 
-| Render style | Intended use |
-| --- | --- |
-| Auto | Dispatch on the actual runtime value class |
-| Table/kable | Static tabular rendering for data frames |
-| Interactive table/datatable | Searchable browser table for HTML |
-| Figure | A retained static plot/grob or supported widget |
-| Print | A text/monospace representation of an object |
+Word produces a .docx file that you can edit in a compatible word processor. Use static charts and tables; a Word page cannot keep browser hover controls. If your chart is missing, enable its static image output, run the chart, and select that output in the report.
 
-Auto treats data frames as tables, static ggplots/grobs as figures, widgets as interactive HTML where supported and other objects as printed values. The actual value matters more than an old saved kind label. If an upstream Script changes what a name refers to, inspect the report's result rather than assuming the old presentation is still appropriate.
+The Windows Setup includes the normal report tools. An R-only installation needs extra reporting packages, and Word also needs Pandoc. See [Optional: install with R](#install-with-r) if that is how you run the app.
 
-Word cannot reproduce browser interaction. Interactive table/widget selections receive an explanatory treatment rather than a false claim that their behavior survived in DOCX. Select static figures/tables for a document that must work consistently across HTML and Word. A model object printed into a report is also different from a curated coefficient/fit table.
+## Pick a content style
 
-Report headings and notes should explain analysis context: dataset/subset, units, missing-data handling and model specification. Do not use a polished title to imply a broader population, time period or causal interpretation than the underlying data support.
+Start with **Auto**. It chooses a display based on the actual result. Use a table style for a table and a figure style for a static chart. Print style shows an object's text when that is what you need.
 
-## Rendering prerequisites and portability
+Give a reader enough context to understand a result. For example: **Mean petal length by species, 150 flowers, measurements in centimetres** is more useful than **Output 2**. If you change the data or chart, run Report again; a previously saved document will not update on its own.
 
-When Pandoc/reporting support is available, the task writes companion R Markdown/data and renders with the selected format. Word requires Pandoc. HTML can fall back to a built-in renderer, which embeds static figures and local widget dependencies where supported to keep downloaded files portable.
+## Export {#task-export}
 
-Fallback HTML and Pandoc HTML need not be visually identical. Both should carry the intended content, but pagination, table presentation and styling can differ. A fallback warning explains which path produced the file. If exact publication formatting matters, select and verify a controlled rendering environment.
+Use **Export** to write a table, chart, or supported object to an outside file.
 
-After downloading, open the document outside the running app. Check that figures load with no dependency on a temporary localhost URL, that large tables remain usable, and that headings/units are complete. For Word, inspect the DOCX in your intended reader. Neither the app's preview nor a successful file write guarantees the final reader will show an acceptable page layout.
+Choose the source result first. Then select a compatible format, a destination folder, and a filename. For tables, check any selected-column settings. For images, check dimensions and resolution. Run the task and open the file from the chosen folder.
 
-## Report logging boundary
+Start with CSV for data and PNG for a still chart. The source must be the right kind of result: exporting chart data as CSV is different from exporting the chart's static image as PNG.
 
-The appendix is headed **Pipeline execution log**. It captures other tasks' retained events before generation. It may contain previous runs and excludes the report's own completion. The minimum level affects the appendix, not what all tasks originally recorded. A WARN-only appendix can be empty in an otherwise healthy run; that is a filter result, not proof that logging was broken.
+Check Overwrite before rerunning. Append is available for CSV and TSV when supported; it adds rows to an existing file. It is not a general way to add a sheet to Excel. An Export task writes a file and does not create a new table for later tasks. The original result remains the source for those tasks.
 
-For a report that documents its own creation, run Export Log afterwards and deliver that file alongside the document. If you need a tightly scoped one-run audit, inspect timestamps/run IDs and design your logging/retention procedure accordingly rather than describing an accumulated project log as an exclusive one-run trace.
+## Choose an export format
 
-## Export reference {#task-export}
-
-Export writes a selected table, object or plot to disk. Choose the source output, compatible format, destination folder and filename. Table exports can select columns; static image exports expose dimensions, units, DPI/background/transparent options where relevant. Configure Overwrite or supported Append explicitly.
-
-The task validates the actual value kind and format. It writes through a temporary replacement so a failed serialization should not deliberately leave a half-written target as the successful result. It is still an external side effect: restoring a project does not rewind the contents of an overwritten external file.
-
-The destination folder must exist and be writable. Append is supported only for CSV/TSV; it is not a hidden Excel-sheet append or schema reconciliation feature. A loop exporting to one filename with overwrite can leave only the last file. Use iteration placeholders in destinations when every iteration needs its own artifact.
-
-Export creates no new named analytical table. Keep its producer's table for downstream work. Use the task's resolved output path and file information to verify what was written, rather than looking in a remembered Downloads folder that was never the chosen destination.
-
-## Table export formats
-
-| Format | Suitable use | Important limitation/choice |
+| What you need | A useful choice | What to check |
 | --- | --- | --- |
-| CSV/TSV | Broad tabular interchange and text inspection | Types/labels/leading zeroes can be interpreted differently by another reader; Append only applies here |
-| Parquet/Feather | Typed columnar exchange through Arrow-capable tools | Requires compatible readers; not every arbitrary R attribute is an interchange contract |
-| XLSX | Spreadsheet delivery | Check sheet/readback behavior and spreadsheet display/type interpretation |
-| JSON | Structured exchange | Decide how the receiving tool interprets dates, missingness and row records |
-| RDS | One R value with R structure/classes | Needs R and relevant class/method support |
-| RData | Named R value(s) for R workflows | Object names and classes matter on loading |
+| Data for many other apps | CSV or TSV | Dates, text IDs, and missing values after opening |
+| A spreadsheet | XLSX | Column types and the receiving spreadsheet's limits |
+| A still chart | PNG | Readable labels, dimensions, and resolution |
+| A chart that can scale | PDF or SVG, when offered | That the receiving app can open it |
+| Typed data for compatible tools | Parquet or Feather | Support in the receiving tool |
+| Structured data for a program | JSON | The format expected by that program |
+| An R result for another R user | RDS or RData | The recipient's R and package support |
 
-For machine-to-machine exchange, choose the schema and receiving reader together. A CSV that looks correct in a text editor can be reinterpreted by a spreadsheet application; the app cannot force every external tool to preserve an identifier's leading zeroes.
+You do not need to learn every format. Choose the one your reader or next tool can use. If leading zeros disappear in a spreadsheet, import the ID column as text in that spreadsheet.
 
-## Plot and object export formats
+## Check a finished delivery
 
-Static ggplot-style values export to PNG, JPEG, TIFF, SVG or PDF. Raster files need appropriate dimensions and DPI. SVG/PDF are vector-oriented where the plot components support it, useful for scaling in documents. Background and transparency need to suit the final page/background.
+Save the project. Open the exported report and data files outside the app. Check titles, units, row counts, charts, and the log's dates. Make sure you are sending the latest files from the folder you actually chose.
 
-Interactive plot values export to HTML or SVG in the supported implementation. Choose the static image output for PNG/JPEG/TIFF/PDF. Renaming an interactive HTML file to `.png` does not render it to pixels. HTML can retain interaction, while SVG is a static vector representation of the available plot content.
-
-General R objects export as RDS or RData. A fitted model is not a CSV table just because its coefficient summary is tabular. Export the coefficient/fit table when another tool needs readable rows, and the model object when an R workflow needs its methods and fitted structure.
-
-## Naming and overwrite discipline
-
-Use filenames that identify the analysis and purpose, such as `iris-species-summary.csv`, `iris-petal-scatter.png` and `iris-report.html`. Include a period/run identifier when you need to retain several deliveries. Avoid one generic `output.csv` used by unrelated tasks in the same folder.
-
-Overwrite is a deliberate reproducible-output policy when a flow owns a destination. It is a poor default for a folder containing hand-edited deliverables that should be preserved. Append can duplicate prior rows on reruns, so design idempotence explicitly: rerunning the same pipeline should not accidentally add the same extract twice.
-
-Before a handoff, inspect the exported file's content and compare a count or known value with the retained result. Save the project after the intended run so task configuration, logs and run records describe the delivered files. Use portable project export to carry supported inputs/results when the recipient needs to reproduce the analysis, and the generated-code chapter for execution outside the app.
+If you need a record that the report finished, send a final Export Log made after Report. Its events are later than the snapshot inside the report.

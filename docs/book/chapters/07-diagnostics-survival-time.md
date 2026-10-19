@@ -1,86 +1,57 @@
-# Distribution diagnostics, process charts and time {#diagnostics-and-time}
+# Check patterns and work with time {#diagnostics-and-time}
 
-These tasks expose specific diagnostic and forecasting calculations. Their category names are guides to use, not claims that the application implements every method in a discipline. For example, Life Tables is Kaplan–Meier estimation in this app, and the forecasting task is a basic univariate ARIMA workflow rather than an all-purpose time-series workbench.
+These tasks answer more specific questions. Read the matching example first, and keep the meaning and order of your data clear.
 
 ## CDF Plots {#task-cdf_plots}
 
-Select a numeric response and optional grouping variable. The task draws an empirical cumulative distribution and returns quantiles at five-percentage-point steps from 0 to 100 percent. Retain the table and desired static/interactive output.
+Use **CDF Plots** to see what share of observations is at or below a value. CDF stands for cumulative distribution function.
 
-A CDF answers what fraction of observed values are at or below a threshold. It is useful when percentiles or group distribution comparisons are more informative than a bin-dependent histogram. Grouped curves still reflect their own observed samples; matching a percentile does not mean sample sizes or uncertainties are equal.
+Choose a numeric measurement and run the task. Pick a value on the horizontal axis and read the share on the vertical axis. For example, a share of 0.75 means about 75% of the observations are at or below that value.
 
-Missing values are handled by the calculation, while nonfinite values and unsuitable types require correction. A flat stretch means no observed values in that range, not evidence that future values cannot occur there. The curve is empirical and does not fit a parametric tail model.
-
-The Nile diagnostic project combines CDF, probability plot and control chart. Compare what each reveals: distribution position, shape relative to normality and behavior in observation order. They are complementary perspectives rather than three independent approvals of a process.
+This view can help you compare thresholds without choosing histogram bins. Check the units and missing-value count. It describes the data you supplied, not a guarantee about future measurements. **Nile flow - distribution and stability** includes this plot alongside a probability plot and control chart, so you can compare different views of the same 100 annual observations.
 
 ## Probability Plots {#task-probability_plots}
 
-Choose one numeric variable. The task draws a normal Q–Q plot with a reference line through the sample quartiles, and returns a table containing count, mean, standard deviation, skewness, excess kurtosis and Shapiro–Wilk information where available.
+Use **Probability Plots** to compare the pattern of a numeric column with a reference distribution, such as a normal distribution.
 
-At least three nonmissing observations are required. The Shapiro test is attempted for the supported sample-size range, 3–5,000; beyond it the related fields can be missing rather than a fabricated p-value. Constant or otherwise unsuitable samples can also make a formal statistic unavailable. Inspect the plot and result fields together.
+Choose the measurement and available reference settings, then run the task. Points that follow the reference line suggest a similar pattern. Curves and distant points suggest differences, especially in the tails where extreme values lie.
 
-The reference line is not an estimated regression model for the original data. Departures in the tails, curvature or outlying observations help describe shape. A small p-value and a large sample are not a complete judgement of a model's practical adequacy, and raw-variable normality is not the same as residual assumptions.
-
-Use the retained normality table in a report with a heading that identifies the variable and analysis subset. If you use transformed values, say so explicitly. Do not silently replace the original observations simply to make a diagnostic line look straighter.
+The plot is a check, not a pass-or-fail certificate for every later analysis. Read it with a histogram and the study context. Do not remove observations just to make the points straighter. **Nile flow - distribution and stability** gives you a worked normal probability plot. Use it to learn how the line and points relate before interpreting your own data.
 
 ## Control Charts {#task-control_charts}
 
-Choose a numeric measurement and, optionally, a subgroup field. With no subgroup, the task creates an **Individuals** chart using sigma estimated from average moving range divided by 1.128. It requires at least three nonmissing values. Row order matters because moving ranges and run rules depend on adjacency.
+Use **Control Charts** to inspect measurements in their recorded order and flag unusual patterns.
 
-With a subgroup, it creates an Xbar-style chart. Balanced groups of size 2–10 use A2 × average-range limits. Other group sizes/unequal sizes use the implementation's fallback, three standard deviations of subgroup means. The result identifies the method; do not describe that fallback as the same calculation as a balanced Xbar-R chart.
+Choose the measurement and check the row order. Time order matters here. Review the selected chart and rule settings, then run the task. Inspect any flagged points or runs.
 
-Optional run rules extend simple limit breaches:
-
-| Rule | Trigger |
-| --- | --- |
-| 1 | A point beyond three sigma |
-| 2 | Two of three consecutive points beyond two sigma on the same side |
-| 3 | Four of five beyond one sigma on the same side |
-| 4 | Eight consecutive points on one side of the centre |
-
-Pattern rules flag the point completing the pattern. Outputs include points/limits and rule flags, plot/static image and an optional summary. Limits are estimated from the supplied observations; they are not externally specified engineering tolerances or Cp/Cpk calculations.
-
-The Nile series illustrates historical stability diagnostics, not a controlled manufacturing process. Time dependence, changing regimes, subgroup design and distributional context affect interpretation. Sort the input chronologically and preserve the original sequence before using order-sensitive diagnostics.
+The app estimates limits from the data. Those limits are different from an outside target or an allowed tolerance set by a customer. A point inside a limit is not proof that it meets a product requirement. **Nile flow - distribution and stability** uses an individuals chart for practice. River observations are a teaching dataset, not a controlled factory process. Read the example's notes before borrowing its settings for another purpose.
 
 ## ARIMA / Basic Forecasting {#task-arima_forecast}
 
-Choose a numeric series-value field, keep rows in their intended time order and select a positive integer horizon. The task requires at least eight observations and rejects missing series values rather than dropping them and silently changing time spacing.
+Use **ARIMA / Basic Forecasting** to estimate future values from an ordered numeric series.
 
-When `forecast` is installed, the engine uses `forecast::auto.arima`; otherwise it searches a small AIC-selected grid with `stats::arima`. The selected engine/order is available in the optional summary. Package availability can therefore change model selection. Record the engine and environment if results need to be reproduced elsewhere.
+Choose the value column and set the forecast horizon, the number of future steps. Make sure each step means the same interval, such as one month. Sort and check the series before fitting. Run the task and inspect the fitted model summary, forecasts, and intervals.
 
-The input is treated as an ordered numeric series, not an automatically inferred irregular-date forecasting problem. Do not assume a separate date column supplies seasonal frequency or missing-period information. The AirPassengers example forecasts twelve steps from 144 monthly observations and explains that this is the task's basic workflow, not a tuned seasonal model for airline demand.
+**Air passengers - forecast a monthly series** starts with 144 monthly values and forecasts 12 more steps. The task does not automatically turn every dated table into a tuned seasonal model. Check the settings and model used. The intervals show model uncertainty; they do not promise that future events will stay within them. Keep the time labels clear when reporting the result.
 
-Outputs include point forecasts and 80/95 percent intervals, a forecast display, an optional ARIMA model and selection summary. The horizon means steps at the series' intended spacing. Forecast intervals reflect the fitted model and assumptions, not every possible structural change. Compare predictions with held-out observations and a sensible benchmark when assessing practical forecasting value.
+# Time until an event {#survival-analysis}
 
-# Survival analysis with explicit event coding {#survival-analysis}
+Survival tasks use a time column and an event indicator. An event might be a failure, a repair, or another outcome. A censored observation means the event had not been seen by the end of that observation's follow-up.
 
-Survival data combine a duration with information about whether the event was observed or the observation was censored. A duration alone is not enough. Event coding must be established before either task runs; interpreting the wrong code as an event changes the analysis fundamentally.
-
-The lung-cancer example preserves `lung_raw`, selects complete cases for its stated fields, converts original status **2** into event **1**, and labels sex. Read that preparation. It is an educational workflow using historical data, not clinical guidance or a complete adjusted clinical model.
-
-## Event indicators and missingness
-
-Numeric indicators must contain 0/1; logical values map to false/true. For character/factor indicators, explicitly choose the event level when possible. With a blank event level and exactly two observed character levels, the helper uses the second sorted level. Do not rely on lexical order to encode a domain decision.
-
-The shared survival preparation omits rows with missing duration/event indicator, and the fitted method can omit additional rows with missing predictors. Track both stages if observation counts matter. Infinite numeric values are rejected. Check units of time and the meaning of zero/negative/otherwise questionable values according to your study design rather than assuming the UI has established the design for you.
-
-These panels expose ordinary right-censored survival workflows. Delayed entry, competing risks, time-varying effects, complex survey weights and specialized censoring structures are not implied by the category name. Use an explicit supported R specification in Script for those requirements.
+For these tasks, check that **1 means the event occurred** and **0 means it was not observed during follow-up**. Other coding systems must be converted first. The example does this for you and explains the change in its preparation task.
 
 ## Life Tables {#task-life_tables}
 
-In this application, Life Tables fits **Kaplan–Meier** survival with `survival::survfit`. Select time as the response, event indicator as the group/event field and, optionally, a stratifying predictor. The implementation uses the first selected stratifying field for its grouping formula.
+Use **Life Tables** to estimate how the chance of remaining event-free changes over time.
 
-The primary table contains survival-step estimates with confidence information. A compact median-survival summary is also available, along with static/interactive survival curves and the `survfit` model. A median can be undefined if the estimated curve does not reach the relevant probability; a missing median is not automatically a software error.
+Choose the time column and event column. Add a grouping column if you want separate curves, then run the task. Check the number of usable rows and events. Confirm that time uses one unit and does not contain unexplained negative values.
 
-The lung example compares survival curves by labelled sex. Censoring and follow-up affect how much information remains in later portions of a curve. Read confidence bounds and sample/event counts rather than comparing the last visible points as though each had equal support.
-
-This task does not automatically add a log-rank comparison or fit a covariate-adjusted hazard model. Its name should not be used to imply an actuarial interval life-table implementation. Choose Proportional Hazards for the supported Cox model, or write a separate Script for another defined analysis.
+**Lung cancer - survival analysis** keeps the 228-row original data and prepares a separate input for analysis. Its original event code of 2 is converted to 1. Open the preparation task before reading the curve. The example teaches app controls and coding checks. It is not a guide for making care decisions. Use suitable analysis advice before applying these methods to important decisions.
 
 ## Proportional Hazards {#task-proportional_hazards}
 
-Select time, event indicator and at least one covariate. The task fits an additive `survival::coxph` model. Its coefficient table includes hazard ratios `exp(coef)` beside log-hazard estimates, with confidence/fit information and optional fitted values, risk predictions and the model object.
+Use **Proportional Hazards** to model the relationship between predictors and the rate at which an event occurs over time. This is often called a Cox model.
 
-The lung example uses age and labelled sex after explicit event conversion. A hazard ratio describes the fitted relative hazard under the model and its coding; it is not a direct probability or an automatic causal effect. Check reference categories, time units, missing-data exclusions and the proportional-hazards assumption.
+Choose time, event, and predictor columns. Check event coding and missing values, then run the task. Read the coefficients, intervals, warnings, and number of included observations.
 
-New-data predictions in this task are **relative risk** values from the Cox model. They are not automatically absolute survival probabilities at a chosen time. If a report needs a time-specific survival estimate or a diagnostic such as proportional-hazards testing, retain the model and implement the appropriate additional calculation in Script.
-
-Do not force an unsuitable model through by recoding every unusual status as censored. Establish the original code meanings, retain the raw status and log the conversion. The project should make that decision inspectable long after the person who configured the task has forgotten it.
+The **Lung cancer - survival analysis** example shows the prepared input and an illustrative model. A hazard ratio compares event rates in the fitted model. It is not an absolute probability that a person will remain event-free until a chosen date. The method also has assumptions about how relationships behave over time. Use the example to learn the app's settings, and get method advice when those assumptions affect your work.

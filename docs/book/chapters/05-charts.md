@@ -1,111 +1,93 @@
-# Charts that remain useful downstream {#charts}
+# Make charts people can read {#charts}
 
-The Graph category contains ten task types. Each uses a table plus explicit variable mappings and can expose a data table, an interactive plot and a static ggplot image. The graph task is the producer; an Export or Report task is a consumer of the retained output you select.
+Choose a chart based on the question you want to answer. Start with simple settings, then add a clear title, axis labels, and units.
 
-Start with the question and the unit of observation. Category counts suggest bars, a numeric distribution suggests a histogram, paired numeric measurements suggest a scatter plot, and an ordered series suggests a line. A visually elaborate chart is not necessarily more informative than a simple one with correct units and a clear denominator.
+The **X** setting usually controls the horizontal axis. **Y** controls the vertical axis. Group or colour separates categories. After running, check both the chart and the number of rows it uses.
 
-## Shared mapping and output controls
+## Keep the output you need
 
-X/Y choose variables, not fixed numbers. Group/colour/fill supplies series or categories where supported. Size supplies a numeric bubble mapping where applied. Facet splits a display into panels. Blank optional mappings are different from selecting an actual column containing missing values.
+Chart tasks can offer plotting data, an interactive chart, and a static image. An interactive chart may show details when you hover. A static image is a still chart that works well in Word reports and image exports.
 
-The shared parameter schema contains fields for several chart/statistical families. A field in the parameter appendix does not imply every task shows or uses that field. For example, the ordinary Scatter Plot panel shares a Size selection, but its current plotting implementation does not apply a point-size mapping; use **Bubble Plot** when size must encode a third variable.
+Enable the static image output if you want to export PNG. Then use an **Export** task to write the file. Making a chart in the project does not by itself write a picture into your chosen folder.
 
-Choose retained outputs deliberately. The table and interactive plot are commonly enabled by default; the static image is generally optional. A static image output is a plot value that can be rendered to PNG/SVG/PDF, not a pre-existing file whose DPI is fixed forever. Name each enabled output so a Report/Export task can select it without confusing it with the input table.
-
-Graph result tables need careful interpretation. Count bars, pies and histograms return computed counts/bins. Many other graph tasks retain at most the first **1,000 input rows** as their primary data output, while their plotted layer can use the full input. The scatter-matrix display itself also uses a first-1,000-row cap. Do not use a graph's retained table as a presumed full-data substitute for the original analytical table.
-
-## Styling, dimensions and export
-
-Plot styling includes title, subtitle, X/Y labels, caption, theme, palette, legend placement and grid display. Themes include Clean, Publication, Minimal, Classic, Light and Dark. Palettes include Individual Guide, Okabe-Ito, Tableau, Viridis and Grey. A numeric group can use a continuous scale; a categorical group uses discrete colours. Repeated palette colours can be necessary when categories exceed available colours, so avoid interpreting colour alone as a unique identifier in a large legend.
-
-Opacity controls help with overplotting but do not solve every density problem. Line width, bin count, bar opacity and point opacity are enabled where relevant. Default graph dimensions in the current constructors are eight by four; renderer minimums constrain very small choices. Export has its own dimensions, units and DPI, so check the final file rather than assuming its size matches an on-screen card.
-
-Interactive widgets support hover behavior where interactive layers supply tooltips. Wrapping a noninteractive statistical layer in a widget does not create a detailed tooltip for every component. Static files have no live hover behavior. Interactive widgets export to HTML or SVG; raster image formats belong to the static plot output. The output chapter lists the exact format families.
-
-The example libraries retain static plot values for portable saved projects. Cached interactive widgets can contain machine-specific font resources. Re-enable the interactive plot output and rerun locally when you want its live interaction. This is not a loss of the underlying observations or plot specification.
+Some chart views and chart data outputs show only the first 1,000 rows. Check the task's row limit before using a chart output as if it were the complete source table. Use a summary or sample on purpose when there are too many points to read.
 
 ## Bar Chart {#task-bar_chart}
 
-Choose a category/X field. With Y blank, the chart counts rows by category, with optional fill grouping. The retained data table contains category counts. This is appropriate for questions such as how many observations belong to each species or how many orders fall into each status.
+Use **Bar Chart** to compare category counts or a selected numeric summary.
 
-With a numeric Y field, the task uses value bars rather than silently taking a group mean. If several observations share a category, the geometry can stack/overlap according to its configured grouping; compute a deliberate summary first when the question is mean or total by group. Do not label the chart “average” without a matching aggregation task.
+Choose the category for X. If the chart mode asks for a value or summary, choose those too. Add a group only if it helps the comparison. Run the task and check that the axis describes what the bar height means: a count, sum, and mean answer different questions.
 
-Flip makes a horizontal layout. Use readable category labels and a scale suitable for counts/values. The categorical chart gallery counts Iris species, giving three bars of 50. Its balance is easy to verify against One-Way Frequencies and makes a useful first chart test.
+Keep category names readable. If the labels overlap, reduce the number of categories or change the layout. **Flowers - categorical chart gallery** counts the three species. Each bar should represent 50 flowers. Compare it with the frequency table if you are unsure what the chart is counting.
 
 ## Bar-Line Chart {#task-bar_line_chart}
 
-Choose X and numeric Y for a combined bar/line display. Without a secondary Y, the line follows the selected Y values over X. Grouping can define line series. An optional secondary numeric Y is drawn through a scale transformation with a labelled secondary axis.
+Use **Bar-Line Chart** to show bars and a line on the same category or time axis.
 
-Use this when two related summaries share a meaningful ordered X, and prepare one row per intended X/group first. Connecting raw duplicate X values can give a picture unlike the intended monthly trend. The task does not automatically decide whether repeated records should be summed or averaged.
+Choose the shared X column, then the values for the bars and line. Check axis labels and any second-axis settings. Run the chart and make sure the legend clearly identifies each part.
 
-The Nottingham temperature example first calculates annual means and ranges, then plots the mean as bars and range as a secondary series. Its axis label explicitly states that the second measure is an annual range in degrees Fahrenheit. Dual axes can make unrelated curves appear to align; explain the two units and transformation rather than presenting visual agreement as evidence of a relationship.
+If the two values use different units or scales, explain both. Similar-looking heights on two axes do not mean equal values. Avoid using the chart to imply a relationship just because the shapes line up. **Nottingham temperatures - time charts** compares annual averages with observed ranges. The range is a difference between observed values, not a measure of uncertainty around the average.
 
 ## Box Plot {#task-box_plot}
 
-Choose a category X and numeric Y, with optional fill group and horizontal layout. Numeric X values are treated as categories in this task so a dose or cylinder-count grouping does not accidentally collapse into one continuous-position box.
+Use **Box Plot** to compare the spread of a numeric measurement across groups.
 
-Boxes summarize distributions within categories using ggplot's box-plot conventions. A displayed outlying point is not automatically a bad record, and a box overlap is not a formal test of a group difference. Small groups and unequal sample sizes deserve explicit counts beside the figure.
+Choose the group for X and the measurement for Y. Run the task. The line inside the box marks the median, the middle value. The box covers the middle half of the data. Points beyond the whiskers highlight values that may deserve a closer look.
 
-The categorical gallery plots petal length by species. Inspect the underlying `flowers` table and its group summaries when a box looks unexpected. If you need the numerical quartile values as a retained table, use Summary Statistics/Summary Tables or a Script; the graph's primary data output should not be mistaken for a dedicated table of box boundaries.
+Read the plot alongside group counts. A small group gives less information than a large one, even if their boxes look similar. Check unusual points before deciding they are errors. **Flowers - categorical chart gallery** compares flower measurements by species. Use Summary Tables if you also need exact group values in a report.
 
 ## Bubble Plot {#task-bubble_plot}
 
-Choose numeric X/Y and a numeric size variable. An optional colour group adds a categorical or continuous distinction where appropriate. The task uses interactive point layers with mapped values available to tooltips.
+Use **Bubble Plot** to show two numeric measurements, with bubble size showing a third.
 
-Use a size field with an interpretable nonnegative magnitude. A third variable with mixed signs or poorly understood units is difficult to communicate through area. Check how size changes perceptually and include a useful size legend. More dimensions do not compensate for a missing analytical question.
+Choose X, Y, and a numeric size column. Add colour or group if useful, then run the task. Check that the size legend explains what larger bubbles mean. Keep the units clear for all three measurements.
 
-The numeric gallery maps sepal length against petal length, sizes by petal width and colours by species. Compare it with the ordinary scatter plot to judge whether size adds useful information or simply clutter. For dense data, adjust opacity or use a density display; very large bubbles can hide smaller observations completely.
+Overlapping bubbles can hide smaller ones. Try less data or a simpler Scatter Plot if the picture is hard to read. Use this task when size needs to change visibly; a Size field shared with other chart forms may not have that effect in Scatter Plot. **Flowers - numeric chart gallery** lets you compare both charts using the same observations.
 
 ## Contour Plot {#task-contour_plot}
 
-Contour Plot estimates a two-dimensional density from numeric X/Y and draws filled density contours. It helps reveal concentration when a scatter plot contains too many overlapping points. It is not a contour map of a separately supplied Z measurement and does not accept arbitrary spatial elevation as an implied third field.
+Use **Contour Plot** to see where pairs of numeric values are concentrated.
 
-The implementation delegates density estimation/contouring to ggplot's statistical layer. It does not expose every bandwidth parameter through the task UI. Sparse, degenerate or near-constant variables can make the estimate uninformative or fail. Inspect the scatter plot and original ranges first.
+Choose the two numeric columns for X and Y, then run the chart. Read the contour lines or regions as a guide to where more observations lie. Compare the result with a scatter plot of the same columns.
 
-The numeric gallery uses Iris sepal and petal lengths. Contour bands describe the distribution of those observations; they are not confidence regions for a regression coefficient or proof of discrete clusters. If you need category-specific densities or a custom bandwidth, use an explicit Script/ggplot specification and retain the resulting plot.
+The smooth shape depends on the data and chart settings. It does not show a measured boundary around a real group. A small sample can give a pattern that looks more certain than it is. **Flowers - numeric chart gallery** includes contours beside the individual flower points, which makes it easier to see what the smoothing adds and what it leaves out.
 
 ## Histogram {#task-histogram_graph}
 
-Choose a numeric X, bin count and optional fill group. The retained table contains bin edges, midpoints, counts and densities, with group/panel information where applicable. This is one of the graph tasks whose result table is a computed plotting summary rather than a raw-data subset.
+Use **Histogram** to show how one numeric measurement is distributed.
 
-The optional density overlay changes the histogram's vertical mapping to density so the continuous curve uses a compatible scale. A density overlay needs at least two finite observations. Changing the bin count can reveal or conceal structure; compare a few reasonable choices and keep units visible on X.
+Choose the numeric column and a bin setting. A bin is a range of values counted together. Run the task and check the horizontal axis, the counts, and the number of missing values.
 
-The numeric gallery uses 15 bins for sepal length. The sum of bin counts is a useful check, while missing/nonfinite handling and grouped panels need attention when comparing to a raw row count. For a formal numeric summary or missingness audit, use the Describe tasks as well. A histogram alone does not tell you whether a value is missing because it was absent, filtered or converted unsuccessfully.
+Try a few sensible bin choices. Very wide bins can hide patterns, while very narrow bins can make random variation look important. A histogram's bars represent numeric ranges; a Bar Chart usually represents separate categories. **Flowers - numeric chart gallery** includes a histogram you can compare with its Summary Statistics. Use both when you want a picture of the spread and exact values.
 
 ## Line Plot {#task-line_plot}
 
-Choose an ordered numeric or date X and numeric Y. Optional grouping defines separate series; an optional secondary Y uses the same secondary-axis mechanism as Bar-Line. The line geometry connects observations according to X within its grouping conventions.
+Use **Line Plot** to show change across an ordered column, often time.
 
-Prepare chronological order and a meaningful time spacing. Repeated X values can create vertical segments; absent months do not become observed zeroes. A date axis is not a substitute for deciding how missing periods should be represented. Keep multiple series identified with a proper group field so observations from different series are not accidentally connected.
+Choose the date or ordered value for X and a measurement for Y. Add a group if you need separate lines. When several rows share the same time, decide whether you need to summarize them first. Check the order, then run the task.
 
-The Nottingham example constructs a Date for each monthly temperature and draws the full ordered series. It is a visualization, not an ARIMA model or a forecast. Use the forecasting task when you need an estimated future distribution, and preserve the difference between observed and predicted periods in a report.
+A line joins observations. It does not prove what happened between them, and it is not a forecast. Check gaps and the time range so readers can see where data are missing. **Nottingham temperatures - time charts** shows 240 monthly observations. Read the date column and units before comparing years or describing a seasonal pattern.
 
 ## Pie Chart {#task-pie_chart}
 
-Choose a categorical field. The task counts observations, retains the count table and draws category shares. A Donut option changes the presentation. It does not map an arbitrary numeric Y into slice values; create the appropriate supported data representation or a custom plot if weighted shares are required.
+Use **Pie Chart** for a simple view of category shares when there are only a few groups.
 
-Missing values are counted when present in the category table. Check the denominator and make category names readable. A large number of small slices is difficult to compare; a bar chart is often easier for precise category comparisons.
+Choose the category column and run the task. Check each category's count and share. In this task, the slices count observations by category; do not assume a numeric amount column supplies slice weights.
 
-The categorical gallery's three Iris species give equal thirds. That is a useful check of the count-based behavior. If your input already has one row per category with a count column, a count-based pie would count those rows rather than silently use that count column as weights. This distinction is easy to miss when the table happens to look like a plotting summary.
+Use a frequency table to confirm the totals. Many small slices are hard to compare, so a Bar Chart may be easier to read when you have many groups. **Flowers - categorical chart gallery** uses the three Iris species. Its slices should be equal because each species has 50 observations. Changing colour affects the display, not the counts behind it.
 
 ## Scatter Plot {#task-scatter_plot}
 
-Choose X and numeric Y, with optional colour grouping and faceting. Use it to inspect paired measurements and identify ranges, unusual observations or possible relationships before modelling. Interactive point tooltips expose mapped fields.
+Use **Scatter Plot** to look at the relationship between two numeric columns.
 
-The current ordinary scatter implementation does not apply the shared Size field to its points. Use Bubble Plot for an actual third-variable size encoding. A numeric group can imply a continuous colour scale; convert a numeric category to factor when it is genuinely categorical and the desired interpretation is discrete.
+Choose X and Y, then add colour or group if it helps. Run the chart and check the labels and units. Each visible point represents an observation, although points can overlap.
 
-The Iris and fuel-economy projects show species grouping and weight/mpg association. A scatter pattern does not identify causality. Overplotting can hide repeated observations, so consider opacity, grouping or density displays. Remember that the retained graph data table can be capped at 1,000 rows while the plotted data source is larger; use the original table for downstream full-data calculations.
+Look for a trend, curved pattern, separate groups, and unusual points. A visible trend does not prove that one measurement causes the other. Use Bubble Plot if you need a third measurement to control point size. **Iris exploration** compares sepal length with petal length by species. Try changing Y to petal width in a saved copy, then rerun the report so it shows your new chart.
 
 ## Scatter Plot Matrix {#task-scatter_matrix}
 
-Select at least two numeric columns. Choose **Pairwise scatterplots** or **Distributions**. Pairwise mode creates a grid of variable pairs; distribution mode creates faceted histograms. The current default constructor chooses pairwise mode, even though older help text may describe only the histogram view.
+Use **Scatter Plot Matrix** to compare several numeric columns in one grid.
 
-The display uses the first **1,000 rows**, not a random sample. This cap keeps large grids manageable but can bias an exploratory impression when row order contains time, group or quality structure. If you need a representative subset, create a seeded sample before the matrix and describe it in the caption.
+Choose a small set of numeric columns and any grouping setting, then run it. Each panel compares a pair of columns. Read its row and column labels to know which measurements are shown.
 
-The numeric gallery uses the four Iris measurements, giving a manageable grid. Larger variable selections grow the pair grid rapidly and can become unreadable. Select a coherent subset, inspect missing/constant columns and compare any apparent patterns with full-data summaries. A correlation table is related but answers a different question from the shapes and outliers visible in a pair plot.
-
-## A chart review routine
-
-Check the input's observation count and classes. State what one plotted mark represents. Verify aggregation and denominators. Label units and any secondary axis. Inspect missingness, group membership and limits. Compare a plotted count/summary with an independent table. Then render the final exported file at its intended size and open it outside the app.
-
-When adding a chart to a report, choose the static or interactive output deliberately. HTML can embed interaction; Word cannot reproduce a browser widget's behavior. A static figure with a clear caption is usually easier to carry across output formats. Retain the plotting specification in the task so a later correction is a rerun, not manual editing of a detached image.
+Start with three or four columns. A large grid becomes hard to read, and display limits may show only part of a large dataset. If one pair is interesting, open a separate Scatter Plot for a clearer view. **Flowers - numeric chart gallery** compares the four Iris measurements. Use its matrix to choose a relationship to inspect, rather than trying to explain every panel at once.

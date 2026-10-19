@@ -1,18 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 290" role="img" aria-labelledby="title desc">
-<title id="title">A reproducible pipeline separates data, calculation and delivery</title>
+<title id="title">From your data to a report and log</title>
 <desc id="desc">An import produces a raw table. A preparation task produces analysis data. Summary and chart tasks feed a report. All task events feed a final log export.</desc>
 <defs><marker id="a" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0 0L7 3L0 6" fill="#536280"/></marker></defs>
 <rect width="1000" height="290" rx="12" fill="#f6f8fc"/>
 <g stroke="#536280" stroke-width="2" fill="none" marker-end="url(#a)"><path d="M160 96H215"/><path d="M365 96H415"/><path d="M570 96H620"/><path d="M770 96H820"/><path d="M100 135V205H870V135"/><path d="M290 135V205"/><path d="M495 135V205"/><path d="M695 135V205"/></g>
 <g font-family="Arial, sans-serif" text-anchor="middle" font-size="19" fill="#172744">
 <g fill="#e7eeff" stroke="#4361ee" stroke-width="2"><rect x="25" y="55" width="135" height="80" rx="12"/><rect x="215" y="55" width="150" height="80" rx="12"/><rect x="415" y="55" width="155" height="80" rx="12"/><rect x="620" y="55" width="150" height="80" rx="12"/><rect x="820" y="55" width="150" height="80" rx="12"/></g>
-<text x="92" y="88">Import</text><text x="92" y="114" font-size="15">raw observations</text>
-<text x="290" y="88">Prepare</text><text x="290" y="114" font-size="15">named analysis data</text>
-<text x="492" y="88">Analyse</text><text x="492" y="114" font-size="15">tables and models</text>
-<text x="695" y="88">Visualize</text><text x="695" y="114" font-size="15">retained figures</text>
-<text x="895" y="88">Report / Export</text><text x="895" y="114" font-size="15">reader deliverables</text>
+<text x="92" y="88">Import</text><text x="92" y="114" font-size="15">bring in data</text>
+<text x="290" y="88">Prepare</text><text x="290" y="114" font-size="15">clean your table</text>
+<text x="492" y="88">Summarize</text><text x="492" y="114" font-size="15">check the numbers</text>
+<text x="695" y="88">Chart</text><text x="695" y="114" font-size="15">show the pattern</text>
+<text x="895" y="88">Report / Export</text><text x="895" y="114" font-size="15">share your results</text>
 <rect x="365" y="225" width="290" height="42" rx="9" fill="#ecf6ee" stroke="#237a47"/>
-<text x="510" y="252" font-size="17">Export retained task events</text>
+<text x="510" y="252" font-size="17">Save the log to a file</text>
 <path d="M510 205V225" stroke="#536280" stroke-width="2" marker-end="url(#a)"/>
-<text x="500" y="35" font-size="15">Original inputs stay distinct from transformations and external writes</text>
+<text x="500" y="35" font-size="15">Keep your source data, then follow the steps to your results</text>
 </g></svg>

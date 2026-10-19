@@ -6,13 +6,17 @@ A low-code analytical pipeline builder, packaged as the R package
 visual process-flow canvas, and every task generates readable R code behind
 the scenes.
 
-## Complete handbook
+## Friendly app guide
 
-The [complete app handbook](docs/book/README.md) covers installation, every task,
-all 22 example projects, execution, logging/reports, the console, code exports,
-review, troubleshooting and desktop development. Editable chapter sources and a
-source-backed reference are in `docs/book/`; offline HTML, PDF, EPUB and Word
-editions are built into `build/book/`. The 0.4.0 edition covers the current source and rebuilt desktop release.
+The [friendly app guide](https://woodtho.github.io/IndividualGuide/) assumes no R experience and covers installation, every task,
+all 22 example projects, saving, logging, reports, and troubleshooting. R setup,
+the console, and code exports are optional. It uses the public Windows release,
+CRAN packages, and a GitHub release tag for the R installation route.
+Read it online or download PDF, EPUB, Word, and offline HTML from the page.
+The editions are also committed in [`docs/handbook`](docs/handbook), with editable
+chapters in [`docs/book`](docs/book/README.md). GitHub Pages publishes verified
+changes automatically. Application downloads are on the
+[releases page](https://github.com/woodtho/IndividualGuide/releases/latest).
 
 ## Installation
 

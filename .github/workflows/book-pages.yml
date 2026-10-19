@@ -1,0 +1,60 @@
+name: Publish handbook
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/**'
+      - 'R/**'
+      - 'DESCRIPTION'
+      - 'tools/*book*'
+      - 'tools/example-recipes.R'
+      - 'tools/desktop/menus.cjs'
+      - 'tools/desktop/BUILD-README.md'
+      - '.github/workflows/book-pages.yml'
+  pull_request:
+    paths:
+      - 'docs/**'
+      - 'R/**'
+      - 'DESCRIPTION'
+      - 'tools/*book*'
+      - 'tools/example-recipes.R'
+      - 'tools/desktop/menus.cjs'
+      - 'tools/desktop/BUILD-README.md'
+      - '.github/workflows/book-pages.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: handbook-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Verify committed books and source identity
+        run: node tools/publish-book.cjs --check
+      - name: Verify stale and altered books are rejected
+        run: node --test tools/publish-book.test.cjs
+      - uses: actions/upload-pages-artifact@v3
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        with:
+          path: docs/handbook
+  deploy:
+    needs: verify
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/configure-pages@v5
+      - name: Publish readable handbook and downloads
+        id: deployment
+        uses: actions/deploy-pages@v4

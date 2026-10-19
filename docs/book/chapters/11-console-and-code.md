@@ -1,118 +1,68 @@
-# Working in the R Console {#console}
+# Optional: try the R Console {#console}
 
-The permanent R Console tab is an exploratory workspace with a terminal-style composer, history, output, plots and completions. It runs in a separate persistent R process for the current app session. It is useful for investigating a retained dataset or trying a calculation before turning it into a task.
+You can use the app without the console. It is there for quick questions and small trials when you want more control.
 
-Open it from View > R console in the desktop shell, click its permanent tab or use Ctrl+Alt+C outside a text field. Project tables/objects are copied into the console and also exposed through `.project$tables` and `.project$objects`. Changing one of these copies does not commit a change back into the pipeline store.
-
-## A useful first session
-
-After opening the Iris project, try:
+R is the calculation language behind the app. A **command** is an instruction you ask R to carry out. The console shows the command and its result. You can start with a harmless calculation:
 
 ```r
-names(.project$tables)
-head(flowers)
-summary(flowers$Petal.Length)
-plot(flowers$Sepal.Length, flowers$Petal.Length)
+2 + 3
 ```
 
-Use the copied data to investigate, then put reproducible work into a Script task. A model created only as `fit <- lm(...)` in this console will not automatically appear as a saved project model output. Declare it in a Script or use a configured model task when it belongs to the project.
+The result is 5. You do not need to install anything to try this inside the desktop app.
 
-**Refresh data** replaces the imported project-variable copies with the project's latest retained values and keeps unrelated console variables. If you edited a console copy named `flowers`, refreshing can replace that copy. Live database handles are skipped rather than passed unsafely into the console process; materialize a suitable table if you need to inspect database-derived values there.
+## Open the console and run a command
 
-## Composer and keyboard
+Choose the **R Console** tab. In the desktop app, you can also use **View > R console**. Type in the command area, then press Enter for a one-line command. Use Shift+Enter to add a line and Ctrl+Enter to run a block.
 
-| Action | Console key/control |
-| --- | --- |
-| Run a command | Enter or Run |
-| Insert a newline | Shift+Enter |
-| Run multiline code | Ctrl+Enter |
-| Run selected text | Ctrl+Shift+Enter or Selection |
-| Recall commands | Up/Down at the editor boundary; Alt+Up/Down anywhere |
-| Request completion | Ctrl+Space |
-| Clear output/plots while keeping variables | Ctrl+L or Clear output |
-| Copy selected output | Ctrl+C with text selected |
-| Interrupt a running command and clear console workspace | Ctrl+C with no selected text, or Stop |
+![The R Console has a command area, results, and controls for working with project data.](assets/r-console.png)
 
-History recall preserves the unsent draft so you can return to it. The history panel searches retained commands locally and lets you recall whole commands. History is bounded to the recent 200 commands in the current browser/session behavior; it is not a permanent project notebook.
+If you want to inspect a project table, use the console's project-data controls to add it. Use its exact table name in commands. These are working copies; changing a console value does not automatically change the project's table or flow.
 
-The composer supports R-oriented highlighting and grows to a capped editor area. Draft typing does not send the whole textarea to Shiny on each keystroke. Highlighting of long drafts uses a bounded styled prefix to keep typing responsive; a lack of colour far into an unusually long command is not evidence that those characters were omitted from the submitted command.
+## Read a command before running it
 
-## Completions
-
-Completion uses known names and captured column metadata without evaluating the expression being typed. It can offer project/console symbols, exposed package names/functions and `$` fields. Package `::` completion is limited to namespaces already loaded. It does not dynamically install packages or execute an arbitrary expression to discover its result.
-
-For an object name with spaces, insert/keep R backticks. If the console has changed a table, captured worker fields can take precedence for its ordinary variable, while `.project` remains an explicit view of the supplied project snapshot. Refresh data when you want the newest project values.
-
-Completions are a convenience, not a parser guarantee. A suggested field can still be inappropriate for a function or unavailable after a later reset. Read errors in the transcript and inspect `names()`/classes when the distinction matters.
-
-## Output, plots and transcript limits
-
-Printed values, messages, warnings and errors stream above the editor. Scrollback stays where you are reading as output arrives; **Latest output** returns to the bottom. Literal output text is rendered as text rather than trusted HTML instructions.
-
-The console displays the most recent **12 plots**, generated as raster output by its worker. Saving a transcript downloads retained text; it is not a project save, plot bundle or complete image archive. Retain important plots through a Script/graph task and Export when they are deliverables.
-
-Transcript text is bounded: after it grows beyond about 300,000 characters, the retained tail is reduced to roughly 250,000 with a trimming notice. A command also has a 100,000-character input limit. Do not use this console as an unlimited logging sink; save an appropriate external log or produce an explicit task result for long-running work.
-
-## Clear, Stop, Reset and Restart
-
-Clear output removes displayed output and plots while retaining variables. Stop terminates the console's R process, including a long native call, and clears its R workspace; the next run starts a fresh workspace with current project copies. Output/history and an unsent draft are kept according to the Stop workflow.
-
-Reset R also clears console output, plots and history. New/Open/Close project and app-server restart clear console work. These behaviors keep a variable from one project from silently masquerading as an input in another.
-
-Restart R server is a desktop-shell action affecting the Shiny backend and its session. It is stronger than resetting only the console. Save project work first when possible. Console filesystem/database commands still access those external resources with your permissions; isolation from the project store does not make arbitrary code reversible.
-
-## Create Script
-
-Create Script can use selected code, the draft or the last command. The helper identifies straightforward assignments and references to project values to propose input/output declarations. Review those declarations and any missing-symbol warning before running the new task.
-
-Inference is intentionally limited. A local console variable that was created by an earlier command is not automatically a project input. A complex assignment inside a function or an object fetched dynamically may not be inferred as an output. Put all required setup in the Script or retain the required values through explicit upstream tasks.
-
-Once promoted, run the Script from the pipeline and inspect its retained outputs. Delete or rename temporary exploratory variables only after the task reproduces the intended result. A saved task plus its generated pipeline is a stronger handoff than an unrecorded console state.
-
-# Generated R and execution outside the app {#generated-code}
-
-Readable code is part of the application's design. A task's Code toggle shows its current configured operation; the permanent Code tab assembles the **active flow** into a pipeline. Saved cached results are not automatically inlined as a universal replacement for all upstream tasks.
-
-## Three code views
-
-**Pipeline** is the concise sequence of named steps. **Supporting functions** contains shared calculations, validation, task metadata and logging support. **Complete script** combines them. Copy R copies the selected view, so copying Pipeline alone is not the same as downloading the complete standalone script.
-
-Download .R provides one self-contained R script. Download bundle provides `pipeline.R`, `pipeline_support.R` and a README. Keep both R files together. The loader locates the support file relative to the script even when started from another directory; it deliberately does not change the working directory that your input/output paths use.
-
-Run a downloaded complete script or extracted bundle with:
-
-```powershell
-Rscript --vanilla pipeline.R
-```
-
-Or from an R session:
+Commands can calculate, change values, read files, or write files. Use code you understand or trust. For a simple practice with R's built-in flower data, try:
 
 ```r
-source("pipeline.R")
+mean(datasets::iris$Sepal.Length)
 ```
 
-The application package itself is not required by the generated export. Referenced R packages, input files, database access and system dependencies still are. A script that includes a user-written `library(specialPackage)` needs that package, even if the app's own configured tasks normally use a smaller dependency set.
+The result is about 5.8433. Here, `mean` asks for an average. The rest identifies the sepal-length column in the built-in flower data. You do not need to memorize that punctuation to use the task forms.
 
-## Scope and dependencies
+## Find and reuse a command
 
-The Code tab exports the active flow. If it consumes a table produced only in another flow, arrange to generate/provide that prerequisite in the execution environment or consolidate/export the necessary workflow deliberately. Do not describe an active-flow export as a guaranteed project-wide scheduler for every flow.
+Use the history controls to find earlier commands. Up and Down move through history when the cursor is at the command boundary; Alt+Up and Alt+Down also help. Ctrl+R searches command history.
 
-Task settings are synchronized and code is rebuilt from configuration. Dependency order, branch decisions, loop bodies, configured output names, logging and seeds are carried into the full pipeline. A Loop node's individual snippet mainly describes iteration-source construction; the full export includes the repeated dependent body.
+Tab or Ctrl+Space offers completions when available. A completion helps type a name; it does not check that the finished command answers your question. Read errors and edit the command before trying again.
 
-File paths remain file paths. A project that can display a cached table after reopening may still fail to rerun outside the app if its original import is missing. Portable `.igpx` export is also not the same thing as a code bundle that packages every arbitrary Script dependency. Inspect the paths in the downloaded code and supply the necessary files.
+## Clear, Stop, and Reset
 
-## Settings preserved and settings not implied
+| Action | When to use it | What to expect |
+| --- | --- | --- |
+| Clear or Ctrl+L | You want a cleaner display | Clears visible output; working values remain |
+| Stop | A command is taking too long | Stops console work and clears its working values; the transcript and history remain |
+| Reset | You want a fresh console | Clears its working values, transcript, history, draft, and plots |
+| Restart R server | The app's calculation service has stopped | Restarts the app session; save first if possible |
 
-The script records configured random seeds, RNG kind, model contrasts and missing-value option. An optional project seed is applied to task/loop execution. User-written Script code is retained and can explicitly choose its own seed or package behavior.
+Stopping console work can mean you need to load your project-table copies again. These actions do not turn a trial command into a saved task.
 
-These settings improve reproducibility without freezing all external state. Database contents can change; a library version can change; system fonts can change a rendered figure. For important work, retain the run manifest/environment information and the actual delivered outputs as well.
+## Keep useful code in a task
 
-Generated logging uses its own runtime context. An Export Log task or a Report appendix reads events collected in that generated pipeline run, not task history from a closed Shiny session. Existing project history is saved in `.igpx`; standalone execution starts its own execution evidence.
+If a command should be part of the analysis every time, use **Create Script** or copy it into a Script task. Declare the input tables and named outputs there. Run the task and check its results.
 
-## Verify a code handoff
+Use task logging for the saved analysis. The console transcript records your trials, which may include commands you later changed or abandoned.
 
-Extract a bundle into a new folder. Install its referenced packages in an appropriate R library. Supply inputs and writable destinations, then run from the intended working directory in a fresh R process. Check expected table values, report sections and file/log outputs. A script that parses has passed a syntax check, not a complete reproducibility test.
+# Optional: export the flow as R code {#generated-code}
 
-For ordinary deterministic examples, compare known counts and summaries. For a stochastic method, compare configured seeds and relevant environment before interpreting differences. For a database flow, record the query/extract conditions and whether a frozen local input is needed to reproduce the exact historical result.
+The **Code** tab can export the active flow as a complete R script or a code bundle. This is useful when someone needs to rerun the analysis without opening Individual Guide.
 
-Keep the generated file with the saved project and final report. If you edit the downloaded R by hand, it becomes a separate analytical artifact; those edits do not automatically update the app's task forms. Document which artifact is authoritative before a later maintainer tries to rerun both.
+A script is a text file of R commands. A bundle includes the script and supporting files with instructions. Choose a complete-flow export for a handoff; an individual task's code may depend on earlier steps.
+
+You can skip code export for everyday app use. A saved project is usually the easiest way to return to your work.
+
+## Share code that someone can run
+
+Before exporting, run the flow and check its results. Choose the flow you mean to share, then export its full script or bundle from Code. Include needed input files and tell the recipient which outputs to expect.
+
+The recipient needs R, the packages requested by the script, and access to its inputs. The complete generated pipeline does not need the Individual Guide package itself. Database access and file locations still need to be set up on the receiving computer.
+
+Open the bundle's README and follow its instructions in a separate working folder. Check output destinations before running. Running a saved script can replace files just as running Export inside the app can.
