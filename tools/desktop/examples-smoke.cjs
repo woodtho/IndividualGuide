@@ -27,7 +27,20 @@ module.exports = async ({ window, pause, state, rendererCommand }) => {
     dialog.showMessageBox=async()=>({response:1});
     await wait(()=>menu('open').enabled && js("Boolean(document.getElementById('splash_fresh')?.classList.contains('shiny-bound-input'))"),'startup');
     await click('splash_fresh'); await help();
-    assert.equal(await js("document.querySelectorAll('[data-ig-example]').length"),3); checks.helpCatalog=true;
+    const runtime = process.env.IG_RUNTIME_OVERRIDE || (process.defaultApp ? path.resolve(__dirname, '../../build/staging/runtime') : path.join(process.resourcesPath, 'runtime'));
+    const exampleRoot = path.join(runtime, 'R/library/IndividualGuide/examples');
+    const expectedCount = fs.readdirSync(exampleRoot, {withFileTypes:true}).filter(entry => entry.isDirectory() && fs.existsSync(path.join(exampleRoot, entry.name, 'project.igpx'))).length;
+    assert.ok(expectedCount >= 20, 'The expanded offline catalogue is bundled');
+    assert.equal(await js("document.querySelectorAll('[data-ig-example]').length"),expectedCount); checks.helpCatalog=true;
+    assert.equal(await js(`(() => {
+      const type=document.getElementById('ig-example-type');
+      for(const option of Array.from(type.options).slice(1)) {
+        type.value=option.value; type.dispatchEvent(new Event('change'));
+        const visible=Array.from(document.querySelectorAll('.ig-example-card')).filter(card=>!card.hidden);
+        if(!visible.length || visible.some(card=>!card.dataset.tasks.split('|').includes(option.value))) return false;
+      }
+      type.value=''; type.dispatchEvent(new Event('change')); return true;
+    })()`),true); checks.everyTaskFilterHasExamples=true;
     await click('help_example_iris'); await idle();
     assert.ok(window.getTitle().includes('Iris exploration')); checks.loadFromHelp=true;
     await js("Shiny.setInputValue('tree_task_click','example_source',{priority:'event'})");
