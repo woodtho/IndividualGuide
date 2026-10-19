@@ -21,6 +21,7 @@ evalq({
   check("iris_count", nrow(datasets::iris) == 150L)
   check("iris_species_counts", all(table(datasets::iris$Species) == 50L))
   check("sepal_mean", abs(mean(datasets::iris$Sepal.Length) - 5.8433333333) < 1e-8)
+  check("petal_width_chart_range", identical(range(datasets::iris$Petal.Width),c(0.1,2.5)))
   means <- aggregate(Petal.Length ~ Species, datasets::iris, mean)$Petal.Length
   check("petal_means", isTRUE(all.equal(means, c(1.462, 4.260, 5.552), tolerance = 1e-10)))
   check("other_real_source_counts", identical(c(nrow(datasets::airquality), nrow(datasets::mtcars), nrow(datasets::ToothGrowth),
@@ -38,6 +39,24 @@ evalq({
   check("Word_XML_well_formed", inspect_xml_archive(file.path(output,"Individual-Guide-Handbook.docx"),"[.]xml$") >= 5L)
   work <- tempfile("ig-book-tutorial-"); dir.create(work)
   old <- setwd(work)
+  writeLines(c("id,amount", "001,5", "002,6"), file.path(work,"identifiers.csv"))
+  imported <- default_import_params("ids_raw")
+  imported$path <- file.path(work,"identifiers.csv"); imported$type <- "csv"; imported$csv_col_types <- "cc"
+  identifiers <- execute_import(imported)
+  check("CSV_ID_zeros_preserved", is.null(identifiers$error) && identical(identifiers$data$id,c("001","002")))
+  check("CSV_cc_reads_both_columns_as_text", is.character(identifiers$data$amount))
+  typed <- default_change_types_params("ids_ready"); typed$input_table <- "ids_raw"
+  typed$type_changes <- list(list(col="amount",type="numeric"))
+  converted <- execute_change_types(typed,list(ids_raw=identifiers$data))
+  check("convert_measurements_keep_text_ID", is.null(converted$error) && is.numeric(converted$data$amount) && identical(converted$data$id,c("001","002")))
+  database <- file.path(work,"practice.sqlite")
+  connection <- DBI::dbConnect(RSQLite::SQLite(),database)
+  DBI::dbWriteTable(connection,"observations",identifiers$data); DBI::dbDisconnect(connection)
+  sqlite <- default_import_params("database_copy"); sqlite$source_kind <- "db"; sqlite$db_conn_mode <- "form"
+  sqlite$db_driver <- "sqlite"; sqlite$db_database <- database; sqlite$db_table <- "observations"; sqlite$db_collect <- TRUE
+  database_copy <- execute_import(sqlite)
+  check("SQLite_form_collects_a_fixed_copy", is.null(database_copy$error) && nrow(database_copy$data)==2L && !isTRUE(database_copy$lazy))
+  check("SQLite_copy_keeps_text_ID", identical(database_copy$data$id,c("001","002")))
   Sys.setenv(IG_USER_DATA = file.path(work, "profile"))
   options(ig.background_workers = 0L, ig.recovery_dir = file.path(work,"recovery"), ig.catalogue_dir = file.path(work,"connections"))
   store <- make_store()
@@ -45,6 +64,7 @@ evalq({
   store$flows <- setNames(list(flow),flow$id); store$active_flow <- flow$id
   add <- function(id, type, p) store_set_task(store, store_task_from_params(task_def(id,type),p))
   p <- default_script_params("flowers")
+  p$output_defs <- list(list(name="flowers",kind="table"))
   tutorial <- paste(readLines(file.path(root,"docs/book/chapters/01-first-project.md"),encoding="UTF-8"),collapse="\n")
   source <- regmatches(tutorial,regexpr("```r\n[\\s\\S]*?\n```",tutorial,perl=TRUE))
   p$code <- sub("\n```$","",sub("^```r\n","",source)); add("source","script",p)
@@ -52,8 +72,8 @@ evalq({
   p <- default_summary_tables_params("species_summary");p$input_table<-"flowers";p$row_var<-"Species";p$value_var<-"Petal.Length";p$stat_fn<-"mean";add("groups","summary_tables",p)
   p <- default_phase3_params("scatter_plot","iris_scatter");p$input_table<-"flowers";p$x<-"Sepal.Length";p$y<-"Petal.Length";p$group<-"Species";p$title<-"Iris measurements by species"
   p$output_enabled$image<-TRUE;p$output_names$image<-"iris_scatter_image";add("chart","scatter_plot",p)
-  p<-default_export_params();p$source<-"species_summary";p$dir<-work;p$filename<-"species-summary.csv";p$overwrite<-TRUE;add("csv","export",p)
-  p<-default_export_params();p$source<-"iris_scatter_image";p$format<-"png";p$value_kind<-"image";p$dir<-work;p$filename<-"iris-scatter.png";p$dpi<-150;p$overwrite<-TRUE;add("png","export",p)
+  p<-default_export_params();p$source<-"species_summary";p$dir<-work;p$filename<-"species-summary";p$overwrite<-TRUE;add("csv","export",p)
+  p<-default_export_params();p$source<-"iris_scatter_image";p$format<-"png";p$value_kind<-"image";p$dir<-work;p$filename<-"iris-scatter";p$dpi<-150;p$overwrite<-TRUE;add("png","export",p)
   p<-default_report_params("iris_report");p$title<-"First Iris report";p$include_log<-TRUE
   p$items<-lapply(c("measurement_summary","species_summary","iris_scatter_image"),function(name)list(name=name,heading=name));add("report","report",p)
   p<-default_export_log_params();p$path<-file.path(work,"iris-log.csv");p$format<-"csv";p$overwrite<-TRUE;p$after_tasks<-isolate(store$task_order);add("audit","export_log",p)

@@ -9,10 +9,11 @@ function inputFiles() {
     ...Object.keys(meta.source_md5),
     ...fs.readdirSync(path.join(root,'docs/book/chapters')).filter(f=>f.endsWith('.md')).map(f=>'docs/book/chapters/'+f),
     ...fs.readdirSync(path.join(root,'docs/book/assets')).map(f=>'docs/book/assets/'+f),
-    'docs/book/data/app-reference.json', 'docs/book/data/example-lessons.json',
+    'docs/book/data/app-reference.json', 'docs/book/data/example-lessons.json', 'docs/book/data/screenshots.json',
     'tools/book-metadata.R', 'tools/build-book.cjs', 'tools/render-book.R',
     'tools/test-book.R', 'tools/verify-book.cjs', 'tools/book-readability.cjs',
-    'tools/book-inputs.cjs', 'tools/publish-book.cjs'
+    'tools/book-inputs.cjs', 'tools/book-figures.cjs', 'tools/capture-book-screenshots.cjs',
+    'tools/capture-book-screenshots.ps1', 'tools/annotate-book-screenshots.cjs', 'tools/publish-book.cjs'
   ])].sort();
 }
 function inputHash(relative) {

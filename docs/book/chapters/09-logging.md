@@ -4,7 +4,7 @@ A log helps answer three questions: What ran? What changed? What went wrong? The
 
 ## Choose how much to record
 
-Open a task's **Logging** section. Keep logging enabled, then choose a minimum level.
+Open a configured task and expand **Logging**, near the top of its panel. Keep **Record task logs** enabled, then choose **Minimum severity to record**. Severity means how serious a message is. The app calls these choices levels.
 
 | Level | Use it for |
 | --- | --- |
@@ -17,11 +17,13 @@ INFO is a useful starting point. A minimum of WARN keeps warnings and errors but
 
 ## Customize a task's message
 
-1. Open Logging and find the rule for the event you want, such as task completion.
-2. Leave the rule enabled. Choose a level that fits the message.
-3. Edit the message. Use the field picker and insertion buttons to add values, such as task name or output row count.
-4. Open the logging preview and check the wording.
-5. Run the task once and read the actual log entry.
+1. Expand **Logging**. Find the rule whose **When** setting is the event you need, such as task completion.
+2. Check **Enable this rule** and choose its **Level**. The level must also pass **Minimum severity to record**.
+3. Edit **Message**. Use **Field to insert into a message** and the rule's insertion button for values such as task name or output row count.
+4. Set **Preview an event** to the same event. Use **Example values** to try sample counts, then read **Rendered log entries**. This preview does not run the task.
+5. Run the task and inspect its recorded entries under Logging. Check the timestamp so you read the new entry.
+
+![Task Logging lets you choose events, levels, and message fields. Test the wording in the preview before running the task.](assets/ui-logging.png){#fig-logging}
 
 For a table-cleaning task, you could use:
 
@@ -30,6 +32,8 @@ For a table-cleaning task, you could use:
 ```
 
 The words in braces are placeholders. The app fills them with values from the run. Use the picker so you do not need to memorize their spelling. An output count may not exist at task start, so use it in a completion message.
+
+![Read the rendered entry before running the task. File output preview lets you inspect Text, CSV, or JSON without writing a file.](assets/ui-logging-preview.png){#fig-logging-preview}
 
 Keep the original-message field in warning and error rules. That way, your friendly wording does not hide the reason something failed. If a placeholder stays visible, check the field and event in the preview.
 
@@ -50,10 +54,12 @@ A warning message alone does not stop a Script. If you need a quality condition 
 Use **Export Log** to write selected task logs to a file as part of your flow.
 
 1. Add Export Log from Output.
-2. Select the tasks to include and wait for. Include Report if you want its completion recorded.
-3. Choose TXT, CSV, or JSON and the minimum level.
-4. Choose a full destination path in a folder you can write to. Match the file ending to the format.
-5. Set Overwrite only if reruns should replace that file. Run the task and open the file to check it.
+2. Choose the tasks in **Run after and include these tasks**. Include Report if you want its completion recorded. Blank means all other tasks in the active flow.
+3. Choose **Text**, **CSV**, or **JSON** in **Format**, then set **Minimum severity to export**. Leave **Show example entries instead of retained logs** off when checking your own run.
+4. Enter a full **Destination file path** in a folder you can write to. Include the matching file ending, such as `/pipeline-log.csv` after the folder address for CSV.
+5. Check **Overwrite an existing file** only if reruns should replace it. Select **Export log**, or **Run** in the task header. Open the file outside the app and check its dates and messages.
+
+![Export Log needs a complete file path, a format, and the tasks to wait for. Its severity filter applies to messages already retained by those tasks.](assets/ui-export-log.png){#fig-export-log}
 
 TXT is easiest to read as plain text. CSV opens in a spreadsheet with separate fields. JSON is useful when another program will read the records. Export Log writes a file rather than making a new data table.
 
@@ -61,7 +67,11 @@ If the flow stopped at an earlier error, run Export Log by itself afterwards whe
 
 ## Put the log in a report
 
-In **Report > Appearance**, turn on **Include pipeline log in the report**. Choose INFO to include normal progress, or WARN for warnings and errors only. Run the report and look for **Pipeline execution log**.
+1. Open a Report task after running the tasks whose logs you need.
+2. Under **Appearance**, check **Include pipeline log in the report**. Set **Minimum log level** to INFO for normal progress, or WARN for warnings and errors only.
+3. Select **Generate Report**, then **Download HTML** or **Download DOCX**. Open the file and look for **Pipeline execution log**.
+
+![Report Appearance controls the log appendix and its minimum level. Generate the report again after changing this setting.](assets/ui-report-log.png){#fig-report-log}
 
 The report takes a snapshot of other tasks' available logs before it is made. It cannot include its own completion at that point. Add Export Log after Report if you need that event in a separate file. You can also make a report containing only a log by enabling the log option without selecting ordinary report items.
 
@@ -73,6 +83,4 @@ Use the timestamps and run identifiers to compare runs. Old warnings may still a
 
 ## Use startup logs for startup problems
 
-The desktop **Session** menu offers **Open startup log**, **Open logs folder**, and **Save diagnostic log**. These help when the window cannot connect or the R server stops. Task logs help with the analysis itself.
-
-Before sharing any log, check it for private data, passwords, and file paths you do not want to publish. Send the relevant file and a short description of what you were doing.
+The desktop **Session** menu offers **Open startup log**, **Open logs folder**, and **Save diagnostic log** for connection and startup problems. Task logs help with the analysis itself. Before sharing a log, remove private data, passwords, and file paths you do not want to publish.

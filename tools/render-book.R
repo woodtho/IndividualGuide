@@ -39,6 +39,10 @@ main <- function() {
   checks <- list()
   checks$htmlSha256 <- digest::digest(file = file.path(output,"Individual-Guide-Handbook.html"), algo = "sha256")
   checks$images <- evaluate("Array.from(document.images).map(image=>({alt:image.alt,width:image.naturalWidth,height:image.naturalHeight}))")
+  checks$figures <- evaluate("Array.from(document.querySelectorAll('figure')).map(figure=>({caption:figure.querySelector('figcaption')?.textContent.trim(),alt:figure.querySelector('img')?.alt,width:figure.querySelector('img')?.getBoundingClientRect().width}))")
+  stopifnot(length(checks$figures) >= 25L,
+    all(vapply(checks$figures, function(figure) nzchar(figure$alt) &&
+      grepl('^Figure [0-9]+[.]', figure$caption) && figure$width > 150, logical(1))))
   checks$anchors <- evaluate("(() => {const ids=Array.from(document.querySelectorAll('[id]')).map(e=>e.id);return {duplicate:ids.filter((id,i)=>ids.indexOf(id)!==i),missing:Array.from(document.querySelectorAll('a[href^=\"#\"]')).map(a=>a.getAttribute('href').slice(1)).filter(id=>id&&!document.getElementById(decodeURIComponent(id)))};})()")
   stopifnot(length(checks$anchors$duplicate) == 0L, length(checks$anchors$missing) == 0L)
   checks$sourceEdition <- evaluate("document.body.innerText.includes('0.4.0-Setup-Windows-x64.exe')&&document.body.innerText.includes('58 task')")
@@ -61,6 +65,8 @@ main <- function() {
   shot(file.path(output, "book-task-reference.png"))
   evaluate("document.querySelectorAll('h1,h2,h3,h4').forEach(heading=>heading.setAttribute('aria-label',heading.textContent.trim()));true")
   page$Emulation$setEmulatedMedia(media = "print")
+  checks$taskFinderCellPadding <- evaluate("parseFloat(getComputedStyle(document.getElementById('task-finder').nextElementSibling.nextElementSibling.querySelector('td')).paddingTop)")
+  stopifnot(checks$taskFinderCellPadding > 4, checks$taskFinderCellPadding < 6)
   pdf <- page$Page$printToPDF(printBackground = TRUE, preferCSSPageSize = TRUE,
     displayHeaderFooter = TRUE,
     headerTemplate = '<div style="font-family:Arial;font-size:8px;width:100%;text-align:center;color:#65748b">Individual Guide · A Friendly Guide · Release 0.4.0</div>',
@@ -79,7 +85,8 @@ main <- function() {
   checks$pdf$outline <- pdftools::pdf_toc(pdf_path)
   stopifnot(length(checks$pdf$outline) > 0L)
   stopifnot(info$pages >= 20L, all(nchar(trimws(texts)) > 80L))
-  selected <- unique(as.integer(c(1, 3, round(info$pages / 3), round(info$pages * 2/3), info$pages)))
+  figure_pages <- which(grepl("Figure[[:space:]]+[[:digit:]]+[.]", texts))
+  selected <- sort(unique(as.integer(c(1, 3, figure_pages, round(info$pages / 3), round(info$pages * 2/3), info$pages))))
   images <- pdftools::pdf_convert(pdf_path, format = "png", pages = selected, dpi = 80,
     filenames = file.path(output, paste0("pdf-page-", selected, ".png")), verbose = FALSE)
   checks$pdf$samplePages <- selected

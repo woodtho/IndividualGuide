@@ -15,7 +15,7 @@ After a Preview, use Run to keep the result. After running, use Save to keep the
 
 ## Check the task status
 
-A successful status means the task finished. Open its result to make sure it answered your question. An error means it needs attention. Open its Log and read the first useful error message.
+A successful status means the task finished. Open its result to make sure it answered your question. An error means it needs attention. Expand **Logging** and read its recorded error entries.
 
 A stale result means an input or setting has changed since that result was made. Run the affected task and the later tasks that use it. An old report may still open while it waits to be rebuilt.
 
@@ -25,7 +25,13 @@ A skipped task may belong to a branch that was not chosen. A waiting task may ne
 
 Use the flow's play button to run the active flow. Check which flow is selected if your project has more than one. Right-click a task for **Run to here** or **Run from here** when those actions are available. These follow task connections, rather than the positions of shapes on the screen.
 
-Use **Validate active flow** to check for missing inputs and other setup problems before a long run. Validation checks the setup. It cannot prove that your data or conclusions are correct.
+1. In the desktop app, choose **Task > Validate active flow...** before a long run. In a browser, select **Validate active flow** in the app header.
+2. Read the listed problems. Close the dialog and correct any missing inputs or invalid settings.
+3. Validate again. Once the setup is ready, choose **Task > Run active flow** or use the flow's play button.
+
+Validation checks the setup. It cannot prove that your data or conclusions are correct.
+
+![Validation lists problems or information about checks that will run later. Read each message and resolve blocking items before continuing.](assets/ui-validation.png){#fig-validation}
 
 ## Stop a run
 
@@ -41,21 +47,45 @@ For a first import, use a small CSV or Excel sheet with one header row. Give eve
 
 Use **Import Data** to bring a file or database table into the project.
 
-1. Add the task from Data. Choose the file type and select your file.
-2. For CSV or other text files, check the separator, header, and text encoding. A separator is the character between columns, often a comma or tab.
-3. For Excel, choose the sheet and any row or range settings you need.
-4. Check the preview. Each field should be in its own column, with the right names and values.
-5. Choose a clear output name, such as `sales_raw`, and run the task.
+1. Select **Add Task > Data > Import Data**. Under **Setup**, choose **File** in **Source**.
+2. Select **Browse...** and choose your file. The app detects its type from the selected file.
+3. For CSV or other text files, check **Delimiter** and **First row is header**. A delimiter separates columns, often with a comma or tab. Open **More file settings** only if you need to change options such as text encoding.
+4. For Excel, choose the sheet and any row or range settings shown after selecting the file.
+5. Select **Preview**. Each field should be in its own column, with the right names and values.
+6. Enter a clear **Output table name**, such as `sales_raw`, then select **Run import**.
+
+![Import Data detects the selected CSV and offers delimiter and header settings. Preview it before running the import.](assets/ui-import.png){#fig-import}
 
 Open the new table and check its row count. Check dates, missing values, and identifiers such as postal codes. If an ID starts with zero, keep it as text so the zero is not lost.
 
+Selecting a different file suggests a new output name based on that filename. Check **Output table name** again before rerunning an existing import. Later tasks still need the name they were set up to use.
+
 If all values land in one column, check the separator. If the names become the first data row, check the header setting. If letters look wrong, try the file's text encoding. The **US states - import, join and filter** example uses a real bundled CSV that you can inspect without finding your own file.
+
+### Keep zeros at the start of an ID
+
+Use this when a CSV contains IDs such as `001` and you need to preserve their exact text.
+
+1. Select the CSV, then open **More file settings**.
+2. In **col_types**, type one lowercase `c` for each column, without spaces or quotes. Use `cc` for a two-column file or `cccc` for four columns. Each `c` tells the app to read that column as text.
+3. Preview the file and check that `001` still has its zeros. Confirm the output name, then select **Run import**.
+4. Use **Change Column Types** afterwards to convert measurement columns to numeric. Leave the ID column as text.
+
+Use this option only when you need it. Reading every column as text means measurements need conversion before numeric charts or models can use them.
 
 ## Work with a database
 
-Choose the database source in Import Data and select or set up its connection. You may need an address, database name, account, and a driver from your database provider. Ask the person who manages the database for these details.
+Ask the person who manages the database for its connection details and a small table to practise with. A **driver** lets the app connect to that kind of database. A **DSN** is a named connection set up on your computer.
 
-Start with a small table or query. A live database result may still need its connection when later tasks run. If you need a fixed copy for a report, make sure the data have been loaded into the project and record when you took the copy.
+1. In **Import Data > Setup**, choose **Database** in **Source**.
+2. If a suitable **Saved connection** exists, select it and choose **Load**. Otherwise, choose **Form** under **Connection** and enter a clear **Connection name**.
+3. Choose **Driver** using your database contact's advice. For a SQLite file, choose **RSQLite::SQLite()** and enter its full path in **Database / file**. For ODBC, choose **odbc::odbc()** and use the supplied **DSN** or connection details.
+4. Open **More connection settings** if you need **Host**, **Port**, or **User**. Enter a password only when the app requests it during connection.
+5. Enter **Table** and **Schema**, if required. Use **Use SQL query** only when you have a suitable query to paste into **SQL**.
+6. For a small, fixed practice copy, check **Collect into memory immediately**. This loads the result and closes the connection. Leave it off only when you intend to keep a live database reference.
+7. Set **Output table name**, select **Preview**, and check the columns. Select **Run import**, then check the saved table and row count.
+
+Start with a small table or query. A live database result still needs its connection when later tasks use it. Record the date of a fixed copy when that matters to your report. A failed connection may mean an incorrect address, missing driver, or account restriction; use the exact error when asking your database contact for help.
 
 The Windows app includes its normal app packages. An R-only installation may need a database package and a separate system driver. The [optional R setup](#install-with-r) explains where to get packages. Do not put passwords in a report, log message, or shared Script.
 
@@ -67,27 +97,42 @@ These tasks help you choose the rows and columns you need. Run the input task fi
 
 Use **Query Builder** when you need to choose columns, join tables, filter rows, or make grouped totals in one task.
 
-Select the input tables, then choose the columns to keep. Add a join only when you need columns from another table. A join matches rows using a shared key, such as a customer number. Pick the key on both sides and choose the join type. A left join keeps the rows from the first table and adds matches from the second.
+1. Select **Add Task > Data > Query Builder**. In **Select Data**, choose the **Primary input table**.
+2. Use the plus buttons under **Available columns** to add columns to **Selected columns**. Use **All** if you need every column.
+3. If you need another table, open **Join Tables > Add join**. Choose the **Right table**, **Join type**, and matching key columns, then select **Add join** in the dialog.
+4. Use **Filter Data > Add condition** to keep matching rows. Use **Sort Data > Add sort** to choose their order.
+5. Enter an **Output table name**. Select **Preview (1 000 rows)** and inspect **Results**, then select **Run & save** to keep the full result.
+
+A join matches rows using a shared key, such as a customer number. A left join keeps the rows from the first table and adds matches from the second.
+
+![Query Builder separates column selection, filters, sorting, and joins into tabs. Add wanted columns to Selected columns before previewing.](assets/ui-query.png){#fig-query}
 
 Preview the result and check its row count. When it looks right, run the task to keep the result. If a key appears several times in both tables, a join can produce more rows than you expected. Check keys before calculating totals.
 
-For grouped results, choose the group columns and a calculation such as sum or mean. Filters before grouping choose input rows. A filter on the finished group result chooses which totals remain. Start with the **US states** example to see a join and a filter together.
+For grouped results, set a selected value column's calculation to **SUM** or **AVG**. AVG means mean. The other selected columns without a calculation define the groups. **Filter Data** chooses input rows; **Having** filters the calculated group results. Start with the **US states** example to inspect a saved join result.
 
 ## Filter and Sort {#task-filter_sort}
 
 Use **Filter and Sort** to keep matching rows and put them in order.
 
-Choose the input table. Add a rule by selecting a column, a comparison, and a value. For example, a numeric amount greater than 100 keeps rows above that amount. Check whether several rules should all match or whether any one may match.
+1. Select **Add Task > Data > Filter and Sort**, then choose **Input table** in the task header.
+2. Under **Filter Data**, select **Add condition**. Choose the column, operator, and value. For example, an amount greater than 100 keeps rows above that amount.
+3. If you add more conditions, check their **AND** or **OR** choice. AND needs both rules to match; OR needs at least one.
+4. Under **Sort Data**, select **Add sort**. Choose the sort column and direction. Ascending goes from smaller to larger, or A to Z; descending reverses that order.
+5. Enter an **Output table name**, select **Run & Save**, and open **Results**. Check a few rows at the top and bottom.
 
-Choose one or more sort columns and their order. Ascending goes from smaller to larger, or A to Z. Descending reverses that order. Run the task with a new output name and check a few rows at the top and bottom.
+Missing values need their own rule. A missing value is an unknown entry, not the same as zero or an empty word. Use **IS NULL** to select missing values, or **IS NOT NULL** to keep known values.
 
-Missing values need their own rule. A missing value is an unknown entry, not the same as zero or an empty word. Use the missing-value choice when you mean to select those rows. The **US states** example shows how filtering changes the final table.
+**Release 0.4.0 note:** opening the saved Filter and Sort step in **US states - import, join and filter** can disconnect the workspace. Inspect its saved output instead, or add a fresh Filter and Sort task using the steps above. Save first. If needed, use the [restart steps](#troubleshooting).
 
 ## Derive Columns {#task-derive_cols}
 
 Use **Derive Columns** to add a calculated column, such as a total or a value converted to new units.
 
-Choose the input, enter a new column name, and enter its formula. A simple formula can use existing column names and arithmetic. For example, if the input has columns named `price` and `quantity`, `price * quantity` calculates their product for each row.
+1. Select **Add Task > Data > Derive Columns** and choose **Input table**.
+2. Select **Add**. Enter **New column name** and **R expression for new column**. For example, if your table has `price` and `quantity`, enter `total` and `price * quantity`.
+3. Enter an **Output table name** and select **Run & Save**.
+4. Open **Results** and check the new column against a few values you calculate yourself.
 
 Start with one new column. Run the task and check a few values by hand. Then add other calculations if needed. Keep units clear: changing the column name alone does not convert centimetres to metres.
 
@@ -99,7 +144,10 @@ Formulas use R expressions, so names and punctuation matter. Copy a working form
 
 Use **Script** when you have trusted R code to run as part of a flow. You can complete many projects using the other task forms instead.
 
-Select the input tables the code needs. Paste code into the Script editor. In the output list, declare each result you want to keep, using exactly the name used by the code. For a data table, choose a table output. A model or other non-table result needs an object output.
+1. Select **Add Task > General > Script**. Under **Setup**, choose any **Input tables / special outputs** the code needs. These choices tell the flow which earlier results to wait for.
+2. Paste trusted code into **R code**. The [first-project exercise](#first-project) supplies a complete two-line example.
+3. In **Outputs**, put each result on a separate line as `name: kind`. For a table called flowers, type `flowers: table`. For a model called fit, type `fit: model`.
+4. Select **Run**, then check the saved results and recorded entries under **Logging**.
 
 Run the task and check Results and Log. If a result is missing, first compare its declared name with the code. Names are case-sensitive: `Flowers` and `flowers` are different.
 

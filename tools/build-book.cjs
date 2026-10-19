@@ -35,12 +35,12 @@ const atlas = [
   '# Choose an example project {#examples}', '',
   'All 22 projects below come with data, configured tasks, saved results, logging, and output files. They use public sample data supplied with R or its packages. You do not need a separate data download to explore them.', '',
   '## Find an example by task', '',
-  '1. Open **Help > Example projects** in the app.',
-  '2. Search for a title or topic. Use the **task type** filter to find a specific task, such as Rename Columns or Cluster Analysis.',
-  '3. Use the **category** filter to narrow the list to a group, such as Graph or Survival Analysis.',
-  '4. Choose **Open example**, then use **Save As** to keep your own copy.', '',
+  '1. Leave the welcome screen with **Start with a blank canvas** if needed. In the desktop app, choose **Help > Application help**; in a browser, select **Help** in the app header. Open **Example projects**.',
+  '2. Search for a title or topic. Use the **Task type** filter to find a specific task, such as Rename Columns or Cluster Analysis.',
+  '3. Use the **Task category** filter to narrow the list to a group, such as Graph or Survival Analysis.',
+  '4. Choose **Open example**. If an unsaved-work prompt appears, cancel and save first. Choose **Discard** in the desktop prompt, or **Discard and open example** in a browser, only when you mean to replace that work. Use **File > Save project as...** in the desktop app to keep your own copy.', '',
   'If nothing appears, clear the search and filters, then try just one filter. You can also use the Task finder at the end of this guide to see which projects contain a task.', '',
-  '![Example projects filtered to the Survival Analysis category in Help.](assets/example-filters.png)', '',
+  '![The Task type filter finds example projects that contain Summary Statistics. Clear a filter to return to the full list.](assets/ui-examples.png){#fig-examples}', '',
   '## A simple learning route', '',
   'Start with **Iris exploration**. Next try **Cars - prepare an analysis table** for cleaning, **Flowers - categorical chart gallery** for charts, and **Cars - a report with an execution audit** for reporting and logs. Choose models and control-flow examples when you need them.', '',
   '## Before you rerun an example', '',
@@ -68,12 +68,12 @@ const reference = [
   'Use the menus while learning. These keys can save time once the actions feel familiar. A text editor or open dialog may use a key for its own controls.', '',
   '| Keys | Action |', '| --- | --- |',
   '| Ctrl+N | New project |', '| Ctrl+O | Open project |',
-  '| Ctrl+S | Save project |', '| Ctrl+Shift+S | Save As |',
+  '| Ctrl+S | Save project |', '| Ctrl+Shift+S | Save project as |',
   '| Ctrl+Shift+F | Search project |', '| Ctrl+Alt+L | Open Task list |',
   '| Ctrl+Alt+R | Run active flow, when focus is outside an editor |',
   '| Ctrl+Shift+F5 | Stop the flow run |', '| Ctrl+Shift+R | Restart R server; save first if possible |',
   '| F1 | Open app help |', '| Tab / Shift+Tab | Move focus through controls |', '',
-  'For more keys, open **Help > Keyboard shortcuts**. If you run in a normal web browser, use the app buttons; the browser may use these same keys for its own actions.', '',
+  'For more keys, open **Help > Keyboard shortcuts...**. If you run in a normal web browser, use the app buttons; the browser may use these same keys for its own actions.', '',
   '## A few more terms', '',
   '| Term | Plain meaning |', '| --- | --- |',
   '| Column type | The kind of value stored, such as text, number, date, or category |',
@@ -89,7 +89,8 @@ const reference = [
   '| Seed | A setting for repeating a random choice with the same inputs |',
   '| Stale | A result that needs to be rerun after a change |', '',
   '## Public downloads and help', '',
-  '- [Individual Guide releases](https://github.com/woodtho/IndividualGuide/releases/latest): Windows Setup, R package files, and downloadable handbook editions.',
+  '- [Current handbook and downloads](https://woodtho.github.io/IndividualGuide/): the latest reviewed HTML, PDF, EPUB, and Word guide. Books attached to older releases may be earlier editions.',
+  '- [Individual Guide releases](https://github.com/woodtho/IndividualGuide/releases/latest): public Windows Setup and R package files.',
   '- [Release 0.4.0](https://github.com/woodtho/IndividualGuide/releases/tag/v0.4.0): the version used by this guide.',
   '- [Report an app issue](https://github.com/woodtho/IndividualGuide/issues): include the version and exact error; check attachments for private information.',
   '- [Download R](https://cran.r-project.org/): needed only for the optional R installation route.',
@@ -105,7 +106,8 @@ for (const file of fs.readdirSync(path.join(out, 'generated'))) {
   if (/^\d{2}-[\w-]+\.md$/.test(file) && !Object.hasOwn(generated, file)) fs.unlinkSync(path.join(out, 'generated', file));
 }
 for (const [file, content] of Object.entries(generated)) fs.writeFileSync(path.join(out, 'generated', file), content + '\n');
-const complete = authored + '\n\n' + Object.values(generated).join('\n\n');
+const numbered=require('./book-figures.cjs').numberFigures(authored+'\n\n'+Object.values(generated).join('\n\n'),source);
+const complete=numbered.markdown,figures=numbered.figures;
 fs.writeFileSync(path.join(out, 'Individual-Guide-Handbook.md'), complete);
 const args = process.argv.slice(2), custom = args.indexOf('--pandoc');
 const candidates = [custom >= 0 ? args[custom + 1] : '', process.env.PANDOC,
@@ -137,7 +139,7 @@ const manifest = {title: metadata.title, edition: metadata.edition, audience:'Ne
   tasks:metadata.registry.map(task=>task.id), examples:metadata.examples.map(example=>example.id),
   exampleSteps:metadata.examples.reduce((n,example)=>n+example.tasks.length,0), words:wordCount,
   chapters:chapterFiles.map(name=>({name,sha256:digest(path.join(source,'chapters',name))})), source_md5:metadata.source_md5,
-  metadataSha256:digest(metadataPath), lessonsSha256:digest(lessonsPath), bookInputs, outputs:[], builtAt:new Date().toISOString()};
+  metadataSha256:digest(metadataPath), lessonsSha256:digest(lessonsPath), figures, bookInputs, outputs:[], builtAt:new Date().toISOString()};
 for (const file of fs.readdirSync(out).filter(name=>/^Individual-Guide-Handbook\.(md|html|epub|docx)$/.test(name))) manifest.outputs.push({file,bytes:fs.statSync(path.join(out,file)).size,sha256:digest(path.join(out,file))});
 fs.writeFileSync(path.join(out,'manifest.json'), JSON.stringify(manifest,null,2)+'\n');
 console.log(JSON.stringify({words:wordCount,tasks:metadata.registry.length,examples:metadata.examples.length,out},null,2));

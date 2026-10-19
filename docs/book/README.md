@@ -24,3 +24,6 @@ When building this edition locally, the finished books are saved in `build/book/
 as `Individual-Guide-Handbook.pdf`, `.html`, `.epub`, and `.docx`. You do not need
 to build the book to use the app. [Book build instructions](BUILDING.md) are
 separate for people maintaining the documentation.
+
+The [review notes](REVIEW.md) describe the editorial changes, verification, and
+known limitations of this edition.

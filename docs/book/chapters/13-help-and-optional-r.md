@@ -20,7 +20,13 @@ If startup shows a failure, open its startup log. Save the error text. Check tha
 
 ## The app disconnects or the R server stops
 
-In the desktop app, choose **Session > Restart R server**. Save first if the workspace still responds. Restarting stops active work and can lose unsaved changes. After reconnecting, reopen your saved project or use the offered recovery copy, then check results before running again.
+1. If the workspace still responds, save the project and wait for saving to finish.
+2. In the desktop app, choose **Session > Restart R server...**. If a reconnect screen is shown, its **Restart R server** button provides the same recovery route.
+3. Read the confirmation and restart. This stops active work and can lose unsaved changes.
+4. Wait for reconnection. Reopen your saved project, or select **Restore** if a **Recover unsaved work?** prompt offers the work you need. Save a recovered copy before continuing.
+5. Check the input paths and results before running the flow again.
+
+![The desktop Session menu provides server restart and startup diagnostics. Use task logs instead when investigating an analysis result.](assets/ui-session-menu.png){#fig-session-menu width=11cm}
 
 When running through R in a web browser, go to the R window that launched the app. Stop that session if needed and run the launch command again. See [Optional: install with R](#install-with-r). The browser version has no independent desktop Session menu.
 
@@ -68,7 +74,7 @@ The report's log section contains earlier recorded events, not its own later com
 
 Use the [public issue tracker](https://github.com/woodtho/IndividualGuide/issues) for app problems. A GitHub account is needed to create an issue. Include the app version, how you opened it, the last action, the exact error, and what you expected.
 
-For startup or connection problems, use **Session > Save diagnostic log** in the desktop app. For an analysis problem, export the relevant task log. Check attachments for private data and passwords before posting them. A small example using public data is often the easiest way to explain a problem.
+For startup or connection problems, use **Session > Save diagnostic log...** in the desktop app. For an analysis problem, export the relevant task log. Check attachments for private data and passwords before posting them. A small example using public data is often the easiest way to explain a problem.
 
 # Optional: install with R {#install-with-r}
 
@@ -78,9 +84,11 @@ Skip this chapter if you use the Windows Setup. These steps are for people who w
 
 ## Step 1: install R from its public website
 
-Go to the [R download site, CRAN](https://cran.r-project.org/). Choose your operating system. On Windows, choose **Download R for Windows**, then **base**, then the current R installer. Follow the installer's instructions.
+1. Go to the [R download site, CRAN](https://cran.r-project.org/). Choose your operating system.
+2. On Windows, choose **Download R for Windows**, then **base**, then the current R installer. Download it and follow its instructions.
+3. Open **R** from the Start menu. Check for a console with a `>` prompt before continuing.
 
-Open **R** from the Start menu. You should see a console with a `>` prompt. That is where you paste the commands below. Do not type the `>` itself, and do not paste these installation commands into an app Script task.
+That R console is where you paste the installation commands below. Do not type the `>` itself. Use the separate R application for installation, rather than a Script task or the R Console inside Individual Guide.
 
 On macOS, use the CRAN macOS download and open the R application. Linux users should follow CRAN's instructions for their Linux version; extra system software may be needed for some packages.
 
@@ -122,7 +130,19 @@ rmarkdown::pandoc_available()
 
 `TRUE` means it was found. HTML reports have a simpler fallback, so you can start with HTML while sorting out Word support.
 
-Only add database support if you need it. Install `RSQLite` for SQLite, `duckdb` for DuckDB, or `odbc` for an ODBC connection using `install.packages()` and the same CRAN address. ODBC may also need a driver from the database provider. Ask your database support contact which one to use.
+Only add database support if you need it. For a SQLite file, run:
+
+```r
+install.packages("RSQLite", repos = "https://cloud.r-project.org")
+```
+
+For an ODBC connection, run:
+
+```r
+install.packages("odbc", repos = "https://cloud.r-project.org")
+```
+
+ODBC may also need a driver from the database provider. Ask your database support contact which one to use. If you have trusted custom connection code, ask its author which extra packages it needs. These commands belong in the separate R application, with the app closed.
 
 ## Step 4: open the app
 
@@ -145,6 +165,8 @@ Open R and run only `IndividualGuide::run_app()`. You do not need to reinstall p
 To update later, save and close the app, start a fresh R session, and follow the instructions for the release you want. The tag `v0.4.0` deliberately selects the version used in this guide.
 
 ## If package installation fails
+
+If an optional task names a missing package, close the app and return to R. Use one of the single-package installation commands above, replacing its first quoted name with the package named in the error. Keep the CRAN address as shown.
 
 Check your internet connection and copy the first useful error. A message about a missing system library or compiler needs the setup for that package and operating system; repeating the same command will not fix it. On Windows, the public Setup is the easier route if you do not need an R-managed installation.
 

@@ -14,12 +14,13 @@ function check(name, condition, detail) { checks[name]={ok:Boolean(condition),..
 function escape(text){return text.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}
 check('complete_reader_edition',meta.task_count===58&&meta.examples.length===22,{words:manifest.words,tasks:meta.task_count,examples:meta.examples.length});
 const authored=fs.readdirSync(path.join(source,'chapters')).filter(f=>f.endsWith('.md')).sort().map(f=>fs.readFileSync(path.join(source,'chapters',f),'utf8')).join('\n\n');
-check('assembled_book_matches_current_chapters',book.startsWith(authored));
+check('assembled_book_matches_current_chapters',book.startsWith(require('./book-figures.cjs').numberFigures(authored,source).markdown));
 for(const task of meta.registry){
   const token='{#task-'+task.id+'}';
   check('task_'+task.id+'_unique',authored.split(token).length===2);
   const start=authored.indexOf(token)+token.length, next=authored.indexOf('\n## ',start), body=authored.slice(start,next<0?undefined:next);
   check('task_'+task.id+'_action_and_check',/\b(?:[Cc]hoose|[Ss]elect|[Aa]dd)\b/.test(body)&&/\b[Rr]un\b/.test(body)&&/\b(?:[Cc]heck|[Ii]nspect|[Cc]ompare|[Rr]ead)\b/.test(body));
+  check('task_'+task.id+'_numbered_steps',(body.match(/^\d+\. /gm)||[]).length>=3);
   check('task_'+task.id+'_PDF',plain.includes(task.label));
 }
 const lessons=JSON.parse(fs.readFileSync(path.join(source,'data/example-lessons.json'),'utf8'));
@@ -42,7 +43,7 @@ check('released_GitHub_package_install',/remotes::install_github\(\s*"woodtho\/I
 check('installation_explains_where_and_next_launch',book.includes('Do not type the `>` itself')&&book.includes('You do not need to reinstall packages each day'));
 check('no_developer_setup_or_default_dump',!/(?:pkgload::|devtools::|renv::|R CMD (?:build|INSTALL)|build\/staging|tools\/build-standalone|saved defaults|source checkout|source_md5|\.defaults_r)/i.test(book));
 check('no_private_machine_paths',!/(?:aThom|OneDrive|C:[\\/]Users[\\/])/i.test(book));
-check('examples_filter_and_report_logging_instructions',book.includes('**task type** filter')&&book.includes('Include pipeline log in the report')&&book.includes('Pipeline execution log'));
+check('examples_filter_and_report_logging_instructions',book.includes('**Task type** filter')&&book.includes('Include pipeline log in the report')&&book.includes('Pipeline execution log'));
 const readability=require('./book-readability.cjs').readability(book);
 check('approximate_eighth_grade_prose',readability.words>1000&&readability.estimatedGrade<=9,readability);
 const ids=Array.from(html.matchAll(/\bid="([^"]+)"/g),m=>m[1]);
@@ -56,6 +57,21 @@ check('no_todo_or_placeholder_sections',!/^\s*(?:TODO|TBD|FIXME|Coming soon|Chap
 for(const [relative,expected]of Object.entries(meta.source_md5))check('source_'+relative,hash(path.join(root,relative),'md5')===expected);
 for(const chapter of manifest.chapters)check('chapter_'+chapter.name,hash(path.join(source,'chapters',chapter.name))===chapter.sha256);
 check('metadata_identity',hash(path.join(source,'data/app-reference.json'))===manifest.metadataSha256);
+const captures=JSON.parse(fs.readFileSync(path.join(source,'data/screenshots.json'),'utf8'));
+check('capture_reference_matches_app_reference',captures.referenceSha256===manifest.metadataSha256);
+check('live_UI_inventory_covers_all_tasks',captures.reviewedTaskPanels.length===58&&meta.registry.every(task=>captures.reviewedTaskPanels.some(panel=>panel.type===task.id)));
+check('screenshots_have_release_provenance',captures.screenshots.length>=25&&captures.screenshots.every(shot=>shot.source==='live Individual Guide desktop application'&&shot.packageVersion===meta.package_version));
+check('workspace_has_explained_callouts',captures.screenshots.find(shot=>shot.id==='workspace')?.annotations?.markers.map(marker=>marker.number).join() === '1,2,3');
+for(const shot of captures.screenshots)check('capture_'+shot.id,hash(path.join(source,shot.file))===shot.sha256&&shot.pixels.width>=500&&shot.pixels.height>=180);
+const figureIDs=new Set();
+check('instructional_figures_throughout',manifest.figures.length>=25);
+for(const figure of manifest.figures){
+  check('figure_'+figure.id+'_source',!figureIDs.has(figure.id)&&figure.number===figureIDs.size+1&&hash(path.join(source,figure.file))===figure.sha256);
+  figureIDs.add(figure.id);
+  check('figure_'+figure.id+'_caption',figure.caption.length>=35&&html.includes('Figure '+figure.number+'.')&&html.includes('id="'+figure.id+'"')&&plain.includes('Figure '+figure.number+'.'));
+  if(figure.file.includes('/ui-'))check('figure_'+figure.id+'_live_capture',captures.screenshots.some(shot=>shot.file===figure.file));
+}
+check('known_release_limitation_explained',book.includes('opening the saved Filter and Sort step')&&book.includes('add a fresh Filter and Sort task'));
 function zip(file){
   const data=fs.readFileSync(file);let end=-1;
   for(let i=data.length-22;i>=Math.max(0,data.length-65557);i--)if(data.readUInt32LE(i)===0x06054b50){end=i;break;}
@@ -88,10 +104,11 @@ check('EPUB_resources_resolve',broken.length===0,broken);
 check('EPUB_has_book_chapters',chapters>=20,chapters);
 const docx=zip(path.join(out,'Individual-Guide-Handbook.docx'));
 check('DOCX_package',docx.has('[Content_Types].xml')&&docx.has('word/document.xml'));
-check('DOCX_all_four_figures',Array.from(docx.keys()).filter(name=>/^word\/media\//.test(name)).length>=4);
+check('DOCX_all_figures',Array.from(docx.keys()).filter(name=>/^word\/media\//.test(name)).length===manifest.figures.length);
 const xml=docx.get('word/document.xml').toString('utf8').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ');
 check('DOCX_has_task_and_example_guide',xml.includes('Cluster Analysis')&&xml.includes('Choose an example project')&&xml.includes('Pipeline execution log'));
 const wordXML=docx.get('word/document.xml').toString('utf8');
+for(const figure of manifest.figures)check('figure_'+figure.id+'_all_editions',xml.includes('Figure '+figure.number+'.')&&Array.from(epub.entries()).some(([name,bytes])=>name.endsWith('.xhtml')&&bytes.toString().includes('Figure '+figure.number+'.')));
 const bookmarks=new Set(Array.from(wordXML.matchAll(/<w:bookmarkStart\b[^>]*w:name="([^"]+)"/g),match=>match[1]));
 const missingBookmarks=Array.from(wordXML.matchAll(/<w:hyperlink\b[^>]*w:anchor="([^"]+)"/g),match=>match[1]).filter(anchor=>!bookmarks.has(anchor));
 check('DOCX_internal_links_resolve',missingBookmarks.length===0,missingBookmarks);

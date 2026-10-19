@@ -49,6 +49,37 @@ Test public installation separately in a disposable package library when changin
 those instructions. Do not download or install packages during ordinary book
 verification.
 
+## Capture the real interface
+
+On Windows, use `resources/runtime` from the installed public release that
+matches `data/app-reference.json`. Install the desktop development dependencies
+with `npm ci` in `tools/desktop`, then run:
+
+```powershell
+./tools/capture-book-screenshots.ps1 -Runtime '<installed app>/resources/runtime'
+node tools/annotate-book-screenshots.cjs
+```
+
+The script copies the desktop shell into a new temporary folder and replaces
+only that copy's product-test hook with the book driver. It uses a separate
+profile and public practice data, with a fresh R session for each example. It does not change an installed app or a user
+project. A writable practice folder outside user profiles is needed to keep
+personal paths out of the images; use `-PracticeParent` if the drive root is not
+writable. `-Resume` continues a failed capture using the private evidence under
+`artifacts/book-review`. Use it only for the same release and app reference.
+
+The driver opens actual forms, waits for bindings and results, and saves PNGs
+and a 58-task label inventory. `data/screenshots.json` records capture provenance,
+dimensions, and checksums. The 0.4.0 saved Filter and Sort example has a known
+panel-initialization defect; the driver reviews a newly added task instead.
+Keep that limitation in the reader guide and review report until a later app
+release fixes it. Do not alter application code to make documentation pass.
+
+Give every Markdown image a descriptive caption and a stable `{#fig-name}`.
+The builder assigns figure numbers and resolves `[Figure](#fig-name)` links in
+all formats. Review the actual screenshots and every figure page in the PDF.
+Automated checks cannot judge whether a cropped label is useful or readable.
+
 Readability uses the Flesch-Kincaid formula with a simple syllable estimate over
 prose paragraphs, excluding code, headings, tables, links, and inline identifiers.
 It is an editing aid, not proof that every technical term is easy to understand.
