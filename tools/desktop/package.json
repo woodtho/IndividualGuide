@@ -1,0 +1,93 @@
+{
+  "name": "individual-guide-desktop",
+  "productName": "Individual Guide",
+  "version": "0.4.0",
+  "private": true,
+  "description": "Standalone Individual Guide Shiny desktop application",
+  "author": "Thomas Wood",
+  "license": "MIT",
+  "main": "main.cjs",
+  "devDependencies": {
+    "axe-core": "4.14.0",
+    "electron": "44.7.2",
+    "electron-builder": "26.15.3"
+  },
+  "build": {
+    "appId": "ca.individualguide.desktop",
+    "productName": "Individual Guide",
+    "executableName": "IndividualGuide",
+    "directories": {
+      "output": "../../build",
+      "buildResources": "assets"
+    },
+    "files": [
+      "main.cjs",
+      "preload.cjs",
+      "diagnostics.cjs",
+      "preferences.cjs",
+      "security.cjs",
+      "menus.cjs",
+      "smoke.cjs",
+      "menu-smoke.cjs",
+      "lifecycle-smoke.cjs",
+      "restart-smoke.cjs",
+      "console-smoke.cjs",
+      "examples-smoke.cjs",
+      "product-smoke.cjs",
+      "loading.html",
+      "package.json",
+      "assets/icon.png",
+      "assets/icon-LICENSE.txt"
+    ],
+    "fileAssociations": [
+      {
+        "ext": "igpx",
+        "name": "Individual Guide project",
+        "description": "Individual Guide analytical pipeline project",
+        "role": "Editor",
+        "icon": "assets/icon.ico"
+      }
+    ],
+    "extraResources": [
+      {
+        "from": "../../build/staging/runtime",
+        "to": "runtime"
+      }
+    ],
+    "asar": true,
+    "compression": "normal",
+    "electronLanguages": [
+      "en-US"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "assets/icon.ico",
+      "signExecutable": false,
+      "artifactName": "IndividualGuide-${version}-Windows-x64.exe"
+    },
+    "nsis": {
+      "artifactName": "IndividualGuide-${version}-Setup-Windows-x64.exe",
+      "oneClick": true,
+      "perMachine": false,
+      "allowElevation": false,
+      "runAfterFinish": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Individual Guide",
+      "deleteAppDataOnUninstall": false
+    },
+    "portable": {
+      "requestExecutionLevel": "user",
+      "unpackDirName": true,
+      "useZip": true,
+      "splashImage": "assets/preparing.bmp"
+    }
+  }
+}

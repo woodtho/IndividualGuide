@@ -1,0 +1,14 @@
+2026-10-19T10:14:59.771-0400 [INFO] example_source start: Script example_source: running R code
+2026-10-19T10:14:59.772-0400 [DEBUG] example_source start: example_source: inputs (none); 0 rows, 0 columns; outputs cars
+2026-10-19T10:14:59.817-0400 [WARN] example_source custom: Observational teaching data: association does not establish causation
+2026-10-19T10:14:59.826-0400 [INFO] example_source custom: Loaded bundled data for report-audit
+2026-10-19T10:14:59.905-0400 [INFO] example_source success: Cars - a report with an execution audit | Load original observations: 32 output rows; cars (0.122s)
+2026-10-19T10:14:59.953-0400 [INFO] example_summary_stats start: Summary Stats example_summary_stats: starting with cars
+2026-10-19T10:14:59.954-0400 [DEBUG] example_summary_stats start: example_summary_stats: inputs cars; 32 rows, 12 columns; outputs audit_summary
+2026-10-19T10:15:00.067-0400 [INFO] example_summary_stats success: Cars - a report with an execution audit | Summary Statistics: 3 output rows; audit_summary (0.116s)
+2026-10-19T10:15:00.120-0400 [INFO] example_csv start: Export example_csv: writing audit_summary to ./report-audit-results.csv
+2026-10-19T10:15:00.121-0400 [DEBUG] example_csv start: example_csv: inputs audit_summary; 3 rows, 11 columns; outputs (none)
+2026-10-19T10:15:00.232-0400 [INFO] example_csv success: Cars - a report with an execution audit | Export results to CSV: 0 output rows; (none) (0.114s)
+2026-10-19T10:15:00.294-0400 [INFO] example_report start: Report example_report: rendering html report from cars, audit_summary
+2026-10-19T10:15:00.295-0400 [DEBUG] example_report start: example_report: inputs cars, audit_summary; 35 rows, 23 columns; outputs example_report
+2026-10-19T10:15:01.628-0400 [INFO] example_report success: Cars - a report with an execution audit | Read the completed HTML report and execution log: n/a output rows; example_report (1.336s)

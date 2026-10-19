@@ -1,0 +1,9 @@
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Generated MD5 of the nonlinear-regression source file, not a Linear credential"
+condition = "AND"
+paths = ['^docs/book/data/app-reference\.json$']
+regexTarget = "line"
+regexes = ['"R/mod_task_nonlinear_regression\.R": "[a-f0-9]{32}"']

@@ -1,0 +1,42 @@
+test_that("recovery preserves identity and settings without clearing unsaved state", {
+  directory <- tempfile("recovery_")
+  old <- options(ig.recovery_dir = directory); on.exit(options(old), add = TRUE)
+  store <- new_test_store(list(raw = data.frame(x = 1:3)))
+  store$project_path <- file.path(tempdir(), "actual-project.igpx")
+  store$project_name <- "Actual project"; store$dirty <- TRUE
+  path <- project_autosave_recovery(store, theme = "light")
+  expect_true(file.exists(path))
+  expect_identical(shiny::isolate(store$project_name), "Actual project")
+  expect_match(shiny::isolate(store$project_path), "actual-project.igpx", fixed = TRUE)
+  expect_true(shiny::isolate(store$dirty))
+  loaded <- make_store(); result <- project_load(loaded, path)
+  expect_identical(result$theme, "light")
+  expect_equal(shiny::isolate(loaded$tables$raw$x), 1:3)
+  project_clear_recovery(); expect_false(file.exists(path))
+})
+
+test_that("connection presets support CRUD without persisting password controls", {
+  old <- options(ig.catalogue_dir = tempfile("catalogue_")); on.exit(options(old), add = TRUE)
+  entry <- cat_entry_from_inputs("SQLite", list(db_driver = "sqlite", db_database = "example.sqlite", db_pwd = "secret"))
+  cat_add(entry)
+  expect_identical(cat_find(entry$id)$db_database, "example.sqlite")
+  expect_false(grepl("secret|db_pwd", paste(readLines(cat_path()), collapse = "")))
+  entry$name <- "Updated"; cat_add(entry)
+  expect_length(cat_read(), 1L)
+  expect_identical(unname(cat_choices()), entry$id)
+  cat_delete(entry$id); expect_length(cat_read(), 0L)
+})
+
+test_that("failed or corrupt catalogue writes preserve the prior file", {
+  old <- options(ig.catalogue_dir = tempfile("catalogue_")); on.exit(options(old), add = TRUE)
+  cat_write(list(list(id = "one", name = "Original")))
+  before <- readLines(cat_path())
+  testthat::local_mocked_bindings(write_json = function(x, path, ...) {
+    writeLines("partial", path); stop("disk failure")
+  }, .package = "jsonlite")
+  expect_error(cat_write(list()), "disk failure")
+  expect_identical(readLines(cat_path()), before)
+  writeLines("corrupt", cat_path())
+  expect_error(cat_write(list()), "unreadable")
+  expect_identical(readLines(cat_path()), "corrupt")
+})

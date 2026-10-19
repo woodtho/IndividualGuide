@@ -1,0 +1,11 @@
+Individual Guide uses the Font Awesome Free 6.5.2 "share-nodes" icon already used
+by the Shiny application's welcome screen (R/app_server.R, .ig-splash-icon).
+
+Copyright 2024 Fonticons, Inc.
+Source: https://fontawesome.com/icons/share-nodes?f=classic&s=solid
+Icons license: Creative Commons Attribution 4.0 International (CC BY 4.0)
+https://creativecommons.org/licenses/by/4.0/
+
+The glyph was obtained from the bundled R fontawesome package. Its geometry
+is unchanged; the app's #4361ee color and transparent square padding are applied
+for the desktop SVG, PNG and ICO assets.

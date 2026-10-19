@@ -1,0 +1,42 @@
+# R session artefacts
+.Rhistory
+.RData
+.Rproj.user/
+
+# build artefacts
+/build/
+/tools/desktop/node_modules/
+/tools/desktop/assets/preparing.bmp
+*.tar.gz
+/check/
+..Rcheck/
+/artifacts/
+/*.Rcheck/
+/inst/build-info.json
+
+# Local planning, review evidence and machine-specific state
+/PROJECT_AUDIT.md
+/IMPLEMENTATION_PLAN.md
+/FEATURE_MATRIX.md
+/UI_UX_AUDIT.md
+/COMPLETION_REPORT.md
+/PERFORMANCE_REPORT.md
+/RELEASE_READINESS_PLAN.md
+/LOGGING_BUILDER_PLAN.md
+/LOGGING_CODE_REVIEW_PLAN.md
+/task_review_progress.md
+/demo-cars.csv
+/docs/book/BOOK_PLAN.md
+/docs/book/VERIFICATION.md
+.Renviron
+.Renviron.*
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.pfx
+*.p12
+*.log
+.DS_Store
+Thumbs.db

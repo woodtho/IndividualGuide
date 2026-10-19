@@ -1,0 +1,2 @@
+column,n,mean,sd,skewness,excess_kurtosis,shapiro_w,shapiro_p
+flow,100,919.35,169.2275,0.3175,-0.3585,0.9734,0.0407

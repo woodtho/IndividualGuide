@@ -1,0 +1,25 @@
+2026-10-19T10:08:38.296-0400 [INFO] example_source start: Script example_source: running R code
+2026-10-19T10:08:38.297-0400 [DEBUG] example_source start: example_source: inputs (none); 0 rows, 0 columns; outputs flowers
+2026-10-19T10:08:38.479-0400 [INFO] example_source custom: Loaded 150 iris observations across 3 species
+2026-10-19T10:08:38.487-0400 [DEBUG] example_source console:
+    setosa versicolor  virginica
+        50         50         50
+2026-10-19T10:08:38.575-0400 [INFO] example_source success: Iris exploration | Load 150 iris measurements: 150 output rows; flowers (0.301s)
+2026-10-19T10:08:38.972-0400 [INFO] example_summary start: Summary Stats example_summary: starting with flowers
+2026-10-19T10:08:38.973-0400 [DEBUG] example_summary start: example_summary: inputs flowers; 150 rows, 5 columns; outputs measurement_summary
+2026-10-19T10:08:39.841-0400 [INFO] example_summary success: Iris exploration | Summarize measurements: 4 output rows; measurement_summary (0.872s)
+2026-10-19T10:08:40.006-0400 [INFO] example_groups start: Summary Tables example_groups: starting with flowers
+2026-10-19T10:08:40.008-0400 [DEBUG] example_groups start: example_groups: inputs flowers; 150 rows, 5 columns; outputs species_summary
+2026-10-19T10:08:40.215-0400 [INFO] example_groups success: Iris exploration | Compare mean petal length by species: 3 output rows; species_summary (0.213s)
+2026-10-19T10:08:40.288-0400 [INFO] example_chart start: Scatter Plot example_chart: starting with flowers
+2026-10-19T10:08:40.290-0400 [DEBUG] example_chart start: example_chart: inputs flowers; 150 rows, 5 columns; outputs chart_data, chart_data_image
+2026-10-19T10:08:44.892-0400 [INFO] example_chart success: Iris exploration | Explore relationships: n/a output rows; chart_data, chart_data_image (4.612s)
+2026-10-19T10:08:45.151-0400 [INFO] example_csv start: Export example_csv: writing species_summary to ./iris-results.csv
+2026-10-19T10:08:45.153-0400 [DEBUG] example_csv start: example_csv: inputs species_summary; 3 rows, 2 columns; outputs (none)
+2026-10-19T10:08:45.443-0400 [INFO] example_csv success: Iris exploration | Export results to CSV: 0 output rows; (none) (0.294s)
+2026-10-19T10:08:45.683-0400 [INFO] example_png start: Export example_png: writing chart_data_image to ./iris-chart.png
+2026-10-19T10:08:45.685-0400 [DEBUG] example_png start: example_png: inputs chart_data_image; n/a rows, n/a columns; outputs (none)
+2026-10-19T10:08:46.642-0400 [INFO] example_png success: Iris exploration | Export chart to PNG: 0 output rows; (none) (0.96s)
+2026-10-19T10:08:46.929-0400 [INFO] example_report start: Report example_report: rendering html report from measurement_summary, species_summary, chart_data_image
+2026-10-19T10:08:46.930-0400 [DEBUG] example_report start: example_report: inputs measurement_summary, species_summary, chart_data_image; n/a rows, n/a columns; outputs example_report
+2026-10-19T10:08:51.503-0400 [INFO] example_report success: Iris exploration | Read the completed HTML report and execution log: n/a output rows; example_report (4.573s)

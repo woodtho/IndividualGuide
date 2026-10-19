@@ -1,0 +1,18 @@
+Sys.setlocale("LC_CTYPE", ".UTF-8")
+Sys.setenv(LC_ALL = "English_Canada.utf8", LANG = "English_Canada.utf8")
+pkgload::load_all(quiet = TRUE)
+source("tools/code-readability-fixtures.R")
+root <- normalizePath("artifacts/review", winslash = "/")
+destination <- file.path(root, "code-before")
+dir.create(destination, recursive = TRUE, showWarnings = FALSE)
+fixtures <- code_readability_fixtures(root)
+scripts <- lapply(fixtures$tasks, build_task_code)
+scripts$pipeline <- shiny::isolate(build_full_r_script(fixtures$pipeline))
+scripts$loop <- shiny::isolate(build_full_r_script(fixtures$loop))
+for (name in names(scripts)) writeLines(scripts[[name]], file.path(destination, paste0(name, ".R")), useBytes = TRUE)
+metrics <- do.call(rbind, lapply(names(scripts), function(name) data.frame(example = name,
+  lines = length(strsplit(scripts[[name]], "\n", fixed = TRUE)[[1L]]), bytes = nchar(scripts[[name]], type = "bytes"))))
+jsonlite::write_json(metrics, file.path(destination, "metrics.json"), dataframe = "rows", pretty = TRUE)
+saveRDS(lapply(fixtures[c("pipeline", "loop")], function(store) shiny::isolate(list(tasks = store$tasks, task_order = store$task_order))),
+  file.path(destination, "fixtures.rds"))
+print(metrics)

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="$lang$">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="The complete Individual Guide source-edition handbook: installation, 58 tasks, 22 real pipelines and daily operation.">
+<title>$pagetitle$</title>
+$for(css)$<link rel="stylesheet" href="$css$">$endfor$
+$if(highlighting-css)$<style>$highlighting-css$</style>$endif$
+</head>
+<body>
+<a class="skip" href="#book-main">Skip contents and read the book</a>
+<nav id="TOC" role="doc-toc" aria-label="Book contents">
+<p class="brand">Individual Guide</p><p class="edition">Complete handbook · release 0.4.0</p>
+<label for="toc-search">Find a chapter or task</label>
+<input id="toc-search" type="search" placeholder="Search contents…" autocomplete="off">
+<p id="toc-count" role="status" aria-live="polite"></p>
+$table-of-contents$
+<button type="button" onclick="window.print()">Print / save PDF</button>
+</nav>
+<main id="book-main">
+<header id="title-block-header"><p class="eyebrow">The complete handbook</p><h1 class="title">Individual Guide</h1><p class="subtitle">Installation, every task, complete projects and daily operation</p><p class="date">$date$</p><p class="cover-note">58 task types · 22 real projects · R/Shiny and Windows desktop</p></header>
+<section id="print-contents" class="print-contents" aria-label="Print contents"><h1>Contents</h1></section>
+$body$
+<footer>Individual Guide source-edition handbook. Verify source/release capabilities before following a newer option in an older installed build.</footer>
+</main>
+<script>
+(() => {
+  const input=document.getElementById('toc-search'), list=document.querySelector('#TOC > ul');
+  const rows=Array.from(list.querySelectorAll('li')).map(li=>({li,link:li.querySelector(':scope > a')}));
+  const printList=list.cloneNode(true);
+  printList.querySelectorAll('[id]').forEach(element=>element.removeAttribute('id'));
+  document.getElementById('print-contents').append(printList);
+  const filter=()=>{
+    const q=input.value.toLocaleLowerCase().trim(); let count=0;
+    rows.forEach(({li,link})=>{const own=link && link.textContent.toLocaleLowerCase().includes(q);li.hidden=Boolean(q&&!own);if(own)count++;});
+    if(q)rows.forEach(({li})=>{if(!li.hidden){let p=li.parentElement.closest('li');while(p){p.hidden=false;p=p.parentElement.closest('li');}}});
+    document.getElementById('toc-count').textContent=q?count+' matching sections':'Contents';
+  };
+  input.addEventListener('input',filter);filter();
+  document.querySelectorAll('main table').forEach(table=>{const wrap=document.createElement('div');wrap.className='table-wrap';table.before(wrap);wrap.append(table);});
+})();
+</script>
+</body></html>

@@ -1,0 +1,31 @@
+test_that("loop reports and exports retain real files and distinct project artifacts", {
+  testthat::local_mocked_bindings(ig_report_pandoc_available = function() FALSE)
+  directory <- tempfile("loop_sinks_"); dir.create(directory)
+  store <- new_test_store(list(raw = data.frame(x = 1:3)))
+  p <- default_loop_params("repeat"); p$values <- "a\nb"
+  loop <- task_def("repeat", "loop", output = "", params = p); loop$outputs <- loop_output_specs(p)
+  shiny::isolate(store_set_task(store, loop))
+  report <- task_def("report", "report", inputs = "raw", output = "document", params = list(
+    output_name = "document", format = "html", title = "Iteration {item}",
+    items = list(list(name = "raw", kind = "table", heading = "Data"))))
+  report$control_inputs <- p$output_token; shiny::isolate(store_set_task(store, report))
+  export <- task_def("export", "export", inputs = "raw", output = "", params = list(source = "raw", format = "csv",
+    dir = directory, filename = "{item}_data", overwrite = TRUE))
+  export$control_inputs <- p$output_token; shiny::isolate(store_set_task(store, export))
+  expect_true(shiny::isolate(run_task_from_store(store, "repeat")))
+  expect_true(file.exists(file.path(directory, "a_data.csv")))
+  expect_true(file.exists(file.path(directory, "b_data.csv")))
+  tasks <- shiny::isolate(store$tasks)
+  reports <- Filter(function(x) identical(x$kind, "report"), tasks[["repeat"]]$outputs)
+  expect_length(reports, 2L)
+  expect_true(all(vapply(reports, function(x) file.exists(x$path), logical(1))))
+  expect_true(file.exists(tasks$report$outputs[[1]]$path))
+  expect_identical(tasks$export$export_file, file.path(directory, "b_data.csv"))
+  path <- tempfile(fileext = ".igpx"); project_save(store, path)
+  loaded <- make_store(); project_load(loaded, path)
+  restored <- Filter(function(x) identical(x$kind, "report"), shiny::isolate(loaded$tasks)[["repeat"]]$outputs)
+  expect_length(restored, 2L)
+  expect_match(paste(readLines(restored[[1]]$path, warn = FALSE), collapse = ""), "Iteration a")
+  expect_match(paste(readLines(restored[[2]]$path, warn = FALSE), collapse = ""), "Iteration b")
+  expect_false(identical(restored[[1]]$path, restored[[2]]$path))
+})

@@ -1,0 +1,3088 @@
+/* Individual Guide — global styles
+   Dark theme. Bootstrap 5 base via bslib.
+   All colours reference the theme palette set in app.R. */
+
+/* Bundled fonts keep first launch independent of Google Fonts or a font cache. */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('fonts/Inter.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 100 800;
+  font-display: swap;
+  src: url('fonts/JetBrainsMono.ttf') format('truetype');
+}
+
+/* ── Screen-reader-only labels ────────────────────────────────────────────── */
+/* Inputs built with sr_label() get a real, AT-exposed <label> whose only
+   content is a .visually-hidden span. The span is already clipped, but the
+   label block itself would still reserve its margin — remove it from flow
+   too so compact header/grid rows keep their layout. */
+label:has(> .visually-hidden:only-child) {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ── Skip navigation link ─────────────────────────────────────────────────── */
+/* Invisible until focused — first Tab stop on every page load.
+   On focus it appears as a visible pill above the header bar so sighted
+   keyboard users can also benefit from it. */
+
+.ig-skip-nav {
+  position: absolute;
+  left:     -9999px;
+  top:      auto;
+  width:    1px;
+  height:   1px;
+  overflow: hidden;
+  z-index:  -999;
+}
+.ig-skip-nav:focus {
+  position:       fixed;
+  top:            0;
+  left:           50%;
+  transform:      translateX(-50%);
+  width:          auto;
+  height:         auto;
+  overflow:       visible;
+  z-index:        9999;
+  padding:        6px 20px;
+  background:     var(--ig-primary, #4361ee);
+  color:          #fff;
+  font-weight:    600;
+  font-size:      0.9rem;
+  border-radius:  0 0 8px 8px;
+  text-decoration: none;
+  box-shadow:     0 2px 8px rgba(0, 0, 0, 0.3);
+  outline:        2px solid #fff;
+  outline-offset: 2px;
+}
+
+/* ── Workspace layout ─────────────────────────────────────────────────────── */
+
+.ig-workspace {
+  height: 100%;
+  display: flex;          /* no !important — JS can override if needed */
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.ig-panel-container {
+  flex: 1 1 0;
+  overflow: hidden;
+  padding: 12px;
+  min-height: 0;          /* prevents flex children from overflowing */
+}
+
+/* ── Tab strip ────────────────────────────────────────────────────────────── */
+
+#ig-tab-strip {
+  background: #12122a;
+  border-bottom: 1px solid #2a2a4a;
+  padding: 4px 8px 0 8px;
+  flex-shrink: 0;
+}
+
+.ig-tab-strip-inner {
+  display: flex;
+  gap: 3px;
+  overflow-x: auto;
+  flex-wrap: nowrap;
+  align-items: flex-end;
+  /* hide scrollbar but keep scrollable */
+  scrollbar-width: none;
+}
+.ig-tab-strip-inner::-webkit-scrollbar { display: none; }
+
+.ig-tab-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border: 1px solid #2a2a4a;
+  border-bottom: none;
+  border-radius: 6px 6px 0 0;
+  background: #1a1a38;
+  color: #9090c0;
+  font-size: 0.82rem;
+  cursor: pointer;
+  white-space: nowrap;
+  user-select: none;
+  transition: background 0.12s, color 0.12s;
+  position: relative;
+  bottom: -1px;         /* sit on top of the strip border */
+}
+
+.ig-tab-pill:hover:not(.active) {
+  background: #22224a;
+  color: #c0c0e0;
+}
+
+.ig-tab-pill.active {
+  background: #1a1a2e;  /* matches page bg */
+  border-color: #4361ee #4361ee #1a1a2e;
+  color: #e0e0f0;
+  font-weight: 600;
+}
+
+/* Close is now a <button> — strip all browser button chrome so it looks
+   identical to the old <span>, then layer the visual styles on top.    */
+.ig-tab-close {
+  /* Reset button chrome */
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  /* Visual styles */
+  margin-left: 4px;
+  font-size: 0.9rem;
+  line-height: 1;
+  color: #9999c0; /* was #666 — 2.93:1 fail → 6.14:1 pass (UI component ≥3:1) */
+  padding: 0 1px;
+  border-radius: 3px;
+  display: inline-flex;
+  align-items: center;
+}
+.ig-tab-close:hover {
+  color: #ff6060;
+  background: rgba(255,96,96,0.12);
+}
+/* Close button focus ring — uses the app's standard focus colour so it is
+   visible against both the dark tab strip and the active tab background. */
+.ig-tab-close:focus-visible {
+  outline: 2px solid var(--ig-focus);
+  outline-offset: 1px;
+}
+
+.ig-shortcuts-table {
+  margin-bottom: 0;
+}
+.ig-shortcuts-table th,
+.ig-shortcuts-table td {
+  color: var(--ig-text, #e0e0f0);
+  border-color: var(--ig-border, #2a2a4a);
+  vertical-align: middle;
+}
+.ig-shortcut-keys {
+  white-space: nowrap;
+}
+.ig-shortcut-keys kbd {
+  margin-right: 4px;
+  background: var(--ig-surface-2, #12122a);
+  color: var(--ig-text, #e0e0f0);
+  border: 1px solid var(--ig-border, #2a2a4a);
+  box-shadow: none;
+}
+
+/* ── Task panel card body — uniform compact padding ──────────────────────── */
+
+.ig-task-panel .card-body {
+  padding: 0.5rem;
+}
+
+/* ── Task panels ──────────────────────────────────────────────────────────── */
+
+/* All panels hidden by default — no Bootstrap !important involved here, so
+   the JS class-toggle can reliably show/hide without being overridden. */
+.ig-task-panel {
+  display: none;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* JS adds this class to whichever panel is active */
+.ig-task-panel.ig-panel-active {
+  display: flex;
+  animation: ig-fade-in 0.1s ease;
+}
+
+/* Card fills the panel and partitions space with flex so header/footer are
+   always visible and the preview pane fills whatever remains. */
+.ig-task-panel > .card {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.ig-task-panel > .card > .card-header {
+  flex: 0 0 auto;
+}
+
+/* Config body: compact, scrolls independently if controls are taller than space */
+.ig-task-panel > .card > .card-body:not(.ig-preview-pane) {
+  flex: 0 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* Footer sits between config and preview — not sticky, just a fixed row */
+.ig-task-panel > .card > .card-footer {
+  flex: 0 0 auto;
+  position: static;
+}
+
+/* ── Tabbed task cards (Setup | Results) ─────────────────────────────────── */
+
+/* The card body hosting the Setup/Results navset fills all remaining height */
+.ig-task-panel > .card > .card-body.ig-task-tabs {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+
+/* bslib may or may not wrap the navset in .tabbable — cover both layouts */
+.ig-task-tabs > .tabbable {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.ig-task-tabs > .nav-tabs,
+.ig-task-tabs > .tabbable > .nav-tabs {
+  flex: 0 0 auto;
+}
+
+.ig-task-tabs > .tab-content,
+.ig-task-tabs > .tabbable > .tab-content {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.ig-task-tabs > .tab-content > .tab-pane.active,
+.ig-task-tabs > .tabbable > .tab-content > .tab-pane.active {
+  height: 100%;
+  overflow-y: auto;
+}
+
+/* Tab strip styling — applies to the Setup/Results strip and any nested
+   results navset for a consistent look */
+.ig-task-tabs .nav-tabs {
+  padding: 0 12px;
+  background: rgba(255,255,255,0.04);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.ig-task-tabs .nav-tabs .nav-link {
+  font-size: 0.8rem;
+  padding: 7px 16px;
+  color: #94a3b8;
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+}
+
+.ig-task-tabs .nav-tabs .nav-link.active {
+  color: #e0e0f0;
+  background: transparent;
+  border-bottom-color: #4361ee;
+}
+
+.ig-task-tabs .nav-tabs .nav-link:hover:not(.active) {
+  color: #c8cee8;
+  background: rgba(255,255,255,0.04);
+}
+
+/* Setup pane: restore the padding the card body gave up */
+.ig-setup-pane {
+  padding: 16px;
+}
+
+/* Results pane fills its tab */
+.ig-results-pane {
+  min-height: 100%;
+}
+
+/* Friendly empty state shown before the first run */
+.ig-results-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 64px 24px;
+  color: #9c9cc4;
+  text-align: center;
+}
+.ig-results-empty p { margin: 0; }
+.ig-results-empty-icon {
+  font-size: 2.2rem;
+  color: #4361ee;
+  opacity: 0.65;
+  margin-bottom: 8px;
+}
+
+/* Light mode */
+html[data-ig-theme="light"] .ig-task-tabs .nav-tabs {
+  background: #f1f3f5;
+  border-bottom-color: #dee2e6;
+}
+html[data-ig-theme="light"] .ig-task-tabs .nav-tabs .nav-link {
+  color: #555d6e;
+}
+html[data-ig-theme="light"] .ig-task-tabs .nav-tabs .nav-link.active {
+  color: #1f2937;
+  border-bottom-color: #4361ee;
+}
+html[data-ig-theme="light"] .ig-results-empty {
+  color: #555d6e;
+}
+
+@keyframes ig-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Task header bar above each task card: identity, live status, code toggle,
+   and the delete action. */
+.ig-panel-toolbar {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 4px 8px 4px;
+  flex: 0 0 auto;
+  gap: 10px;
+}
+
+.ig-panel-task-info {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #d0d0f0;
+  font-size: 0.85rem;
+  min-width: 0;
+}
+.ig-panel-task-info .fa,
+.ig-panel-task-info svg { color: #8c9bff; }
+
+.ig-panel-task-id {
+  font-size: 0.7rem;
+  font-family: "JetBrains Mono", monospace;
+  color: #9c9cc4;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+/* Status chips — colours pass 4.5:1 on their tinted backgrounds over the
+   dark page (and are overridden for light mode below). */
+.ig-status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.72rem;
+  padding: 2px 9px;
+  border-radius: 10px;
+  white-space: nowrap;
+}
+.ig-status-pending { background: rgba(255, 255, 255, 0.06); color: #a8a8cc; }
+.ig-status-success { background: rgba(34, 197, 94, 0.16);   color: #8be3b0; }
+.ig-status-error   { background: rgba(239, 68, 68, 0.18);   color: #ffa1a1; }
+
+html[data-ig-theme="light"] .ig-panel-task-info { color: var(--ig-text) !important; }
+html[data-ig-theme="light"] .ig-panel-task-id {
+  color: #44506b !important;
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+html[data-ig-theme="light"] .ig-status-pending { background: #e8ebf2; color: #44506b !important; }
+html[data-ig-theme="light"] .ig-status-success { background: #dcfce7; color: #14532d !important; }
+html[data-ig-theme="light"] .ig-status-error   { background: #fee2e2; color: #7f1d1d !important; }
+
+/* Collapsible generated-code strip under the header bar */
+.ig-panel-code-view {
+  flex: 0 0 auto;
+  max-height: 30vh;
+  overflow: auto;
+  margin: 0 8px 6px;
+  border-radius: 4px;
+}
+.ig-panel-code-view pre {
+  margin: 0;
+  max-height: none;
+}
+
+.ig-panel-control-deps {
+  flex: 0 0 auto;
+  margin: 0 8px 8px;
+  padding: 8px 10px;
+  border: 1px solid rgba(140, 155, 255, 0.24);
+  border-radius: 6px;
+  background: rgba(67, 97, 238, 0.08);
+}
+.ig-panel-control-deps .shiny-input-container {
+  width: 100% !important;
+  margin-bottom: 3px;
+}
+.ig-panel-control-deps label {
+  margin-bottom: 4px;
+}
+
+.ig-panel-delete-btn {
+  font-size: 0.72rem;
+  padding: 2px 9px;
+  color: #f87171 !important;
+  border-color: #f87171 !important;
+  background: transparent;
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
+}
+
+.ig-panel-delete-btn:hover,
+.ig-panel-delete-btn:focus {
+  color: #ffffff !important;
+  background: #dc2626 !important;
+  border-color: #dc2626 !important;
+}
+
+/* ── Output-name widget (.ig-output-row) ─────────────────────────────────── */
+
+.ig-output-row {
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 7px;
+  padding: 8px 10px 6px;
+  background: rgba(255,255,255,0.03);
+  margin-top: 10px;
+}
+
+.ig-output-row-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 5px;
+}
+
+.ig-output-label {
+  font-size: 0.71rem;
+  font-weight: 700;
+  color: #8888b0;
+  text-transform: uppercase;
+  letter-spacing: 0.055em;
+}
+
+/* collapse Shiny wrapper margin inside the widget */
+.ig-output-row .shiny-input-container {
+  margin-bottom: 0 !important;
+}
+
+/* shrink the checkbox toggle itself */
+.ig-output-row-head .form-check {
+  padding-left: 2em;
+  margin-bottom: 0 !important;
+}
+.ig-output-row-head .form-check-input {
+  margin-left: -2em;
+}
+
+/* ── Per-output definition rows ──────────────────────────────────────────── */
+
+.ig-output-def-row {
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  padding-bottom: 2px;
+}
+.ig-output-def-row:last-child { border-bottom: none; }
+
+/* compact text input inside each row */
+.ig-output-def-row .shiny-input-container { margin-bottom: 0 !important; }
+.ig-output-def-row .form-control {
+  height: 28px !important;
+  font-size: 0.78rem !important;
+  padding: 2px 6px !important;
+  background: rgba(255,255,255,0.05);
+  border-color: rgba(255,255,255,0.12);
+  color: #e0e0f0;
+}
+.ig-output-def-row .form-control:focus {
+  border-color: #4361ee;
+  box-shadow: 0 0 0 2px rgba(67,97,238,0.25);
+}
+/* disabled/grayed when toggle is off — JS adds .ig-output-disabled via observer */
+.ig-output-def-row.ig-output-disabled .form-control {
+  opacity: 0.4;
+  pointer-events: none;
+}
+/* compact toggle switch */
+.ig-output-def-row .form-check { margin-bottom: 0 !important; }
+.ig-output-def-row .form-check-input {
+  width: 2em !important;
+  cursor: pointer;
+}
+
+/* secondary outputs note (broom) */
+.ig-broom-note {
+  font-size: 0.72rem;
+  line-height: 1.4;
+}
+.ig-output-badge {
+  font-size: 0.70rem;
+  background: rgba(99,125,255,0.12);
+  color: #9daeff;
+  border-radius: 3px;
+  padding: 1px 4px;
+}
+
+/* Light theme */
+html[data-ig-theme="light"] .ig-output-row {
+  border-color: rgba(0,0,0,0.09);
+  background: rgba(0,0,0,0.02);
+}
+html[data-ig-theme="light"] .ig-output-label { color: #5a6280; }
+html[data-ig-theme="light"] .ig-output-badge {
+  background: rgba(36,84,214,0.08);
+  color: #2446a8;
+}
+html[data-ig-theme="light"] .ig-output-def-row {
+  border-bottom-color: rgba(0,0,0,0.06);
+}
+html[data-ig-theme="light"] .ig-output-def-row .form-control {
+  background: #ffffff;
+  border-color: rgba(0,0,0,0.15);
+  color: #2a2a3e;
+}
+
+/* ── Splash screen modal ──────────────────────────────────────────────────── */
+
+.ig-splash {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  padding: 8px 0 4px;
+}
+
+.ig-splash-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 24px 0 20px;
+}
+
+.ig-splash-icon {
+  font-size: 3rem;
+  color: #4361ee;
+  animation: splash-pulse 2.5s ease-in-out infinite;
+}
+
+@keyframes splash-pulse {
+  0%, 100% { opacity: 0.85; }
+  50%      { opacity: 1; }
+}
+
+.ig-splash-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 0;
+  color: #5c7cfa;
+}
+
+.ig-splash-tagline {
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.ig-splash-divider {
+  width: 100%;
+  height: 1px;
+  background: rgba(255,255,255,0.08);
+  margin: 4px 0 20px;
+}
+
+.ig-splash-actions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0 8px;
+}
+
+.ig-splash-btn {
+  font-size: 0.95rem;
+  padding: 10px 16px;
+  border-radius: 8px !important;
+}
+
+.ig-splash-btn.btn-primary {
+  background: #3653d8 !important;
+  border: none !important;
+}
+
+.ig-splash-btn.btn-primary:hover {
+  background: #3550d8 !important;
+}
+
+.ig-splash-btn.btn-outline-secondary {
+  border-color: rgba(255,255,255,0.18) !important;
+}
+
+.ig-splash-btn.btn-outline-secondary:hover {
+  background: rgba(255,255,255,0.06) !important;
+}
+
+.ig-splash-fresh {
+  padding: 16px 0 4px;
+}
+
+.ig-splash-fresh-btn {
+  font-size: 0.8rem;
+  opacity: 0.85;
+  text-decoration: none !important;
+  padding: 4px 8px;
+}
+
+.ig-splash-fresh-btn:hover {
+  opacity: 1;
+}
+
+/* Light mode splash overrides */
+html[data-ig-theme="light"] .ig-splash-divider {
+  background: rgba(0,0,0,0.09);
+}
+html[data-ig-theme="light"] .ig-splash-btn.btn-outline-secondary {
+  border-color: rgba(0,0,0,0.15) !important;
+  color: #374151 !important;
+}
+html[data-ig-theme="light"] .ig-splash-btn.btn-outline-secondary:hover {
+  background: rgba(0,0,0,0.04) !important;
+}
+
+/* ── Results pane & formatted output ─────────────────────────────────────── */
+
+/* Container shared by all three tabs in the results navset */
+.ig-result-panel {
+  padding: 16px;
+  min-height: 260px;
+  overflow: auto;
+}
+
+/* The gt table sits inside a white card-like box */
+.ig-formatted-results {
+  background: #ffffff;
+  border-radius: 4px;
+}
+
+/* Ensure gt tables fill the container and inherit clean fonts */
+.ig-formatted-results .gt_table {
+  width: 100% !important;
+  font-family: "Inter", system-ui, sans-serif !important;
+}
+
+/* gt heading area */
+.ig-formatted-results .gt_heading {
+  border-top: none !important;
+}
+
+/* ── Ace editor wrapper ─────────────────────────────────────────────────── */
+
+.ig-ace-wrap {
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 6px;
+  overflow: hidden;   /* clips Ace's own border-radius reset */
+}
+
+/* Make the Ace editor fill the wrapper and use the app's monospace font */
+.ig-ace-wrap .ace_editor {
+  border-radius: 0 !important;
+  font-family: "JetBrains Mono", "Cascadia Code", "Fira Code", monospace !important;
+  font-size: 13px !important;
+  line-height: 1.55 !important;
+}
+
+/* Autocomplete popup — ensure it sits above Shiny modals */
+.ace_autocomplete { z-index: 9999 !important; }
+
+html[data-ig-theme="light"] .ig-ace-wrap {
+  border-color: rgba(0,0,0,0.18);
+}
+
+/* Code panel — dark preformatted block */
+.ig-code-panel {
+  background: #0d1117;
+  border-radius: 4px;
+  padding: 0;
+}
+
+.ig-code-panel pre {
+  background: transparent;
+  color: #c9d1d9;
+  font-family: "JetBrains Mono", "Cascadia Code", monospace;
+  font-size: 0.78rem;
+  line-height: 1.55;
+  padding: 16px;
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+/* Tab strip inside the preview pane */
+.ig-preview-pane > .bslib-navs-bar,
+.ig-preview-pane .nav-tabs {
+  padding: 0 12px;
+  background: rgba(255,255,255,0.04);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.ig-preview-pane .nav-tabs .nav-link {
+  font-size: 0.8rem;
+  padding: 6px 14px;
+  color: #94a3b8;
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+}
+
+.ig-preview-pane .nav-tabs .nav-link.active {
+  color: #e0e0f0;
+  background: transparent;
+  border-bottom-color: #4361ee;
+}
+
+.ig-preview-pane .nav-tabs .nav-link:hover:not(.active) {
+  color: #c8cee8;
+  background: rgba(255,255,255,0.04);
+}
+
+/* Light mode overrides */
+html[data-ig-theme="light"] .ig-code-panel {
+  background: #1e1e2e;
+}
+
+html[data-ig-theme="light"] .ig-preview-pane > .bslib-navs-bar,
+html[data-ig-theme="light"] .ig-preview-pane .nav-tabs {
+  background: #f1f3f5;
+  border-bottom-color: #dee2e6;
+}
+
+html[data-ig-theme="light"] .ig-preview-pane .nav-tabs .nav-link {
+  color: #555d6e; /* was #6b7280 — 4.35:1 fail → 5.94:1 pass */
+}
+
+html[data-ig-theme="light"] .ig-preview-pane .nav-tabs .nav-link.active {
+  color: #1f2937;
+  border-bottom-color: #4361ee;
+}
+
+/* ── Sidebar project explorer ─────────────────────────────────────────────── */
+
+.ig-sb-pane {
+  height: 100%;
+  overflow: auto;
+}
+
+.ig-tree-project-name {
+  padding: 14px 12px 12px;
+  border-bottom: 1px solid #2a2a4a;
+  background: #101026;
+}
+
+.ig-tree-project-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #e0e0f0;
+  font-size: 0.92rem;
+}
+
+.ig-tree-project-subtitle {
+  margin-top: 4px;
+  color: #9090b8; /* was #7878a8 — 4.49:1 fail → 6.11:1 pass */
+  font-size: 0.72rem;
+}
+
+.ig-tree-section {
+  padding: 10px 8px 4px;
+}
+
+.ig-tree-section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 4px 6px;
+  color: #8e8ec0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.ig-tree-add-btn,
+.ig-tree-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: transparent;
+  color: #8383b8;
+  padding: 0;
+}
+
+.ig-tree-add-btn {
+  margin-left: auto;
+}
+
+.ig-tree-add-btn:hover,
+.ig-tree-action-btn:hover {
+  border-color: #34345f;
+  background: #1d1d3a;
+  color: #d0d0f0;
+}
+
+.ig-tree-action-danger:hover {
+  border-color: rgba(255, 96, 96, 0.35);
+  background: rgba(255, 96, 96, 0.12);
+  color: #ff8888;
+}
+
+.ig-tree-items,
+.ig-tree-flows {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ig-tree-item,
+.ig-tree-flow-header {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 30px;
+  padding: 4px 6px;
+  border-radius: 5px;
+  color: #d4d4ec;
+  cursor: pointer;
+}
+
+.ig-tree-item:hover,
+.ig-tree-flow-header:hover {
+  background: #1e1e3d;
+}
+
+.ig-tree-icon {
+  width: 16px;
+  color: #8585bd;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.ig-tree-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.82rem;
+}
+
+.ig-tree-action-btn {
+  margin-left: auto;
+  opacity: 0;
+  flex-shrink: 0;
+}
+
+.ig-tree-item:hover .ig-tree-action-btn,
+.ig-tree-flow-header:hover .ig-tree-action-btn {
+  opacity: 1;
+}
+
+.ig-tree-flow {
+  border-radius: 6px;
+  padding: 2px;
+}
+
+.ig-tree-flow-active {
+  background: rgba(67, 97, 238, 0.12);
+  outline: 1px solid rgba(67, 97, 238, 0.26);
+}
+
+.ig-tree-flow-active > .ig-tree-flow-header {
+  color: #ffffff;
+}
+
+.ig-tree-badge {
+  margin-left: auto;
+  border-radius: 3px;
+  background: rgba(67, 97, 238, 0.3);
+  color: #dfe5ff;
+  font-size: 0.62rem;
+  padding: 1px 5px;
+  text-transform: uppercase;
+}
+
+.ig-tree-flow-btns {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  margin-left: auto;
+}
+
+.ig-tree-flow-btns .ig-tree-action-btn {
+  margin-left: 0;
+}
+
+/* Run-flow button — always visible, accent colour */
+.ig-tree-run-btn {
+  opacity: 1 !important;
+  color: #4a90d9 !important;
+}
+.ig-tree-run-btn:hover {
+  color: #80c0ff !important;
+  border-color: rgba(74, 144, 217, 0.35) !important;
+  background: rgba(74, 144, 217, 0.12) !important;
+}
+
+/* Cross-flow dependency bar */
+.ig-tree-flow-dep-bar {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 1px 0 4px 34px;
+  color: #6888cc;
+  font-size: 0.67rem;
+  font-style: italic;
+}
+
+.ig-tree-task-list {
+  margin: 2px 0 4px 19px;
+  padding-left: 10px;
+  border-left: 1px solid #303055;
+}
+
+.ig-tree-node-group {
+  margin-top: 4px;
+}
+
+.ig-tree-node-group-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 6px 0 2px 22px;
+  color: #9090b8; /* was #7474a8 — 4.20:1 fail → 5.99:1 pass */
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Each task is shown as a self-contained card: its own task row, plus an
+   "Uses" group (inputs) and a "Creates" group (outputs), so it's obvious
+   which inputs/outputs belong to which task. */
+.ig-tree-task-block {
+  margin: 3px 0;
+  padding: 2px;
+  border: 1px solid var(--ig-border, #26264a);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.015);
+}
+html[data-ig-theme="light"] .ig-tree-task-block {
+  background: rgba(0, 0, 0, 0.012);
+}
+
+.ig-tree-task-block-open {
+  border-color: rgba(67, 97, 238, 0.35);
+}
+
+.ig-tree-task-item {
+  min-height: 27px;
+  color: #b8b8dc;
+}
+
+/* The task row sits flush in the card; remove its own hover/active corners
+   on the bottom edge so the card reads as one shape when groups follow. */
+.ig-tree-task-block .ig-tree-task-item {
+  border-radius: 4px;
+}
+
+.ig-tree-dataset-item {
+  color: #cfd8d2;
+}
+
+.ig-tree-derived-item .ig-tree-icon {
+  color: #8ca8ff;
+}
+
+.ig-tree-io-group {
+  margin: 2px 0 2px 8px;
+}
+
+.ig-tree-io-caption {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 2px 0 1px 6px;
+  color: #8888b8; /* was #666695 — 3.40:1 fail → 5.46:1 pass */
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.ig-tree-edge-list {
+  margin-left: 6px;
+  border-left: 1px solid var(--ig-border, #2a2a4a);
+  padding-left: 6px;
+}
+
+.ig-tree-task-id {
+  margin-left: auto;
+  color: #8888b0; /* was #70709d — 3.92:1 fail → 5.41:1 pass */
+  font-size: 0.68rem;
+  font-family: "JetBrains Mono", monospace;
+}
+
+.ig-tree-node-role {
+  margin-left: auto;
+  color: #8888b0; /* was #70709d — 3.92:1 fail → 5.41:1 pass */
+  font-size: 0.64rem;
+  text-transform: uppercase;
+}
+
+.ig-tree-empty,
+.ig-tree-empty-tasks {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #9090b8; /* was #7373a2 — 4.10:1 fail → 5.99:1 pass */
+  font-size: 0.76rem;
+  padding: 7px 6px;
+}
+
+.ig-tree-empty-tasks {
+  margin-left: 20px;
+}
+
+/* ── Collaboration: comments, review, history, search ─────────────────────── */
+
+.ig-header-badge {
+  position: absolute;
+  top: -4px; right: -4px;
+  min-width: 15px; height: 15px;
+  padding: 0 4px;
+  border-radius: 8px;
+  background: #4361ee;
+  color: #fff;
+  font-size: 0.58rem;
+  font-weight: 700;
+  line-height: 15px;
+  text-align: center;
+}
+.ig-header-badge.ig-badge-warn { background: #d97706; }
+.ig-header-dot {
+  position: absolute;
+  top: -2px; right: -2px;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  border: 1.5px solid var(--ig-bg, #1a1a2e);
+}
+
+.ig-collab-new {
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid var(--ig-border, #2a2a4a);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+.ig-collab-new .shiny-input-container { margin-bottom: 8px; }
+
+/* Static filter / search field (shared by comments + global search) */
+.ig-collab-search {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 10px;
+  border: 1px solid var(--ig-border, #2a2a4a);
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.03);
+}
+.ig-collab-search:focus-within { border-color: #4361ee; }
+.ig-collab-search-icon { color: #8888b0; font-size: 0.78rem; flex-shrink: 0; }
+.ig-collab-search-field {
+  flex: 1 1 auto; min-width: 0;
+  border: none; background: transparent;
+  color: var(--ig-text, #e8e8f6); font-size: 0.84rem; outline: none;
+}
+.ig-collab-search-field::placeholder { color: #7777a0; }
+
+.ig-collab-empty {
+  display: flex; align-items: center; gap: 8px;
+  color: #8c8cb4; font-size: 0.85rem;
+  padding: 18px 6px; justify-content: center;
+}
+
+.ig-collab-meta { color: #8888b0; font-size: 0.72rem; }
+.ig-collab-target {
+  display: inline-flex; align-items: center; gap: 4px;
+  color: #9aa0d8; font-size: 0.72rem;
+  background: rgba(99, 125, 255, 0.12);
+  padding: 1px 7px; border-radius: 10px;
+}
+.ig-collab-section {
+  color: #b8b8dc; font-weight: 700; font-size: 0.78rem;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  margin: 14px 0 8px;
+}
+
+/* Status pills */
+.ig-collab-pill {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 0.66rem; font-weight: 700;
+  padding: 2px 9px; border-radius: 10px;
+  text-transform: uppercase; letter-spacing: 0.03em;
+}
+.ig-pill-open      { background: rgba(99,125,255,0.18); color: #b9c4ff; }
+.ig-pill-resolved  { background: rgba(34,197,94,0.18);  color: #86efac; }
+.ig-pill-approved  { background: rgba(34,197,94,0.20);  color: #86efac; }
+.ig-pill-rejected  { background: rgba(239,68,68,0.20);  color: #fca5a5; }
+.ig-pill-changes   { background: rgba(217,119,6,0.22);  color: #fcd49b; }
+.ig-pill-draft     { background: rgba(136,136,176,0.18); color: #c5c5e0; }
+
+/* Comment threads */
+.ig-comment-thread {
+  border: 1px solid var(--ig-border, #2a2a4a);
+  border-radius: 9px;
+  padding: 10px 12px;
+  margin-top: 10px;
+  background: rgba(255, 255, 255, 0.015);
+}
+.ig-comment-thread.is-resolved { opacity: 0.62; }
+.ig-comment-head {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 8px; flex-wrap: wrap;
+}
+.ig-comment-title { color: #e2e2f4; font-size: 0.9rem; }
+.ig-comment-list { display: flex; flex-direction: column; gap: 8px; }
+.ig-comment-msg { display: flex; gap: 8px; align-items: flex-start; }
+.ig-avatar {
+  flex-shrink: 0;
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  color: #fff; font-size: 0.66rem; font-weight: 700;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.ig-comment-bubble {
+  flex: 1 1 auto; min-width: 0;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 4px 10px 10px 10px;
+  padding: 6px 10px;
+}
+.ig-comment-byline { display: flex; align-items: baseline; gap: 8px; }
+.ig-comment-byline strong { font-size: 0.8rem; color: #d8d8ec; }
+.ig-comment-text { font-size: 0.86rem; color: #c8c8e0; margin-top: 2px; white-space: pre-wrap; }
+.ig-comment-actions {
+  display: flex; align-items: center; gap: 6px; margin-top: 10px;
+}
+.ig-comment-actions .shiny-input-container { margin-bottom: 0; }
+
+/* Review dashboard */
+.ig-review-banner {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--ig-border, #2a2a4a);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.02);
+}
+.ig-issue-list { display: flex; flex-direction: column; gap: 8px; }
+.ig-issue-card {
+  display: flex; gap: 10px;
+  border: 1px solid var(--ig-border, #2a2a4a);
+  border-radius: 8px; padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.015);
+}
+.ig-issue-title { color: #e2e2f4; font-size: 0.88rem; }
+.ig-issue-detail { color: #b8b8d4; font-size: 0.82rem; margin: 2px 0; }
+.ig-sev-dot { width: 9px; height: 9px; border-radius: 50%; margin-top: 6px; flex-shrink: 0; }
+.ig-sev-change   { background: #f59e0b; }
+.ig-sev-blocker  { background: #ef4444; }
+.ig-sev-nit, .ig-sev-suggestion { background: #6b8afd; }
+
+.ig-review-timeline { display: flex; flex-direction: column; gap: 4px; }
+.ig-timeline-row { display: flex; gap: 9px; padding: 4px 0; font-size: 0.84rem; color: #c8c8e0; }
+.ig-timeline-icon {
+  flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 0.62rem; background: rgba(255,255,255,0.06); color: #b0b0d8;
+}
+.ig-tl-approve { background: rgba(34,197,94,0.2);  color: #86efac; }
+.ig-tl-reject  { background: rgba(239,68,68,0.2);  color: #fca5a5; }
+.ig-tl-request-changes { background: rgba(217,119,6,0.22); color: #fcd49b; }
+.ig-tl-action { font-weight: 700; text-transform: capitalize; }
+
+html[data-ig-theme="light"] .ig-collab-new,
+html[data-ig-theme="light"] .ig-collab-search,
+html[data-ig-theme="light"] .ig-comment-thread,
+html[data-ig-theme="light"] .ig-review-banner,
+html[data-ig-theme="light"] .ig-issue-card {
+  background: rgba(0, 0, 0, 0.02);
+}
+html[data-ig-theme="light"] .ig-collab-search-field { color: var(--ig-text) !important; }
+html[data-ig-theme="light"] .ig-comment-bubble { background: rgba(0, 0, 0, 0.04); }
+
+/* ── Tree search / filter ─────────────────────────────────────────────────── */
+
+.ig-tree-search {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 8px 10px 4px;
+  padding: 4px 8px;
+  border: 1px solid var(--ig-border, #2a2a4a);
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.03);
+}
+.ig-tree-search.ig-tree-search-active {
+  border-color: #4361ee;
+}
+.ig-tree-search-icon {
+  color: #8888b0;
+  font-size: 0.72rem;
+  flex-shrink: 0;
+}
+.ig-tree-search-field {
+  flex: 1 1 auto;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  color: var(--ig-text, #e8e8f6);
+  font-size: 0.78rem;
+  outline: none;
+}
+.ig-tree-search-field::placeholder { color: #7777a0; }
+.ig-tree-search-clear {
+  border: none;
+  background: transparent;
+  color: #8888b0;
+  padding: 0 2px;
+  cursor: pointer;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+.ig-tree-search-active .ig-tree-search-clear { opacity: 1; }
+.ig-tree-search-clear:hover { color: #d0d0e8; }
+
+/* Rows filtered out by the search term. */
+.ig-tree-filter-hide { display: none !important; }
+
+/* ── Bulk select ──────────────────────────────────────────────────────────── */
+
+/* Per-task checkbox: subtle until hovered or checked, so it doesn't clutter. */
+.ig-tree-task-check {
+  flex-shrink: 0;
+  margin: 0 1px 0 0;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+  accent-color: #4361ee;
+}
+.ig-tree-task-item:hover .ig-tree-task-check,
+.ig-tree-task-check:checked,
+.ig-tree-task-check:focus-visible {
+  opacity: 1;
+}
+
+.ig-tree-bulk-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 2px 0 4px 22px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: rgba(180, 84, 58, 0.14);
+  border: 1px solid rgba(180, 84, 58, 0.3);
+}
+.ig-tree-bulk-count {
+  color: #e0a050;
+  font-size: 0.7rem;
+  font-weight: 600;
+  margin-right: auto;
+}
+.ig-tree-bulk-btn {
+  font-size: 0.68rem !important;
+  padding: 1px 8px !important;
+}
+
+html[data-ig-theme="light"] .ig-tree-search {
+  background: rgba(0, 0, 0, 0.02);
+}
+html[data-ig-theme="light"] .ig-tree-search-field {
+  color: var(--ig-text) !important;
+}
+
+/* ── Issues panel ─────────────────────────────────────────────────────────── */
+
+.ig-tree-issues-group .ig-tree-node-group-title {
+  color: #e0a050; /* amber — draws the eye without being alarming */
+}
+
+.ig-tree-issue-count {
+  margin-left: 6px;
+  min-width: 16px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: #b4543a;
+  color: #fff;
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.ig-tree-issue-row {
+  min-height: 26px;
+  gap: 6px;
+}
+
+.ig-tree-issue-row .ig-tree-label {
+  flex: 0 1 auto;
+  font-size: 0.78rem;
+}
+
+.ig-tree-issue-msg {
+  min-width: 0;
+  margin-left: auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #8888b0;
+  font-size: 0.64rem;
+  max-width: 55%;
+}
+
+.ig-tree-issue-error  .ig-tree-icon { color: #ef4444; }
+.ig-tree-issue-stale  .ig-tree-icon { color: #f59e0b; }
+.ig-tree-issue-dependency .ig-tree-icon { color: #ef4444; }
+
+html[data-ig-theme="light"] .ig-tree-issues-group .ig-tree-node-group-title {
+  color: #9a5a12 !important;
+}
+html[data-ig-theme="light"] .ig-tree-issue-msg {
+  color: var(--ig-text-muted) !important;
+}
+
+/* ── Tree collapse ────────────────────────────────────────────────────────── */
+
+/* Caret toggle button — always visible (unlike action-btns which hide until hover) */
+.ig-tree-caret-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border: none;
+  background: transparent;
+  color: #6060a0;
+  padding: 0;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.ig-tree-caret-btn:hover { color: #b0b0e0; }
+
+/* Node-group titles are clickable when they contain a caret. */
+.ig-tree-node-group-title[data-collapsible="1"] {
+  cursor: pointer;
+  user-select: none;
+}
+.ig-tree-node-group-title[data-collapsible="1"]:hover {
+  color: #a0a0d0;
+}
+
+/* Caret chevron: default = collapsed (pointing right, rotated -90deg from down).
+   Parent NOT collapsed: rotate to 0deg (pointing down). */
+.ig-tree-caret {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6rem;
+  transition: transform 0.18s ease;
+  transform: rotate(-90deg);       /* collapsed default */
+}
+.ig-tree-flow:not(.ig-collapsed) > .ig-tree-flow-header .ig-tree-caret,
+.ig-tree-node-group:not(.ig-collapsed) > .ig-tree-node-group-title .ig-tree-caret,
+.ig-tree-task-block:not(.ig-collapsed) > .ig-tree-item .ig-tree-caret {
+  transform: rotate(0deg);         /* expanded */
+}
+
+/* Hide body content when collapsed */
+.ig-tree-flow.ig-collapsed > :not(.ig-tree-flow-header) {
+  display: none;
+}
+.ig-tree-node-group.ig-collapsed > :not(.ig-tree-node-group-title) {
+  display: none;
+}
+.ig-tree-task-block.ig-collapsed > .ig-tree-io-group {
+  display: none;
+}
+
+/* ── Task picker modal ────────────────────────────────────────────────────── */
+
+/* Capped against the viewport (~280px of modal chrome) so the Add Task modal
+   always fits on screen; only the list itself scrolls. The media query
+   restores the 480px design cap on tall screens. */
+.ig-task-list {
+  max-height: calc(100vh - 280px);
+  overflow-y: auto;
+  margin-top: 8px;
+  border: 1px solid #2a2a4a;
+  border-radius: 6px;
+}
+@media (min-height: 760px) {
+  .ig-task-list { max-height: 480px; }
+}
+
+.ig-task-category {
+  padding: 6px 12px 4px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #8080b8; /* was #6060a0 — 3.21:1 fail → 4.97:1 pass */
+  background: #12122a;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  border-bottom: 1px solid #2a2a4a;
+}
+
+.ig-task-item {
+  cursor: pointer;
+  border-bottom: 1px solid #1e1e38;
+  transition: background 0.1s;
+}
+.ig-task-item:last-child { border-bottom: none; }
+
+.ig-task-item:hover:not(.ig-task-unavailable) {
+  background: #22224a;
+}
+
+.ig-task-item.ig-task-unavailable {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.ig-task-item-inner {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 14px;
+}
+
+.ig-task-icon {
+  margin-top: 2px;
+  width: 16px;
+  color: #8080cc;
+  flex-shrink: 0;
+}
+.ig-task-item:hover:not(.ig-task-unavailable) .ig-task-icon {
+  color: #4361ee;
+}
+
+.ig-task-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #d0d0f0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ig-task-desc {
+  font-size: 0.75rem;
+  color: #9090b0; /* was #7070a0 — 3.48:1 fail → 5.24:1 pass */
+  line-height: 1.35;
+  margin-top: 2px;
+}
+
+.ig-phase-badge {
+  font-size: 0.65rem;
+  font-weight: 500;
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: #2a2a4a;
+  color: #9898b8; /* was #7070a0 — 2.95:1 fail → 4.92:1 pass */
+}
+
+/* ── Tab strip extras: status dots + Flow task count ─────────────────────── */
+
+.ig-tab-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+.ig-tab-dot-success { background: #22c55e; }
+.ig-tab-dot-error   { background: #ef4444; }
+
+.ig-tab-count {
+  font-size: 0.66rem;
+  line-height: 1.4;
+  min-width: 16px;
+  text-align: center;
+  padding: 0 4px;
+  border-radius: 8px;
+  background: rgba(67, 97, 238, 0.30);
+  color: #dfe5ff;
+}
+html[data-ig-theme="light"] .ig-tab-count {
+  background: rgba(36, 84, 214, 0.14);
+  color: #1c3d99 !important;
+}
+
+/* ── Project tree: the task whose panel is active ────────────────────────── */
+
+.ig-tree-task-open {
+  background: rgba(67, 97, 238, 0.16);
+  outline: 1px solid rgba(67, 97, 238, 0.35);
+}
+html[data-ig-theme="light"] .ig-tree-task-open {
+  background: rgba(36, 84, 214, 0.10) !important;
+  outline-color: rgba(36, 84, 214, 0.35);
+}
+
+/* ── Canvas controls + empty state ───────────────────────────────────────── */
+
+.ig-canvas-wrap { position: relative; height: 100%; }
+
+.ig-canvas-controls {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Layout dropdown sits inline with the Fit / Re-arrange buttons. */
+.ig-canvas-layout-select { display: inline-flex; }
+.ig-canvas-layout-select .shiny-input-container { width: 140px !important; margin: 0; }
+.ig-canvas-layout-select select.form-select,
+.ig-canvas-layout-select select.form-control {
+  height: 28px;
+  padding: 1px 24px 1px 8px;
+  font-size: 0.74rem;
+  background-color: var(--ig-surface, #1e1e38);
+  color: var(--ig-text, #e8e8f6);
+  border: 1px solid var(--ig-border, #2a2a4a);
+  border-radius: 6px;
+}
+
+.ig-canvas-empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;        /* canvas stays drag/zoomable around it */
+}
+.ig-canvas-empty-inner {
+  pointer-events: auto;
+  text-align: center;
+  padding: 30px 44px;
+  border: 1px dashed var(--ig-border);
+  border-radius: 12px;
+  background: var(--ig-surface);
+  max-width: 420px;
+}
+.ig-canvas-empty-icon {
+  font-size: 2.2rem;
+  color: #5c7cfa;
+  margin-bottom: 10px;
+}
+.ig-canvas-empty h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 4px 0 6px;
+}
+
+/* ── Task picker: per-category task counts ───────────────────────────────── */
+
+.ig-picker-count {
+  margin-left: 6px;
+  font-size: 0.64rem;
+  line-height: 1.5;
+  min-width: 17px;
+  text-align: center;
+  display: inline-block;
+  padding: 0 5px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #a8a8cc;
+}
+html[data-ig-theme="light"] .ig-picker-count {
+  background: rgba(0, 0, 0, 0.07);
+  color: #44506b !important;
+}
+
+/* ── Help modal ───────────────────────────────────────────────────────────── */
+
+.ig-help-body {
+  max-height: calc(100vh - 240px);
+  display: flex;
+  flex-direction: column;
+}
+.ig-help-pane {
+  overflow-y: auto;
+  max-height: calc(100vh - 320px);
+  padding: 12px 6px 4px;
+}
+.ig-help-h {
+  font-size: 0.92rem;
+  font-weight: 700;
+  margin: 14px 0 4px;
+}
+.ig-help-h:first-child { margin-top: 0; }
+.ig-help-p {
+  font-size: 0.84rem;
+  line-height: 1.55;
+  color: var(--ig-text-muted);
+  margin-bottom: 8px;
+}
+.ig-help-cat { margin-bottom: 10px; }
+.ig-help-cat-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 14px 0 6px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--ig-border);
+}
+.ig-help-task {
+  padding: 8px 10px;
+  border: 1px solid var(--ig-border);
+  border-radius: 6px;
+  margin-bottom: 8px;
+  background: var(--ig-surface-2);
+}
+.ig-help-task-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.88rem;
+  margin-bottom: 4px;
+}
+.ig-help-task-head .fa,
+.ig-help-task-head svg { color: #8c9bff; width: 16px; }
+.ig-help-task .ig-help-p { margin-bottom: 4px; }
+.ig-help-task-details {
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--ig-text-muted);
+  margin: 0;
+}
+.ig-help-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  vertical-align: baseline;
+  margin: 0 2px;
+}
+.ig-help-dot-green { background: #22c55e; }
+.ig-help-dot-red   { background: #ef4444; }
+.ig-help-dot-amber { background: #f59e0b; }
+
+/* ── Cards ────────────────────────────────────────────────────────────────── */
+
+.card {
+  background: #1e1e38;
+  border: 1px solid #2a2a4a;
+}
+.card-header {
+  background: #16163a;
+  border-bottom: 1px solid #2a2a4a;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+/* ── Nav tabs (inside QB module) ─────────────────────────────────────────── */
+
+.nav-tabs {
+  border-bottom: 1px solid #2a2a4a;
+}
+.nav-tabs .nav-link {
+  font-size: 0.83rem;
+  padding: 5px 12px;
+  color: #8080b0;
+  border-color: transparent;
+}
+.nav-tabs .nav-link:hover {
+  color: #c0c0e0;
+  border-color: #2a2a4a #2a2a4a transparent;
+}
+.nav-tabs .nav-link.active {
+  background: #1a1a2e;
+  border-color: #2a2a4a #2a2a4a #1a1a2e;
+  color: #e0e0f0;
+}
+
+/* ── Code display ─────────────────────────────────────────────────────────── */
+
+/* Only `<pre>`-rendered outputs (verbatimTextOutput — full code/console      */
+/* displays) get the boxed "code" treatment. Inline status text              */
+/* (textOutput(..., inline = TRUE), e.g. run_status / path_display) also     */
+/* carries the `.shiny-text-output` class but renders as a `<span>`, and      */
+/* previously inherited this padding/border/background, showing as a stray   */
+/* dark box around short status messages.                                    */
+pre {
+  background: #0d0d1f;
+  color: #c9d1d9;
+  font-size: 0.78rem;
+  border: 1px solid #2a2a4a;
+  padding: 12px;
+  border-radius: 4px;
+  max-height: 65vh;
+  overflow: auto;
+  white-space: pre;
+}
+
+/* ── DT tables ────────────────────────────────────────────────────────────── */
+
+table.dataTable { font-size: 0.82rem; }
+table.dataTable thead th {
+  background: #16163a !important;
+  color: #b0b0d0;
+  border-bottom: 1px solid #2a2a4a !important;
+}
+table.dataTable.display tbody tr:hover > * {
+  box-shadow: inset 0 0 0 9999px rgba(67,97,238,0.12);
+}
+.dataTables_wrapper .dataTables_info,
+.dataTables_wrapper .dataTables_paginate { font-size: 0.78rem; } /* colour set per-theme below */
+/* Dark theme only — hardcoded colour kept out of global scope so it can't bleed into light mode */
+:root:not([data-ig-theme="light"]) .dataTables_wrapper .dataTables_info,
+:root:not([data-ig-theme="light"]) .dataTables_wrapper .dataTables_paginate { color: #9090b0; }
+.dataTables_wrapper .dataTables_filter input,
+.dataTables_wrapper .dataTables_length select {
+  background: #1e1e38;
+  border: 1px solid #2a2a4a;
+  color: #e0e0f0;
+}
+
+/* ── Task picker: favourites + collapsible groups ───────────────────────── */
+
+.ig-picker-group-header {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  user-select: none;
+}
+.ig-picker-group-header:hover { background: #22224a !important; }
+.ig-picker-group-header .ig-tree-caret {
+  display: inline-flex;
+  font-size: 0.6rem;
+  transition: transform 0.18s ease;
+  transform: rotate(0deg);
+}
+.ig-picker-group-header .ig-tree-caret.ig-picker-open { transform: rotate(-90deg); }
+.ig-picker-group-body { overflow: hidden; }
+.ig-picker-group-body.ig-picker-collapsed { display: none; }
+.ig-picker-star {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  margin-top: 2px;
+  flex-shrink: 0;
+  width: 18px;
+}
+.ig-picker-star .ig-star-icon { font-size: 0.8rem; }
+/* off-state is an interactive toggle indicator → UI component needs 3:1 */
+.ig-picker-star.ig-picker-star--off .ig-star-icon { color: #7d7daf; } /* was #3a3a5a — 1.69:1 fail → 4.62:1 pass */
+.ig-picker-star.ig-picker-star--on  .ig-star-icon { color: #f5c518; }
+.ig-picker-star:hover .ig-star-icon { color: #f5c518 !important; }
+html[data-ig-theme="light"] .ig-picker-star.ig-picker-star--off .ig-star-icon {
+  color: #6b7280 !important; /* 4.83:1 on #ffffff */
+}
+html[data-ig-theme="light"] .ig-picker-star.ig-picker-star--on .ig-star-icon {
+  color: #a16207 !important; /* gold #f5c518 is 1.62:1 on white → amber-700 4.83:1 */
+}
+
+/* ── Misc ─────────────────────────────────────────────────────────────────── */
+
+.shiny-notification {
+  background: #2a2a4a;
+  border-left: 3px solid #4361ee;
+  color: #e0e0f0;
+}
+
+/* Compact form controls inside QB panels */
+.ig-task-panel .form-control,
+.ig-task-panel .form-select {
+  font-size: 0.82rem;
+  padding: 3px 8px;
+  background: #1a1a38;
+  border-color: #2a2a4a;
+  color: #d0d0f0;
+}
+.ig-task-panel label {
+  font-size: 0.78rem;
+  color: #9090b0;
+  margin-bottom: 2px;
+}
+
+/* Small buttons */
+.btn-xs {
+  padding: 2px 6px;
+  font-size: 0.72rem;
+  line-height: 1.4;
+}
+
+/* visNetwork canvas */
+#canvas-net {
+  border: 1px solid #2a2a4a;
+  border-radius: 4px;
+  background: #12122a;
+}
+
+/* Preview/result pane: fills all remaining card space after config + footer */
+.ig-preview-pane {
+  flex: 1 1 0;
+  min-height: 0;
+  max-height: none;
+  overflow: auto;
+  border-top: 1px solid #2a2a4a;
+}
+
+.ig-preview-pane > .shiny-html-output:empty {
+  display: none;
+}
+
+/* Collapse the pane entirely when it contains no rendered content.
+   The :empty rule catches Shiny wrappers that are truly empty;
+   the .ig-preview-empty modifier is set by server logic when data is NULL.
+   When the only child is a hidden conditionalPanel, the pane still takes
+   zero meaningful height because min-height is 0 and padding is suppressed. */
+.ig-preview-pane:empty,
+.ig-preview-pane.ig-preview-empty,
+.ig-preview-pane:has(> .shiny-html-output:empty:only-child) {
+  display: none;
+  border-top: none;
+}
+
+/* When ig-preview-pane contains only a shiny-bound div that is display:none,
+   collapse it by removing padding/border so it takes no visual space. */
+.ig-preview-pane:has(> [style*="display: none"]:only-child),
+.ig-preview-pane:has(> .shiny-html-output:empty:only-child) {
+  padding: 0 !important;
+  border-top: none;
+  flex: 0 0 0;
+}
+
+.ig-filter-sort-card > .card-body:not(.ig-preview-pane) {
+  flex: 1 1 auto !important;
+  min-height: 0;
+  overflow: visible !important;
+}
+
+.ig-filter-sort-card > .ig-preview-pane {
+  flex: 0 1 32%;
+  max-height: 32%;
+}
+
+.ig-filter-sort-card .tab-content,
+.ig-filter-sort-card .tab-pane,
+.ig-filter-sort-card .tab-pane > .card-body {
+  min-height: 0;
+  overflow: visible !important;
+}
+
+.ig-filter-sort-card,
+.ig-filter-sort-card > .card {
+  overflow: visible !important;
+}
+
+.selectize-dropdown,
+.selectize-dropdown.form-control,
+.dropdown-menu,
+.shiny-bound-input + .selectize-control .selectize-dropdown {
+  z-index: 10050 !important;
+}
+
+.ig-preview-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  color: #d0d0f0;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+/* Direct-child button (single close action) hugs the right; grouped action
+   rows bring their own ms-auto container instead. */
+.ig-preview-header > .btn {
+  margin-left: auto;
+}
+
+.ig-dataset-preview-meta {
+  color: #8c8cb8;
+  font-size: 0.78rem;
+  margin-bottom: 8px;
+}
+
+.ig-waldo-preview {
+  background: var(--ig-code-bg);
+  border: 1px solid var(--ig-border);
+  border-radius: 6px;
+  color: var(--ig-text);
+  font-family: "JetBrains Mono", "Cascadia Code", monospace;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  max-height: 65vh;
+  overflow: auto;
+  padding: 10px 12px;
+  white-space: pre;
+}
+
+.ig-waldo-line {
+  border-left: 3px solid transparent;
+  min-height: 1.45em;
+  padding: 0 8px;
+}
+
+.ig-waldo-line code {
+  background: transparent !important;
+  color: inherit !important;
+  font: inherit;
+  padding: 0;
+}
+
+.ig-waldo-header {
+  color: #f8fafc;
+  font-weight: 700;
+}
+
+.ig-waldo-added {
+  background: rgba(34, 197, 94, 0.13);
+  border-left-color: #22c55e;
+  color: #bbf7d0;
+}
+
+.ig-waldo-removed {
+  background: rgba(239, 68, 68, 0.13);
+  border-left-color: #ef4444;
+  color: #fecaca;
+}
+
+.ig-waldo-detail {
+  color: #93c5fd;
+}
+
+html[data-ig-theme="light"] .ig-waldo-preview {
+  background: var(--ig-code-bg);
+  border-color: var(--ig-border);
+  color: var(--ig-text);
+}
+
+html[data-ig-theme="light"] .ig-waldo-header {
+  color: #111827;
+}
+
+html[data-ig-theme="light"] .ig-waldo-added {
+  background: #dcfce7;
+  color: #14532d;
+}
+
+html[data-ig-theme="light"] .ig-waldo-removed {
+  background: #fee2e2;
+  color: #7f1d1d;
+}
+
+html[data-ig-theme="light"] .ig-waldo-detail {
+  color: #1d4ed8;
+}
+
+.ig-function-palette {
+  margin: 4px 0 12px;
+  padding: 8px 10px;
+  border: 1px solid #2a2a4a;
+  border-radius: 5px;
+  background: #151530;
+  color: #aaaad0;
+  font-size: 0.76rem;
+}
+
+.ig-function-palette ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.ig-function-palette li {
+  margin: 2px 0;
+}
+
+.ig-operand-box {
+  border: 1px solid #2a2a4a;
+  border-radius: 5px;
+  padding: 8px 10px;
+  background: #151530;
+}
+
+.ig-operand-title {
+  color: #d0d0f0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+/* ── Navbar / title-bar buttons ──────────────────────────────────────────── */
+
+/* "Add Task" — primary action, solid accent pill */
+.ig-add-task-btn {
+  background: #3b54d1 !important;
+  border: none !important;
+  border-radius: 20px !important;
+  padding: 5px 14px 5px 10px !important;
+  font-size: 0.8rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.2px;
+  color: #fff !important;
+  transition: background 0.12s ease !important;
+}
+
+.ig-add-task-btn:hover {
+  background: #3b5de0 !important;
+  color: #fff !important;
+}
+
+.ig-add-task-btn:active {
+  background: #3350c8 !important;
+  color: #fff !important;
+}
+
+/* Icon-only toolbar buttons — ghost style, accent tint on hover */
+.ig-header-btn {
+  background: transparent !important;
+  border: 1px solid transparent !important;
+  color: #7880aa !important;
+  border-radius: 7px !important;
+  width: 30px;
+  height: 30px;
+  padding: 0 !important;
+  position: relative;
+  font-size: 0.82rem;
+  transition: background 0.13s ease, border-color 0.13s ease,
+              color 0.13s ease, transform 0.1s ease !important;
+}
+
+.ig-header-btn:hover {
+  background: rgba(99, 125, 255, 0.16) !important;
+  border-color: rgba(99, 125, 255, 0.38) !important;
+  color: #c0caff !important;
+}
+
+.ig-header-btn:focus-visible {
+  outline: 2px solid rgba(99, 125, 255, 0.6);
+  outline-offset: 1px;
+}
+
+.ig-header-btn:active {
+  transform: scale(0.90);
+  background: rgba(99, 125, 255, 0.26) !important;
+}
+
+.ig-header-btn .fa,
+.ig-header-btn svg {
+  color: currentColor !important;
+}
+
+/* Undo button: depth badge + disabled state. */
+.ig-undo-btn-wrap { display: inline-flex; }
+#btn_undo .ig-undo-badge {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  min-width: 14px;
+  height: 14px;
+  padding: 0 3px;
+  border-radius: 8px;
+  background: #4361ee;
+  color: #fff;
+  font-size: 0.56rem;
+  font-weight: 700;
+  line-height: 14px;
+  text-align: center;
+}
+#btn_undo.disabled,
+#btn_undo:disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* ── Accessibility and theme overrides ───────────────────────────────────── */
+
+:root {
+  color-scheme: dark;
+  --ig-bg: #1a1a2e;
+  --ig-surface: #1e1e38;
+  --ig-surface-2: #16163a;
+  --ig-sidebar: #12122a;
+  --ig-border: #2a2a4a;
+  --ig-text: #e8e8f6;
+  --ig-text-muted: #b7b7d4;
+  --ig-focus: #ffd166;
+  --ig-primary: #5c7cfa;
+  --ig-hover: #24244b;
+  --ig-code-bg: #0d0d1f;
+}
+
+:root[data-ig-theme="light"] {
+  color-scheme: light;
+  --ig-bg: #f7f8fb;
+  --ig-surface: #ffffff;
+  --ig-surface-2: #eef1f7;
+  --ig-sidebar: #f1f3f8;
+  --ig-border: #c8cfdd;
+  --ig-text: #000000;
+  --ig-text-muted: #4d5a70;
+  --ig-focus: #8a5a00;
+  --ig-primary: #2454d6;
+  --ig-hover: #e4e9f3;
+  --ig-code-bg: #f4f6fa;
+}
+
+html[data-ig-theme="light"] body,
+html[data-ig-theme="light"] .bslib-page,
+html[data-ig-theme="light"] .ig-workspace {
+  background: var(--ig-bg) !important;
+  color: var(--ig-text) !important;
+}
+
+html[data-ig-theme="light"] .sidebar,
+html[data-ig-theme="light"] .bslib-sidebar-layout > .sidebar,
+html[data-ig-theme="light"] #main_sidebar {
+  background: var(--ig-sidebar) !important;
+  color: var(--ig-text) !important;
+}
+
+html[data-ig-theme="light"] #ig-tab-strip,
+html[data-ig-theme="light"] .ig-tree-project-name,
+html[data-ig-theme="light"] .ig-task-category {
+  background: var(--ig-sidebar) !important;
+  border-color: var(--ig-border) !important;
+}
+
+html[data-ig-theme="light"] .card,
+html[data-ig-theme="light"] .ig-tab-pill,
+html[data-ig-theme="light"] .ig-function-palette,
+html[data-ig-theme="light"] .ig-operand-box {
+  background: var(--ig-surface) !important;
+  border-color: var(--ig-border) !important;
+  color: var(--ig-text) !important;
+}
+
+html[data-ig-theme="light"] .card-header,
+html[data-ig-theme="light"] .card-footer,
+html[data-ig-theme="light"] .nav-tabs .nav-link.active {
+  background: var(--ig-surface-2) !important;
+  border-color: var(--ig-border) !important;
+  color: var(--ig-text) !important;
+}
+
+html[data-ig-theme="light"] .ig-tab-pill.active {
+  background: var(--ig-bg) !important;
+  border-color: var(--ig-primary) var(--ig-primary) var(--ig-bg) !important;
+  color: var(--ig-text) !important;
+}
+
+/* Inactive pill text + close glyph were left at dark-theme values on the
+   white pill background. #9090c0 = 3.03:1 and #9999c0 = 2.74:1 — both fail. */
+html[data-ig-theme="light"] .ig-tab-pill:not(.active) {
+  color: var(--ig-text-muted) !important; /* #4d5a70 — 7.04:1 on #ffffff */
+}
+html[data-ig-theme="light"] .ig-tab-close {
+  color: #5a6478 !important; /* 5.97:1 on #ffffff; hover keeps the red cue */
+}
+
+html[data-ig-theme="light"] .ig-tree-item,
+html[data-ig-theme="light"] .ig-tree-flow-header,
+html[data-ig-theme="light"] .ig-tree-project-title,
+html[data-ig-theme="light"] .ig-task-label,
+html[data-ig-theme="light"] .ig-preview-header,
+html[data-ig-theme="light"] .ig-operand-title {
+  color: var(--ig-text) !important;
+}
+
+html[data-ig-theme="light"] .ig-tree-item:hover,
+html[data-ig-theme="light"] .ig-tree-flow-header:hover,
+html[data-ig-theme="light"] .ig-tab-pill:hover:not(.active),
+html[data-ig-theme="light"] .ig-task-item:hover:not(.ig-task-unavailable) {
+  background: var(--ig-hover) !important;
+  color: var(--ig-text) !important;
+}
+
+html[data-ig-theme="light"] .text-muted,
+html[data-ig-theme="light"] .ig-tree-project-subtitle,
+html[data-ig-theme="light"] .ig-tree-section-header,
+html[data-ig-theme="light"] .ig-tree-node-group-title,
+html[data-ig-theme="light"] .ig-tree-io-caption,
+html[data-ig-theme="light"] .ig-tree-task-id,
+html[data-ig-theme="light"] .ig-tree-node-role,
+html[data-ig-theme="light"] .ig-task-desc,
+html[data-ig-theme="light"] .ig-dataset-preview-meta {
+  color: var(--ig-text-muted) !important; /* #4d5a70 — passes 4.5:1 on all light surfaces */
+}
+
+/* Light-theme: tree icons and accent elements that were left at dark-theme values.
+   #3d5080 gives 7.12:1 on #f1f3f8 and passes both 4.5:1 (text) and 3:1 (UI). */
+html[data-ig-theme="light"] .ig-tree-icon,
+html[data-ig-theme="light"] .ig-tree-caret-btn,
+html[data-ig-theme="light"] .ig-tree-add-btn,
+html[data-ig-theme="light"] .ig-tree-action-btn {
+  color: #3d5080 !important; /* was #8585bd / #6060a0 — <3:1 fail → 7.12:1 pass */
+}
+
+html[data-ig-theme="light"] .ig-tree-caret-btn:hover,
+html[data-ig-theme="light"] .ig-tree-node-group-title[data-collapsible="1"]:hover {
+  color: var(--ig-primary) !important; /* #2454d6 — 4.77:1 on white, visible hover cue */
+}
+
+/* Task-category sticky header in light: was #8080b8 (dark fix) but on #f1f3f8 bg */
+html[data-ig-theme="light"] .ig-task-category {
+  color: #3d5080 !important; /* was #6060a0 — 2.56:1 fail on #f1f3f8 → 7.12:1 pass */
+}
+
+/* Cross-flow dependency bar in light sidebar */
+html[data-ig-theme="light"] .ig-tree-flow-dep-bar {
+  color: #4e6aaa !important; /* was #6888cc — 3.16:1 fail → 4.77:1 pass */
+}
+
+html[data-ig-theme="light"] pre,
+html[data-ig-theme="light"] .ig-task-panel .form-control,
+html[data-ig-theme="light"] .ig-task-panel .form-select {
+  background: var(--ig-code-bg) !important;
+  border-color: var(--ig-border) !important;
+  color: var(--ig-text) !important;
+}
+
+/* ── DataTables — full light-mode repaint ────────────────────────────────── */
+/* bslib bakes Bootstrap CSS vars at render time; we must override them here  */
+
+html[data-ig-theme="light"] .dataTables_wrapper {
+  color: var(--ig-text) !important;
+}
+
+/* Reset Bootstrap table variables that DataTables inherits */
+html[data-ig-theme="light"] table.dataTable {
+  --bs-table-bg:            transparent;
+  --bs-table-color:         var(--ig-text);
+  --bs-table-border-color:  var(--ig-border);
+  --bs-table-striped-bg:    rgba(0, 0, 0, 0.025);
+  --bs-table-striped-color: var(--ig-text);
+  --bs-table-hover-bg:      rgba(36, 84, 214, 0.06);
+  --bs-table-hover-color:   var(--ig-text);
+  color: var(--ig-text) !important;
+  border-color: var(--ig-border) !important;
+}
+
+html[data-ig-theme="light"] table.dataTable thead th,
+html[data-ig-theme="light"] table.dataTable thead td {
+  background: var(--ig-surface-2) !important;
+  color: var(--ig-text) !important;
+  border-color: var(--ig-border) !important;
+}
+
+html[data-ig-theme="light"] table.dataTable tbody tr {
+  background-color: transparent !important;
+}
+
+html[data-ig-theme="light"] table.dataTable tbody td,
+html[data-ig-theme="light"] table.dataTable tbody th {
+  color: var(--ig-text) !important;
+  border-color: var(--ig-border) !important;
+}
+
+/* Striped / hover row shading via box-shadow (matches DataTables' own technique) */
+html[data-ig-theme="light"] table.dataTable.stripe tbody tr.odd > *,
+html[data-ig-theme="light"] table.dataTable.display tbody tr.odd > * {
+  box-shadow: inset 0 0 0 9999px rgba(0, 0, 0, 0.025) !important;
+}
+
+html[data-ig-theme="light"] table.dataTable.hover tbody tr:hover > *,
+html[data-ig-theme="light"] table.dataTable.display tbody tr:hover > * {
+  box-shadow: inset 0 0 0 9999px rgba(36, 84, 214, 0.06) !important;
+}
+
+/* Search box + page-length select */
+html[data-ig-theme="light"] .dataTables_wrapper .dataTables_filter input,
+html[data-ig-theme="light"] .dataTables_wrapper .dataTables_length select {
+  background: var(--ig-surface) !important;
+  border-color: var(--ig-border) !important;
+  color: var(--ig-text) !important;
+}
+
+/* Wrapper-level Bootstrap body vars — bslib compiles --bs-body-bg / --bs-body-color
+   using the dark theme palette.  Resetting them here lets every Bootstrap component
+   inside .dataTables_wrapper (inputs, selects, pagination) resolve to light values. */
+html[data-ig-theme="light"] .dataTables_wrapper {
+  --bs-body-bg:              var(--ig-bg);
+  --bs-body-color:           var(--ig-text);
+  --bs-secondary-color:      var(--ig-text-muted);
+  --bs-border-color:         var(--ig-border);
+  --bs-body-bg-rgb:          247, 248, 251;
+  --bs-body-color-rgb:       0, 0, 0;
+  background-color:          var(--ig-bg) !important;
+  color:                     var(--ig-text) !important;
+}
+
+/* Pagination — reset Bootstrap 5 CSS vars baked in by bslib with dark values.
+   bslib generates --bs-pagination-* at :root with dark colours; switching to
+   light mode via data-ig-theme doesn't update them, so we must re-declare them
+   here.  Both the BS5 .page-link path and the classic DT .paginate_button path
+   are covered so the fix works regardless of which DT pagination style is used. */
+html[data-ig-theme="light"] .dataTables_wrapper .dataTables_paginate {
+  /* Override Bootstrap 5 pagination CSS custom properties */
+  --bs-pagination-padding-x:       0.625rem;
+  --bs-pagination-padding-y:       0.25rem;
+  --bs-pagination-color:           var(--ig-text);
+  --bs-pagination-bg:              var(--ig-surface);
+  --bs-pagination-border-color:    var(--ig-border);
+  --bs-pagination-hover-color:     var(--ig-text);
+  --bs-pagination-hover-bg:        var(--ig-hover);
+  --bs-pagination-hover-border-color: var(--ig-border);
+  --bs-pagination-focus-color:     var(--ig-text);
+  --bs-pagination-focus-bg:        var(--ig-hover);
+  --bs-pagination-focus-box-shadow: 0 0 0 0.2rem rgba(36,84,214,.25);
+  --bs-pagination-active-color:    #ffffff;
+  --bs-pagination-active-bg:       var(--ig-primary);
+  --bs-pagination-active-border-color: var(--ig-primary);
+  --bs-pagination-disabled-color:  var(--ig-text-muted);
+  --bs-pagination-disabled-bg:     var(--ig-surface-2);
+  --bs-pagination-disabled-border-color: var(--ig-border);
+}
+
+/* Bootstrap 5 path: .page-item > .page-link */
+html[data-ig-theme="light"] .dataTables_wrapper .dataTables_paginate .page-item .page-link {
+  color:            var(--ig-text) !important;
+  background-color: var(--ig-surface) !important;
+  border-color:     var(--ig-border) !important;
+}
+html[data-ig-theme="light"] .dataTables_wrapper .dataTables_paginate .page-item .page-link:hover,
+html[data-ig-theme="light"] .dataTables_wrapper .dataTables_paginate .page-item .page-link:focus {
+  color:            var(--ig-text) !important;
+  background-color: var(--ig-hover) !important;
+  border-color:     var(--ig-border) !important;
+}
+html[data-ig-theme="light"] .dataTables_wrapper .dataTables_paginate .page-item.active .page-link {
+  color:            #ffffff !important;
+  background-color: var(--ig-primary) !important;
+  border-color:     var(--ig-primary) !important;
+}
+html[data-ig-theme="light"] .dataTables_wrapper .dataTables_paginate .page-item.disabled .page-link {
+  color:            var(--ig-text-muted) !important;
+  background-color: var(--ig-surface-2) !important;
+  border-color:     var(--ig-border) !important;
+}
+
+/* Classic DT path: .paginate_button (older DT Bootstrap 3 renderer) */
+html[data-ig-theme="light"] .dataTables_wrapper .dataTables_paginate .paginate_button {
+  color:      var(--ig-text) !important;
+  background: var(--ig-surface) !important;
+  border:     1px solid var(--ig-border) !important;
+  border-radius: 4px;
+}
+html[data-ig-theme="light"] .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+  color:      var(--ig-text) !important;
+  background: var(--ig-hover) !important;
+  border-color: var(--ig-border) !important;
+}
+html[data-ig-theme="light"] .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+html[data-ig-theme="light"] .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+  color:      #ffffff !important;
+  background: var(--ig-primary) !important;
+  border-color: var(--ig-primary) !important;
+}
+html[data-ig-theme="light"] .dataTables_wrapper .dataTables_paginate .paginate_button.disabled,
+html[data-ig-theme="light"] .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover {
+  color:      var(--ig-text-muted) !important;
+  background: var(--ig-surface-2) !important;
+  border-color: var(--ig-border) !important;
+}
+
+html[data-ig-theme="light"] .dataTables_wrapper .dataTables_info {
+  color: var(--ig-text-muted) !important;
+}
+
+html[data-ig-theme="light"] .btn-outline-light {
+  color: var(--ig-text) !important;
+  border-color: #7b879b !important;
+}
+
+html[data-ig-theme="light"] .ig-header-btn {
+  background: transparent !important;
+  border-color: transparent !important;
+  color: #566072 !important;
+}
+
+/* Amber dot on the Save button while the project has unsaved changes */
+.ig-header-btn.ig-dirty::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #f59e0b;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.35);
+}
+
+html[data-ig-theme="light"] .ig-header-btn:hover {
+  background: rgba(67, 97, 238, 0.10) !important;
+  border-color: rgba(67, 97, 238, 0.28) !important;
+  color: #2a46c0 !important;
+}
+
+html[data-ig-theme="light"] .ig-header-btn:active {
+  background: rgba(67, 97, 238, 0.18) !important;
+}
+
+html[data-ig-theme="light"] .btn-outline-light:hover,
+html[data-ig-theme="light"] .btn-outline-secondary:hover {
+  background: var(--ig-hover) !important;
+  color: var(--ig-text) !important;
+}
+
+.ig-tree-item:focus-visible,
+.ig-tree-flow-header:focus-visible,
+.ig-tab-pill:focus-visible,
+.ig-task-item:focus-visible,
+button:focus-visible,
+.btn:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+.form-control:focus,
+.form-select:focus {
+  outline: 3px solid var(--ig-focus) !important;
+  outline-offset: 2px !important;
+  box-shadow: none !important;
+}
+
+.ig-tree-item:focus-within .ig-tree-action-btn,
+.ig-tree-flow-header:focus-within .ig-tree-action-btn,
+.ig-tree-action-btn:focus-visible {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Theme synchronization for Shiny, Bootstrap, and app-specific controls. */
+html,
+body,
+.bslib-page,
+.ig-workspace {
+  background: var(--ig-bg) !important;
+  color: var(--ig-text) !important;
+}
+
+#main_sidebar,
+.ig-sb-pane {
+  background: var(--ig-sidebar) !important;
+  color: var(--ig-text) !important;
+}
+
+.card,
+.modal-content,
+.dropdown-menu,
+.popover,
+.selectize-dropdown {
+  background: var(--ig-surface) !important;
+  color: var(--ig-text) !important;
+  border-color: var(--ig-border) !important;
+}
+
+.card-header,
+.card-footer,
+.modal-header,
+.modal-footer,
+.dropdown-header {
+  background: var(--ig-surface-2) !important;
+  color: var(--ig-text) !important;
+  border-color: var(--ig-border) !important;
+}
+
+.form-control,
+.form-select,
+.selectize-input,
+.selectize-control.single .selectize-input,
+.selectize-control.multi .selectize-input,
+.dataTables_filter input,
+.dataTables_length select {
+  background: var(--ig-code-bg) !important;
+  color: var(--ig-text) !important;
+  border-color: var(--ig-border) !important;
+}
+
+.form-control::placeholder,
+.selectize-input input::placeholder {
+  color: var(--ig-text-muted) !important;
+  opacity: 1;
+}
+
+label,
+.form-label,
+.control-label,
+.text-muted,
+.small.text-muted,
+.dataTables_info,
+.dataTables_wrapper .dataTables_paginate {
+  color: var(--ig-text-muted) !important;
+}
+
+.nav-tabs {
+  border-color: var(--ig-border) !important;
+}
+
+.nav-tabs .nav-link {
+  color: var(--ig-text-muted) !important;
+  border-color: transparent !important;
+}
+
+.nav-tabs .nav-link:hover,
+.nav-tabs .nav-link:focus {
+  background: var(--ig-hover) !important;
+  color: var(--ig-text) !important;
+  border-color: var(--ig-border) !important;
+}
+
+.nav-tabs .nav-link.active {
+  background: var(--ig-bg) !important;
+  color: var(--ig-text) !important;
+  border-color: var(--ig-border) var(--ig-border) var(--ig-bg) !important;
+}
+
+.btn-outline-light,
+.btn-outline-secondary {
+  color: var(--ig-text) !important;
+  border-color: var(--ig-border) !important;
+}
+
+.btn-outline-light:hover,
+.btn-outline-light:focus,
+.btn-outline-secondary:hover,
+.btn-outline-secondary:focus {
+  background: var(--ig-hover) !important;
+  color: var(--ig-text) !important;
+}
+
+.btn-close {
+  filter: var(--ig-close-filter, invert(1) grayscale(100%) brightness(200%));
+}
+
+html[data-ig-theme="light"] .btn-close {
+  --ig-close-filter: none;
+}
+
+.ig-col-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  border-bottom: 1px solid var(--ig-border);
+  color: var(--ig-text);
+  cursor: pointer;
+}
+
+.ig-col-row:hover,
+.ig-col-row:focus-within {
+  background: var(--ig-hover);
+}
+
+.ig-col-row-selected {
+  background: rgba(92, 124, 250, 0.22);
+  background: color-mix(in srgb, var(--ig-primary) 22%, transparent);
+}
+
+.ig-grid-header {
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.18rem 0.5rem;
+  border-bottom: 1px solid var(--ig-border);
+  color: var(--ig-text-muted);
+  font-size: 0.75rem;
+}
+
+.ig-grid-row {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.18rem 0.5rem;
+  min-height: 36px;
+  border-bottom: 1px solid var(--ig-border);
+  color: var(--ig-text);
+}
+
+.ig-summary-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  padding: 0.5rem;
+  background: var(--ig-surface);
+  border: 1px solid var(--ig-border);
+  border-radius: 4px;
+  color: var(--ig-text);
+}
+
+.ig-type-badge {
+  display: inline-block;
+  font-size: 0.68rem;
+  line-height: 1.2;
+  background: #64748b;
+  color: #ffffff;
+  border-radius: 3px;
+  padding: 1px 4px;
+}
+
+.ig-type-numeric,
+.ig-type-integer,
+.ig-type-double {
+  background: #2563eb;
+}
+
+.ig-type-character,
+.ig-type-factor {
+  background: #b45309;
+}
+
+.ig-type-date,
+.ig-type-posixct,
+.ig-type-posixlt {
+  background: #15803d;
+}
+
+.ig-type-logical {
+  background: #be123c;
+}
+
+.ig-type-computed {
+  background: #6d28d9;
+}
+
+#canvas-net {
+  background: var(--ig-surface) !important;
+  border-color: var(--ig-border) !important;
+}
+
+html[data-ig-theme="light"] .card,
+html[data-ig-theme="light"] .card *,
+html[data-ig-theme="light"] .modal-content,
+html[data-ig-theme="light"] .modal-content *,
+html[data-ig-theme="light"] .dropdown-menu,
+html[data-ig-theme="light"] .dropdown-menu *,
+html[data-ig-theme="light"] .popover,
+html[data-ig-theme="light"] .popover *,
+html[data-ig-theme="light"] .selectize-dropdown,
+html[data-ig-theme="light"] .selectize-dropdown *,
+html[data-ig-theme="light"] .ig-summary-row,
+html[data-ig-theme="light"] .ig-summary-row *,
+html[data-ig-theme="light"] .ig-grid-row,
+html[data-ig-theme="light"] .ig-grid-row *,
+html[data-ig-theme="light"] .ig-col-row,
+html[data-ig-theme="light"] .ig-col-row *,
+html[data-ig-theme="light"] table,
+html[data-ig-theme="light"] table * {
+  color: #000000;
+}
+
+html[data-ig-theme="light"] .form-control,
+html[data-ig-theme="light"] .form-select,
+html[data-ig-theme="light"] .selectize-input,
+html[data-ig-theme="light"] .selectize-input *,
+html[data-ig-theme="light"] input,
+html[data-ig-theme="light"] textarea,
+html[data-ig-theme="light"] select {
+  color: #000000 !important;
+}
+
+html[data-ig-theme="light"] .text-muted,
+html[data-ig-theme="light"] .text-muted *,
+html[data-ig-theme="light"] .ig-type-badge,
+html[data-ig-theme="light"] .ig-type-badge * {
+  color: inherit;
+}
+
+html[data-ig-theme="light"] .ig-type-badge,
+html[data-ig-theme="light"] .ig-type-badge * {
+  color: #ffffff !important;
+}
+
+/* Header icon colour — dark theme: white icons on dark backgrounds pass easily.
+   Light theme: was erroneously forced to white (#fff on #f7f8fb = 1.06:1, catastrophic fail).
+   Fix: dark theme uses white; light theme uses #3d4966 (8.44:1 on #f7f8fb). */
+.ig-header-btn .fa,
+.ig-header-btn svg {
+  color: #ffffff !important; /* dark theme only — inherits currentColor from parent */
+  fill: #ffffff !important;
+}
+
+/* Light theme: override icon colour to dark so it is readable on pale background */
+html[data-ig-theme="light"] .ig-header-btn .fa,
+html[data-ig-theme="light"] .ig-header-btn svg {
+  color: currentColor !important; /* follows the parent #3d4966 set below */
+  fill: currentColor !important;
+}
+
+html[data-ig-theme="light"] .ig-header-btn,
+html[data-ig-theme="light"] .ig-header-btn:hover,
+html[data-ig-theme="light"] .ig-header-btn:focus,
+html[data-ig-theme="light"] .ig-header-btn:active {
+  color: #3d4966 !important; /* was #ffffff — 1.06:1 fail → 8.44:1 pass */
+}
+
+html[data-ig-theme="light"] .dataTables_wrapper .dt-buttons,
+html[data-ig-theme="light"] .dataTables_wrapper .dt-buttons * {
+  color: #000000 !important;
+}
+
+html[data-ig-theme="light"] .dataTables_wrapper .dt-buttons .dt-button,
+html[data-ig-theme="light"] .dataTables_wrapper .dt-buttons button,
+html[data-ig-theme="light"] .dataTables_wrapper .dt-buttons .btn,
+html[data-ig-theme="light"] button.dt-button,
+html[data-ig-theme="light"] div.dt-button,
+html[data-ig-theme="light"] a.dt-button {
+  background: var(--ig-surface) !important;
+  background-image: none !important;
+  border: 1px solid var(--ig-border) !important;
+  color: #000000 !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+
+html[data-ig-theme="light"] .dataTables_wrapper .dt-buttons .dt-button:hover,
+html[data-ig-theme="light"] .dataTables_wrapper .dt-buttons .dt-button:focus,
+html[data-ig-theme="light"] .dataTables_wrapper .dt-buttons button:hover,
+html[data-ig-theme="light"] .dataTables_wrapper .dt-buttons button:focus,
+html[data-ig-theme="light"] .dataTables_wrapper .dt-buttons .btn:hover,
+html[data-ig-theme="light"] .dataTables_wrapper .dt-buttons .btn:focus,
+html[data-ig-theme="light"] button.dt-button:hover,
+html[data-ig-theme="light"] button.dt-button:focus,
+html[data-ig-theme="light"] div.dt-button:hover,
+html[data-ig-theme="light"] div.dt-button:focus,
+html[data-ig-theme="light"] a.dt-button:hover,
+html[data-ig-theme="light"] a.dt-button:focus {
+  background: var(--ig-hover) !important;
+  background-image: none !important;
+  border-color: var(--ig-primary) !important;
+  color: #000000 !important;
+  box-shadow: none !important;
+}
+
+html[data-ig-theme="light"] .dt-button-collection,
+html[data-ig-theme="light"] .dt-button-collection .dt-button {
+  background: var(--ig-surface) !important;
+  background-image: none !important;
+  border-color: var(--ig-border) !important;
+  color: #000000 !important;
+}
+
+html[data-ig-theme="light"] .dt-button.disabled,
+html[data-ig-theme="light"] .dt-button:disabled,
+html[data-ig-theme="light"] .dataTables_wrapper .dt-buttons .btn.disabled,
+html[data-ig-theme="light"] .dataTables_wrapper .dt-buttons .btn:disabled {
+  background: var(--ig-surface-2) !important;
+  border-color: var(--ig-border) !important;
+  color: var(--ig-text-muted) !important;
+  opacity: 1 !important;
+}
+
+/* ── Light mode: Shiny notifications ────────────────────────────────────── */
+/* .shiny-notification is hardcoded dark above; reset it for light theme.     */
+
+html[data-ig-theme="light"] .shiny-notification {
+  background:    #ffffff !important;
+  border-left:   3px solid var(--ig-primary) !important;
+  color:         var(--ig-text) !important;
+  box-shadow:    0 2px 12px rgba(0, 0, 0, 0.12) !important;
+}
+
+html[data-ig-theme="light"] .shiny-notification-close {
+  color: var(--ig-text-muted) !important;
+  opacity: 0.7;
+}
+
+html[data-ig-theme="light"] .shiny-notification-close:hover {
+  color: var(--ig-text) !important;
+  opacity: 1;
+}
+
+/* Shiny notification type variants */
+html[data-ig-theme="light"] .shiny-notification-error {
+  background:        #fff5f5 !important;
+  border-left-color: #dc2626 !important;
+}
+
+html[data-ig-theme="light"] .shiny-notification-warning {
+  background:        #fffbeb !important;
+  border-left-color: #d97706 !important;
+}
+
+/* The panel wrapper itself can pick up a dark bg from Bootstrap; reset it.  */
+html[data-ig-theme="light"] #shiny-notification-panel {
+  background: transparent !important;
+}
+
+/* ── Light mode: checkboxes and radio buttons ────────────────────────────── */
+/* Bootstrap 5 computes --bs-form-check-* vars at bslib build time with dark  */
+/* values; switching the theme at runtime does not update them automatically.  */
+/* Declare them fresh on :root[data-ig-theme="light"] so every .form-check-input
+   inside the document resolves the correct light values.                      */
+
+:root[data-ig-theme="light"] {
+  --bs-form-check-input-bg:                       #ffffff;
+  --bs-form-check-input-border:                   rgba(0, 0, 0, 0.25);
+  --bs-form-check-input-checked-bg-color:         var(--ig-primary);
+  --bs-form-check-input-checked-border-color:     var(--ig-primary);
+  --bs-form-check-input-indeterminate-bg-color:   var(--ig-primary);
+  --bs-form-check-input-indeterminate-border-color: var(--ig-primary);
+  --bs-form-check-input-focus-border:             var(--ig-primary);
+  --bs-form-check-input-focus-box-shadow:         0 0 0 0.2rem rgba(36, 84, 214, 0.25);
+}
+
+/* Direct overrides — belt-and-suspenders for browsers that have already
+   resolved the var() calls from the baked dark values.                       */
+html[data-ig-theme="light"] .form-check-input {
+  background-color: #ffffff !important;
+  border-color:     rgba(0, 0, 0, 0.25) !important;
+}
+
+html[data-ig-theme="light"] .form-check-input:checked {
+  background-color: var(--ig-primary) !important;
+  border-color:     var(--ig-primary) !important;
+}
+
+html[data-ig-theme="light"] .form-check-input:indeterminate {
+  background-color: var(--ig-primary) !important;
+  border-color:     var(--ig-primary) !important;
+}
+
+html[data-ig-theme="light"] .form-check-input:focus {
+  border-color: var(--ig-primary) !important;
+  box-shadow:   0 0 0 0.2rem rgba(36, 84, 214, 0.25) !important;
+}
+
+html[data-ig-theme="light"] .form-check-input[disabled],
+html[data-ig-theme="light"] .form-check-input:disabled {
+  background-color: var(--ig-surface-2) !important;
+  border-color:     rgba(0, 0, 0, 0.15) !important;
+  opacity: 0.65;
+}
+
+html[data-ig-theme="light"] .form-check-label {
+  color: var(--ig-text) !important;
+}
+
+/* ── visNetwork canvas tooltip ───────────────────────────────────────────── */
+/* vis.js renders tooltips outside the shadow DOM; pin the canvas tooltip to  */
+/* a light surface so the text stays readable in both app themes.             */
+.vis-tooltip,
+div.vis-tooltip,
+[class*="vis-tooltip"] {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  border: 1px solid #d5d8e5 !important;
+  border-radius: 5px !important;
+  padding: 6px 10px !important;
+  font-size: 12px !important;
+  font-family: inherit !important;
+  max-width: 270px !important;
+  line-height: 1.5 !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.55) !important;
+  pointer-events: none;
+}
+.vis-tooltip *,
+div.vis-tooltip *,
+[class*="vis-tooltip"] * {
+  color: #000000 !important;
+}
+
+/* ── Global "app is busy" loading bar ────────────────────────────────────── */
+/* Operations like adding a task or running a flow involve a server round   */
+/* trip with no on-screen output to attach a spinner to, so without this the */
+/* UI can appear frozen for a couple of seconds. This thin bar at the top of */
+/* the viewport appears (after a short delay, so quick actions don't flicker */
+/* it) whenever Shiny is processing, giving the user continuous feedback.    */
+.ig-busy-bar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  z-index: 9999;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+.ig-busy-bar.ig-busy-bar--active {
+  opacity: 1;
+}
+.ig-busy-bar::before {
+  content: "";
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 40%;
+  background: var(--ig-primary, #4361ee);
+  animation: ig-busy-slide 1.1s ease-in-out infinite;
+}
+@keyframes ig-busy-slide {
+  0%   { left: -40%; }
+  100% { left: 100%; }
+}
+
+/* Log previews show field values beside actual message/file formatting. */
+.ig-log-preview-grid { margin: .5rem 0 1rem; padding: .75rem 0; border-top: 1px solid #36364f; }
+.ig-log-input-table td { overflow-wrap: anywhere; max-width: 18rem; }
+.ig-log-inputs-scroll { max-height: 28rem; overflow: auto; }
+.ig-log-input-table code { font-size: .75rem; }
+.ig-log-input-table caption { caption-side: top; font-size: .8rem; }
+.ig-log-preview-entry { border: 1px solid #36364f; border-radius: 6px; padding: .65rem; margin-bottom: .5rem; }
+.ig-log-preview-message { white-space: pre-wrap; overflow-wrap: anywhere; }
+.ig-log-level { padding: .1rem .4rem; border-radius: 4px; font-weight: 700; font-size: .75rem; }
+.ig-log-level-debug { background: #35354d; color: #dedeee; }
+.ig-log-level-info { background: #223b75; color: #dbe7ff; }
+.ig-log-level-warn { background: #694915; color: #fff0c5; }
+.ig-log-level-error { background: #6b2038; color: #ffe1ea; }
+.ig-log-preview-grid pre, .ig-log-export-preview pre { max-height: 22rem; overflow: auto; font-size: .8rem; }
+/* Desktop menus replace the global header controls; hosted Shiny keeps them. */
+.ig-desktop .ig-desktop-menu-controls { display: none !important; }
+.ig-run-status[hidden],#ig-stop-run[hidden]{display:none!important}
+.ig-run-status{display:flex;align-items:center;gap:8px;min-width:0;font-size:12px}
+#ig-run-description{max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#ig-run-progress{width:80px;height:8px;accent-color:#4361ee}
+#ig-run-elapsed{font-variant-numeric:tabular-nums}
+@media(max-width:1200px){#ig-run-progress{display:none}#ig-run-description{max-width:160px}}
+/* The console keeps its editor mounted while output arrives. */
+.ig-console {
+  --console-bg: #13151d; --console-fg: #d8dee9; --console-muted: #9099ad;
+  --console-border: #2c303e; --console-accent: #9ecea3; --console-error: #ff939b; --console-warning: #e7c787;
+  height: 100%; min-height: 0; display: flex; flex-direction: column; padding: 12px 16px 8px;
+}
+html[data-ig-theme="light"] .ig-console {
+  --console-bg: #fafbfc; --console-fg: #253047; --console-muted: #5e697c;
+  --console-border: #d6dce5; --console-accent: #286842; --console-error: #b42336; --console-warning: #875c0b;
+}
+.ig-console-toolbar { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 18px; padding: 0 2px 10px; flex: 0 0 auto; }
+.ig-console-identity { display: flex; align-items: center; gap: 9px; font-size: 13px; font-weight: 600; }
+.ig-console-mark { display: inline-grid; place-items: center; width: 23px; height: 23px; border: 1px solid var(--console-border); border-radius: 6px; color: var(--console-accent); font: 600 13px 'JetBrains Mono', monospace; }
+.ig-console-session { color: var(--console-muted); font-size: 11px; font-weight: 400; }
+.ig-console-actions { display: flex; flex-wrap: wrap; gap: 3px; margin-left: auto; }
+.ig-console-actions .btn { background: transparent !important; border-color: transparent !important; color: var(--console-muted) !important; box-shadow: none !important; padding: 4px 8px; font-size: 11px; }
+.ig-console-actions .btn:hover { color: var(--console-fg) !important; background: var(--console-border) !important; }
+.ig-console-surface { position: relative; display: flex; flex-direction: column; flex: 1 1 160px; min-height: 100px; overflow: hidden; background: var(--console-bg); border: 1px solid var(--console-border); border-radius: 10px; }
+.ig-console-surface:focus-within { border-color: color-mix(in srgb, var(--console-accent) 50%, var(--console-border)); }
+.ig-console-results { flex: 1 1 auto; min-height: 0; overflow: auto; padding: 20px 22px; scrollbar-width: thin; scrollbar-color: var(--console-border) transparent; overscroll-behavior: contain; }
+.ig-console-transcript { white-space: pre-wrap; overflow-wrap: anywhere; color: var(--console-fg) !important; font: 13px/1.75 'JetBrains Mono', monospace; font-variant-ligatures: none; margin: 0; padding: 0; border: 0; max-height: none; overflow: visible; background: transparent !important; }
+.ig-console-command { color: var(--console-accent); }
+.ig-console-error { color: var(--console-error); }
+.ig-console-warning { color: var(--console-warning); }
+.ig-console-meta { color: var(--console-muted); }
+.ig-console-composer { display: flex; align-items: flex-start; gap: 12px; flex: 0 0 auto; margin: 0 22px; padding: 13px 0 16px; border-top: 1px solid var(--console-border); }
+.ig-console-prompt { color: var(--console-accent); font: 600 16px/1.55 'JetBrains Mono', monospace; user-select: none; }
+.ig-console-editor { flex: 1 1 auto; min-width: 0; box-sizing: border-box; padding: 0; margin: 0; border: 0 !important; outline: 0 !important; box-shadow: none !important; background: transparent !important; color: var(--console-fg) !important; caret-color: var(--console-accent); font: 13px/1.75 'JetBrains Mono', monospace; resize: none; min-height: 24px; max-height: 28vh; overflow-y: auto; tab-size: 2; border-radius: 0; }
+.ig-console-editor::placeholder { color: var(--console-muted); opacity: .8; }
+.ig-console .ig-console-editor:focus-visible { outline: none !important; }
+.ig-console-composer .btn { flex: 0 0 auto; padding: 3px 9px; font-size: 11px; background: transparent !important; border-color: var(--console-border) !important; color: var(--console-muted) !important; }
+.ig-console-composer .btn[id$="-run"]:not(:disabled) { color: var(--console-accent) !important; }
+.ig-console[data-busy="false"] .ig-console-composer .btn[id$="-stop"] { display: none; }
+.ig-console[data-busy="true"] .ig-console-composer .btn[id$="-run"] { display: none; }
+.ig-console[data-busy="true"] .ig-console-composer .btn[id$="-stop"] { color: var(--console-error) !important; }
+.ig-console-latest { position: absolute; bottom: var(--console-entry-height, 64px); right: 22px; padding: 5px 10px; border: 1px solid var(--console-border); border-radius: 20px; background: var(--console-bg); color: var(--console-fg); font-size: 11px; box-shadow: 0 3px 12px #0003; }
+.ig-console-latest[hidden] { display: none; }
+.ig-console-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; padding: 8px 3px 2px; color: var(--console-muted); font: 10px/1.6 'JetBrains Mono', monospace; flex: 0 0 auto; }
+.ig-console-footer [role="status"] { display: flex; align-items: center; gap: 7px; }
+.ig-console-footer [role="status"]::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--console-accent); }
+.ig-console[data-busy="true"] .ig-console-footer [role="status"]::before { background: var(--console-warning); }
+.ig-console[data-status="error"] .ig-console-footer [role="status"]::before,
+.ig-console[data-status="disconnected"] .ig-console-footer [role="status"]::before { background: var(--console-error); }
+.ig-console-info { flex: 0 0 auto; padding: 3px; color: var(--console-muted); font-size: 11px; max-height: 120px; overflow: auto; }
+.ig-console-info summary { width: fit-content; cursor: pointer; }
+.ig-console-info p { max-width: 95ch; margin: 5px 0 2px; line-height: 1.6; }
+.ig-console-plot { display: block; width: auto; max-width: 100%; max-height: 360px; height: auto; margin: 16px 0; border-radius: 6px; background: white; }
+.ig-console :is(button,a,summary):focus-visible { outline: 2px solid var(--console-accent) !important; outline-offset: 2px; }
+.ig-console ::selection { background: color-mix(in srgb, var(--console-accent) 28%, transparent); }
+@media (max-width: 1100px) {
+  .ig-console-session { display: none; }
+  .ig-console-toolbar { gap: 6px; }
+  .ig-console-actions .btn { padding-inline: 5px; }
+  .ig-console-keys { font-size: 9px; }
+  .ig-console-results { padding: 14px; }
+  .ig-console-composer { margin-inline: 14px; gap: 8px; }
+}
+.ig-example-card { border: 1px solid var(--bs-border-color); border-radius: 8px; padding: 16px; margin: 12px 0; }
+.ig-example-card h4 { font-size: 1rem; }
+.ig-example-filters { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr) minmax(190px, 1fr); gap: 12px; margin: 16px 0; }
+.ig-example-filters label { font-weight: 600; margin-bottom: 4px; }
+.ig-example-tasks { color: var(--bs-secondary-color); }
+.ig-example-card[hidden] { display: none; }
+@media (max-width: 800px) { .ig-example-filters { grid-template-columns: 1fr; } }
+.modal-dialog:has(.ig-help-body) { margin-top: 28px !important; margin-bottom: 28px; }
+.modal-dialog:has(.ig-help-body) .modal-content { max-height: calc(100dvh - 56px); }
+.modal-dialog:has(.ig-help-body) .modal-body { min-height: 0; overflow-y: auto; }
+.ig-console-input-wrap { position: relative; flex: 1 1 auto; min-width: 0; overflow: hidden; }
+.ig-console-input-wrap .ig-console-editor { position: relative; display: block; width: 100%; color: transparent !important; -webkit-text-fill-color: transparent; }
+.ig-console-highlight { position: absolute; inset: 0; pointer-events: none; padding: 0; margin: 0; border: 0; border-radius: 0; overflow: visible; max-height: none; background: transparent; color: var(--console-fg); white-space: pre-wrap; overflow-wrap: break-word; font: 13px/1.75 'JetBrains Mono', monospace; font-variant-ligatures: none; tab-size: 2; }
+.ig-console-editor::placeholder { -webkit-text-fill-color: var(--console-muted); }
+.ig-r-string { color: var(--console-accent); }
+.ig-r-comment { color: var(--console-muted); font-style: italic; }
+.ig-r-keyword, .ig-r-operator { color: #bb9af7; }
+.ig-r-number { color: #e7c787; }
+html[data-ig-theme="light"] .ig-r-keyword, html[data-ig-theme="light"] .ig-r-operator { color: #6941a5; }
+html[data-ig-theme="light"] .ig-r-number { color: #875c0b; }
+.ig-console-completions { position: absolute; bottom: var(--console-entry-height, 64px); left: 40px; right: 20px; max-height: 190px; overflow: auto; z-index: 10; border: 1px solid var(--console-border); border-radius: 6px; background: var(--console-bg); padding: 4px; box-shadow: 0 4px 16px #0005; }
+.ig-console-completions button { display: block; width: 100%; text-align: left; padding: 5px 8px; border: 0; background: transparent; color: var(--console-fg); font: 12px/1.5 'JetBrains Mono', monospace; }
+.ig-console-completions [aria-selected="true"] { background: var(--console-border); color: var(--console-accent); }
+.ig-console-history-panel { position: absolute; z-index: 11; inset: 8px 8px auto; max-height: calc(100% - 70px); overflow: auto; padding: 14px; background: var(--console-bg); border: 1px solid var(--console-border); border-radius: 6px; color: var(--console-fg); }
+.ig-console-history-results { margin-top: 8px; }
+.ig-console-history-item { display: block; width: 100%; padding: 8px; border: 0; border-bottom: 1px solid var(--console-border); background: transparent; color: var(--console-fg); text-align: left; white-space: pre-wrap; overflow-wrap: anywhere; font: 12px/1.5 'JetBrains Mono', monospace; }
+.ig-console-history-panel[hidden], .ig-console-completions[hidden] { display: none; }
+.ig-tree-select-flow { border: 0; background: transparent; color: inherit; text-align: left; padding: 0; font: inherit; min-width: 0; }
+.ig-tree-select-flow:focus-visible { outline: 2px solid var(--ig-primary, #4361ee); outline-offset: 3px; }
+.ig-accessible-task-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--bs-border-color); overflow-wrap: anywhere; }
+.ig-accessible-task-row .btn-outline-primary { color: var(--ig-text) !important; border-color: var(--ig-text-muted) !important; }
+html:not([data-ig-theme="light"]) .modal-footer .btn-default { color: #cbd1e2; background-color: #25253e; }
+html:not([data-ig-theme="light"]) .modal-footer .btn-primary { color: #fff; background-color: #344ac3; }
+.modal-dialog:has(.ig-project-tools-title) { max-width: min(1140px, calc(100vw - 24px)); }
+.modal-dialog { margin: 20px auto !important; }
+.modal-content { max-height: calc(100dvh - 40px); }
+.modal-body { min-height: 0; overflow-y: auto; }
+.modal-dialog:has(.ig-project-tools-title) .modal-content { max-height: calc(100dvh - 40px); }
+.modal-dialog:has(.ig-project-tools-title) .modal-body { overflow: auto; min-height: 0; }
+.modal-dialog:has(.ig-project-tools-title) :is(pre,table) { max-width: 100%; overflow: auto; }
+.ig-preflight-list { max-height: 55vh; overflow: auto; }
+@media (forced-colors: active) {
+  .ig-console-highlight { display: none; }
+  .ig-console-input-wrap .ig-console-editor { color: CanvasText !important; -webkit-text-fill-color: CanvasText; }
+}

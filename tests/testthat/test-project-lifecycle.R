@@ -1,0 +1,35 @@
+test_that("project opening clears recovery only after a successful replacement", {
+  withr::local_options(ig.recovery_dir = tempfile(), ig.catalogue_dir = tempfile())
+  shiny::testServer(app_server, {
+    store$tables <- list(original = data.frame(x = 1:3))
+    saved <- tempfile(fileext = ".igpx")
+    project_save(store, saved)
+    store$dirty <- TRUE
+    recovery <- project_autosave_recovery(store)
+    expect_true(file.exists(recovery))
+    invalid <- tempfile(fileext = ".igpx"); writeLines("invalid", invalid)
+    expect_false(load_from_local_path(invalid))
+    expect_true(file.exists(recovery))
+    expect_equal(store$tables$original, data.frame(x = 1:3))
+    expect_true(load_from_local_path(saved))
+    expect_false(file.exists(recovery))
+    expect_false(store$dirty)
+  })
+})
+test_that("desktop file commands cannot bypass an initial recovery decision", {
+  withr::local_options(ig.desktop = TRUE, ig.recovery_dir = tempfile(), ig.catalogue_dir = tempfile())
+  previous <- new_test_store(list(recover_me = data.frame(x = 1)))
+  previous$dirty <- TRUE
+  recovery <- project_autosave_recovery(previous)
+  shiny::testServer(app_server, {
+    root <- session$rootScope(); root$flushReact()
+    state <- desktop_project_state()
+    expect_true(state$startupReady); expect_true(state$recoveryPending)
+    root$setInputs(desktop_file_command = list(id = "blocked", action = "new", path = ""))
+    expect_true(file.exists(recovery)); expect_true(recovery_pending())
+    expect_false(reset_project())
+    root$setInputs(recover_discard = 1)
+    expect_false(recovery_pending()); expect_false(file.exists(recovery))
+    expect_true(reset_project())
+  })
+})

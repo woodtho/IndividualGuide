@@ -1,0 +1,120 @@
+name: Build and release
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 120
+    env:
+      IG_ISOLATED_RELEASE_TEST: '1'
+      RENV_CONFIG_AUTOLOADER_ENABLED: 'FALSE'
+      LC_ALL: English_Canada.utf8
+      LANG: English_Canada.utf8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: '4.6.1'
+          use-public-rspm: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: r-lib/actions/setup-pandoc@v2
+        with:
+          pandoc-version: '3.12.1'
+      - name: Restore locked R dependencies
+        shell: Rscript {0}
+        run: |
+          options(repos = c(CRAN = "https://cloud.r-project.org"))
+          install.packages("renv")
+          renv::restore(library = .libPaths()[1], prompt = FALSE)
+          install.packages(c("testthat", "pkgload", "shinytest2"))
+      - name: R regression tests
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Continue'
+          New-Item -ItemType Directory artifacts/review -Force | Out-Null
+          Rscript --vanilla tools/test-product.R --all
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Build R package and Windows installer
+        shell: powershell
+        run: |
+          $rHome = (& Rscript --vanilla -e 'cat(R.home())')
+          ./tools/build-standalone.ps1 -RHome $rHome -Pandoc (Get-Command pandoc.exe).Source -OutputDirectory build/release
+          $ErrorActionPreference = 'Continue'
+          Rscript --vanilla tools/build-r-package.R build/release
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Desktop JavaScript tests
+        working-directory: tools/desktop
+        run: node --test *.test.cjs
+      - name: Fresh account installation and desktop acceptance
+        shell: powershell
+        run: |
+          ./tools/test-clean-machine.ps1 -ReleaseFolder build/release -EvidenceFolder artifacts/review/clean-machine
+      - name: Verify version, archives and checksums
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Continue'
+          $tag = if ($env:GITHUB_REF_TYPE -eq 'tag') { $env:GITHUB_REF_NAME } else { @() }
+          Rscript --vanilla tools/verify-release.R build/release @tag
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-assets
+          if-no-files-found: error
+          path: |
+            build/release/IndividualGuide_*.tar.gz
+            build/release/IndividualGuide_*.zip
+            build/release/IndividualGuide-*-Setup-Windows-x64.exe
+            build/release/SHA256SUMS.txt
+            build/release/release-manifest.json
+            build/release/README.md
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: verification-evidence
+          path: artifacts/review
+  publish:
+    needs: build
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-assets
+          path: release
+      - name: Publish verified release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd release
+          sha256sum --check SHA256SUMS.txt
+          cd ..
+          if gh release view "$RELEASE_TAG" --json id >/dev/null 2>&1; then
+            mkdir existing
+            gh release download "$RELEASE_TAG" --pattern release-manifest.json --dir existing
+            test "$(jq -r .source_commit existing/release-manifest.json)" = "$(jq -r .source_commit release/release-manifest.json)"
+            for asset in release/*; do
+              gh release view "$RELEASE_TAG" --json assets --jq '.assets[].name' | grep -Fx -- "$(basename "$asset")"
+            done
+            echo 'This source commit already has a complete release; downloads were preserved.'
+          else
+            gh release create "$RELEASE_TAG" release/* --verify-tag --title "Individual Guide ${RELEASE_TAG#v}" --notes-file .github/RELEASE_NOTES.md
+          fi
