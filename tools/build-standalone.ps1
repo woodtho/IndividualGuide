@@ -78,30 +78,15 @@ try {
     if (Test-Path -LiteralPath 'package-lock.json') { Invoke-BuildCommand 'npm.cmd' @('ci', '--no-audit', '--no-fund') }
     else { Invoke-BuildCommand 'npm.cmd' @('install', '--no-audit', '--no-fund') }
   }
-  $assetRoot = Join-Path $desktopRoot 'assets'
-  $iconOutputs = @('icon.png','icon.ico') | ForEach-Object { Join-Path $assetRoot $_ }
-  $iconInputs = @((Join-Path $assetRoot 'icon.svg'), (Join-Path $desktopRoot 'create-icon.cjs'))
-  $renderIcon = @($iconOutputs | Where-Object { !(Test-Path -LiteralPath $_) }).Count -gt 0
-  if (!$renderIcon) {
-    $oldestOutput = ($iconOutputs | ForEach-Object { (Get-Item -LiteralPath $_).LastWriteTimeUtc } | Sort-Object | Select-Object -First 1)
-    $renderIcon = @($iconInputs | Where-Object { (Get-Item -LiteralPath $_).LastWriteTimeUtc -gt $oldestOutput }).Count -gt 0
+  # Electron 44 downloads its binary on demand, rather than during npm ci.
+  $electronBinary = Join-Path $desktopRoot 'node_modules/electron/dist/electron.exe'
+  if (!(Test-Path -LiteralPath $electronBinary)) {
+    Invoke-BuildCommand 'node.exe' @((Join-Path $desktopRoot 'node_modules/electron/install.js'))
   }
-  if ($renderIcon) {
-    $electronRenderer = Join-Path $desktopRoot 'node_modules/electron/dist/electron.exe'
-    if (!(Test-Path -LiteralPath $electronRenderer)) {
-      # Electron 44 downloads its binary on demand, rather than during npm ci.
-      Invoke-BuildCommand 'node.exe' @((Join-Path $desktopRoot 'node_modules/electron/install.js'))
-    }
-    if (!(Test-Path -LiteralPath $electronRenderer)) { throw 'The pinned Electron icon renderer was not installed.' }
-    $previousElectronNode = $env:ELECTRON_RUN_AS_NODE
-    try {
-    Remove-Item Env:ELECTRON_RUN_AS_NODE -ErrorAction SilentlyContinue
-    $iconOutput = Join-Path $buildRoot 'icon-render.log'
-    $iconErrors = Join-Path $buildRoot 'icon-render-errors.log'
-    $iconProcess = Start-Process -FilePath $electronRenderer -ArgumentList ('"{0}"' -f (Join-Path $desktopRoot 'create-icon.cjs')) -WindowStyle Hidden -Wait -PassThru -RedirectStandardOutput $iconOutput -RedirectStandardError $iconErrors
-    if ($iconProcess.ExitCode -ne 0) { throw ('Creating the application icon failed. ' + (Get-Content -LiteralPath $iconErrors -Raw)) }
-    } finally { $env:ELECTRON_RUN_AS_NODE = $previousElectronNode }
-  } else { Write-Output 'Reusing unchanged application icon assets.' }
+  if (!(Test-Path -LiteralPath $electronBinary)) { throw 'The pinned Electron binary was not installed.' }
+  # A fresh checkout can change timestamps. Always derive icons from their SVG,
+  # using a CPU renderer that needs neither a window nor a graphics compositor.
+  Invoke-BuildCommand 'node.exe' @((Join-Path $desktopRoot 'create-icon.cjs'))
   $env:CSC_IDENTITY_AUTO_DISCOVERY = 'false'
   Invoke-BuildCommand 'node.exe' @((Join-Path $desktopRoot 'build.cjs'), "--target=$Target", "--runtime=$RuntimeDirectory", "--output=$OutputDirectory")
 } finally { Pop-Location }
