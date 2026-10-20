@@ -40,7 +40,13 @@ module.exports = async ({ window, pause, state, logPath, sendCommand, saveDiagno
     checks.nativeSave = true;
     const saved = fs.readFileSync(first);
     await js("ace.edit('scr_script_1-code').setValue('menu_rows <- data.frame(value = 99)',-1)");
-    command('save'); await wait(() => !fs.readFileSync(first).equals(saved) && menu('save').enabled && !window.getTitle().endsWith('*'), 'save existing path');
+    command('save'); await wait(() => {
+      // Windows replaces the previous project through a temporary file. The
+      // destination can briefly be absent while that save is still pending.
+      if (!menu('save').enabled || window.getTitle().endsWith('*')) return false;
+      try { return !fs.readFileSync(first).equals(saved); }
+      catch (error) { if (error.code === 'ENOENT') return false; throw error; }
+    }, 'save existing path');
     assert.equal(saveDialogs,2); checks.saveOverwritesSameFile = true;
     dialog.showSaveDialog = async () => { saveDialogs++; return { canceled: false, filePath: second }; };
     command('save-as'); await wait(() => fs.existsSync(second) && menu('save').enabled && window.getTitle().includes('Second project'), 'native Save As');
