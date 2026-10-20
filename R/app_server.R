@@ -21,6 +21,14 @@ app_server <- function(input, output, session) {
   startup_ready <- reactiveVal(FALSE)
   recovery_pending <- reactiveVal(file.exists(project_recovery_path()))
   workspace_welcome <- reactiveVal(TRUE)
+  ig_shiny_apps_server(input, session)
+  observeEvent(input$app_host_open, {
+    if (isTRUE(isolate(recovery_pending()))) return()
+    if (isTRUE(isolate(workspace_welcome()))) {
+      workspace_welcome(FALSE)
+      removeModal()
+    }
+  })
   session$onSessionEnded(function() {
     store_close_connections(store)
     project_release_assets(store)
@@ -1736,7 +1744,9 @@ app_server <- function(input, output, session) {
           actionButton("splash_open", "Open project",
             icon  = icon("folder-open"),
             class = "btn btn-outline-secondary ig-splash-btn",
-            width = "100%")
+            width = "100%"),
+          tags$button(id = "splash_shiny_apps", type = "button", class = "btn btn-outline-secondary ig-splash-btn",
+            icon("window-maximize"), "Open Shiny app")
         ),
         div(class = "ig-splash-fresh",
           actionButton("splash_fresh", "Start with a blank canvas",

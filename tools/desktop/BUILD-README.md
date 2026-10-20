@@ -1,6 +1,6 @@
 # Individual Guide for Windows
 
-Download `IndividualGuide-0.5.0-Setup-Windows-x64.exe` from
+Download `IndividualGuide-0.6.0-Setup-Windows-x64.exe` from
 https://github.com/woodtho/IndividualGuide/releases/latest.
 Run Setup once, then use the Start menu or desktop shortcut. Windows 10/11 x64
 is required; allow approximately 1.5 GB for the program, plus your project data.
@@ -27,6 +27,16 @@ Settings, recovery files, connection settings and startup diagnostics live under
 `%APPDATA%\Individual Guide`. Save project files wherever you choose. Updating
 and uninstalling preserve user data. Use `--data-dir=<directory>` for a separate
 profile. Closing the application stops its R processes.
+
+## Other Shiny apps
+
+Choose File > Open Shiny app, then select app.R or a folder with ui.R and
+server.R. Keep data and helper files together. The loaded app uses its own R
+process inside an Individual Guide view, with controls to return to the main
+workspace, open another app, read its log, or close it. Returning to the workspace
+keeps the other app running and preserves its inputs. Closing or replacing it
+stops it. Use trusted apps; their extra packages or external tools remain the app
+author's setup requirements. Opening an app does not install packages.
 
 File provides native Open, Save, Save As, New, Close, recent/pinned projects,
 previous saved versions and portability tools. Unsaved changes prompt before

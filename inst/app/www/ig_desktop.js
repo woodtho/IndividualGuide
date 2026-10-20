@@ -5,10 +5,12 @@
   if (!desktop) return;
   document.documentElement.classList.add('ig-desktop');
   var project = { name: 'Untitled', path: '', running: false, startupReady: false, recoveryPending: true, welcome: true }, pending = false, serial = 0, snapshot = '', requests = new Map();
+  var appHost = {visible:false,running:false,name:''};
   function connected() { return window.Shiny?.shinyapp?.$socket?.readyState === 1; }
   function publish() {
     var value = { connected: connected(), dirty: !!window._igDirty,
       projectName: project.name, projectPath: project.path, running: !!project.running,
+      appHost:appHost.visible, appHostRunning:appHost.running, hostName:appHost.name,
       canRun: !!project.canRun, recovery: project.recoveryPending === true, startupReady: project.startupReady === true,
       canUndo: !!document.getElementById('btn_undo') && !document.getElementById('btn_undo').disabled,
       pending: pending, modal: !!document.querySelector('.modal.show'), welcome: project.welcome === true,
@@ -98,6 +100,9 @@
       return;
     }
     if (action === 'stop') { document.getElementById('ig-stop-run')?.click(); return; }
+    if (action === 'shiny-apps') { window.igShinyApps?.open(); return; }
+    if (action === 'workspace') { window.igShinyApps?.back(); return; }
+    if (action === 'close-shiny-app') { window.igShinyApps?.close(); return; }
     if (action === 'run') { flush(); Shiny.setInputValue('shortcut_run_flow', Date.now(), { priority: 'event' }); return; }
     if (['versions','files','runs','tasks','validate'].includes(action)) {
       flush(); Shiny.setInputValue('product_action', action, { priority: 'event' }); return;
@@ -139,6 +144,10 @@
     var header = document.querySelector('.ig-desktop-menu-controls');
     if (header) new MutationObserver(publish).observe(header, { childList: true, subtree: true, attributes: true, attributeFilter: ['disabled','class'] });
     window.addEventListener('ig:dirty', publish);
+    window.addEventListener('ig:app-host', function(event) { appHost=event.detail;publish(); });
+    window.addEventListener('ig:app-frame-retired', event => {
+      desktop.releaseShinyApp(event.detail.url).catch(error=>console.warn(error));
+    });
     window.addEventListener('ig:run-state', function (event) { project.running = event.detail.running; publish(); });
     publish();
   });

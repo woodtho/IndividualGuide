@@ -101,7 +101,7 @@ options(repos = c(CRAN = "https://cloud.r-project.org"))
 install.packages("remotes")
 remotes::install_github(
   "woodtho/IndividualGuide",
-  ref = "v0.5.0",
+  ref = "v0.6.0",
   dependencies = NA,
   upgrade = "never"
 )
@@ -162,7 +162,7 @@ Utilisez les boutons d’ouverture et d’enregistrement de l’application. Les
 
 Ouvrez R et exécutez seulement `IndividualGuide::run_app()`. Vous n’avez pas à réinstaller les paquets chaque jour. Si le navigateur ne s’ouvre pas seul, utilisez l’adresse locale affichée dans la console R.
 
-Pour mettre à jour plus tard, enregistrez et fermez l’application, ouvrez une nouvelle session R et suivez les instructions de la version voulue. L’étiquette `v0.5.0` choisit volontairement la version de ce guide.
+Pour mettre à jour plus tard, enregistrez et fermez l’application, ouvrez une nouvelle session R et suivez les instructions de la version voulue. L’étiquette `v0.6.0` choisit volontairement la version de ce guide.
 
 ## Si l’installation d’un paquet échoue
 

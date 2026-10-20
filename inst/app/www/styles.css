@@ -3097,3 +3097,42 @@ html:not([data-ig-theme="light"]) .modal-footer .btn-primary { color: #fff; back
   color: inherit !important;
   background-color: rgba(0, 0, 0, .08) !important;
 }
+
+/* Fixed app-host chrome; the guest keeps its own styles inside its iframe. */
+#ig-shiny-apps[hidden], #ig-shiny-apps [hidden] { display:none!important; }
+#ig-shiny-apps { position:fixed;inset:0;z-index:1040;display:flex;flex-direction:column;background:var(--bs-body-bg,#1a1a2e);color:var(--bs-body-color,#e0e0f0); }
+.ig-host-active #shiny-modal:has(.ig-splash) { display:none!important; }
+.ig-appbar { min-height:60px;padding:10px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--bs-border-color,#45465d);background:var(--bs-body-bg,#1a1a2e); }
+.ig-app-heading { display:flex;flex:1;min-width:0;flex-direction:column;gap:2px; }
+#ig-app-name { overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+#ig-app-status { font-size:.78rem;opacity:.85; }
+#ig-app-stage { flex:1;position:relative;min-height:0;overflow:auto; }
+#ig-app-frame { width:100%;height:100%;border:0;background:white;display:block; }
+.ig-app-card { max-width:680px;margin:clamp(20px,7vh,90px) auto;padding:28px; }
+.ig-app-card h2 { font-size:1.5rem;margin-bottom:16px; }
+.ig-app-choices { display:flex;flex-wrap:wrap;gap:12px;margin:20px 0; }
+#ig-app-selection { margin-top:24px;border-top:1px solid var(--bs-border-color,#45465d);padding-top:20px; }
+#ig-app-path { display:block;overflow-wrap:anywhere;margin-bottom:16px; }
+.ig-app-trust { display:flex;align-items:center;gap:10px;margin:18px 0; }
+#ig-app-error { color:var(--bs-danger-text-emphasis,#f4a6b9);margin-top:16px; }
+#ig-app-log-panel { position:absolute;inset:auto 0 0;max-height:50%;overflow:auto;background:var(--bs-body-bg,#1a1a2e);border-top:1px solid var(--bs-border-color,#45465d);padding:16px 24px;box-shadow:0 -5px 20px #0003; }
+#ig-app-log-panel h2 { font-size:1.1rem; }
+#ig-app-log-text { white-space:pre-wrap;overflow-wrap:anywhere;max-height:28vh;overflow:auto;color:inherit; }
+#ig-app-confirm { max-width:min(520px,90vw);padding:28px;background:var(--bs-body-bg,#1a1a2e);color:var(--bs-body-color,#e0e0f0);border:1px solid var(--bs-border-color,#45465d);border-radius:10px; }
+#ig-app-confirm::backdrop { background:#0008; }
+#ig-app-confirm h2 { font-size:1.3rem; }
+@media(max-width:700px) { .ig-appbar { gap:8px;flex-wrap:wrap;padding:8px; } .ig-app-heading { flex-basis:calc(100% - 180px); } .ig-app-card { padding:20px;margin:20px auto; } }
+/* shinyFiles uses Bootstrap 3's .in state; retain visible, usable pickers with Bootstrap 5. */
+.sF-modalContainer.in { opacity:1;z-index:1070; }
+.sF-modalContainer.in .modal-dialog { transform:none; }
+.sF-modalBackdrop.in { opacity:.5;z-index:1060; }
+#ig-shiny-apps .btn-primary { background:#3653d8;color:#fff!important; }
+.ig-appbar .btn-outline-danger { color:#ffb4c9!important;border-color:#e78ba4!important; }
+.ig-appbar .btn-outline-danger:hover { background:#8b1a4a;color:#fff!important; }
+.sF-modalContainer .modal-header { display:flex;align-items:center;justify-content:space-between;gap:16px; }
+.sF-modalContainer .modal-header .close { margin-left:auto;flex-shrink:0;background:transparent;border:0;color:inherit;font-size:1.5rem; }
+.sF-modalContainer .sF-fileList.sF-detail .sF-file-header { background:var(--bs-tertiary-bg,#303248);color:var(--bs-body-color,#e0e0f0); }
+#btn_shiny_apps { position:relative; }
+#btn_shiny_apps.ig-app-running::after { content:'';position:absolute;right:2px;top:2px;width:7px;height:7px;border-radius:50%;background:#77d8a4;box-shadow:0 0 0 2px var(--bs-body-bg,#1a1a2e); }
+#ig-shiny-apps #sf_shiny_app, #ig-shiny-apps #sf_shiny_folder { color:var(--bs-body-color,#e0e0f0);border:1px solid var(--bs-border-color,#777a91);background:transparent; }
+#ig-shiny-apps #sf_shiny_app:hover, #ig-shiny-apps #sf_shiny_folder:hover { background:var(--bs-tertiary-bg,#303248); }

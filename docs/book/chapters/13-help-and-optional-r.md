@@ -101,7 +101,7 @@ options(repos = c(CRAN = "https://cloud.r-project.org"))
 install.packages("remotes")
 remotes::install_github(
   "woodtho/IndividualGuide",
-  ref = "v0.5.0",
+  ref = "v0.6.0",
   dependencies = NA,
   upgrade = "never"
 )
@@ -162,7 +162,7 @@ When you finish, save the project first. Close the app's browser tab, then stop 
 
 Open R and run only `IndividualGuide::run_app()`. You do not need to reinstall packages each day. If the browser does not open automatically, use the local address printed in the R console.
 
-To update later, save and close the app, start a fresh R session, and follow the instructions for the release you want. The tag `v0.5.0` deliberately selects the version used in this guide.
+To update later, save and close the app, start a fresh R session, and follow the instructions for the release you want. The tag `v0.6.0` deliberately selects the version used in this guide.
 
 ## If package installation fails
 

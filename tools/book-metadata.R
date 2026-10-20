@@ -56,15 +56,19 @@ examples <- lapply(catalog, function(info) {
   info
 })
 paths <- c(list.files("R", full.names = TRUE, pattern = "[.]R$"), "DESCRIPTION",
+  list.files("inst/shiny-apps", full.names = TRUE, recursive = TRUE),
   list.files("inst/app/www",full.names=TRUE,recursive=TRUE,pattern="[.](js|json|css)$"),
-  paste0("tools/desktop/",c("menus.cjs","main.cjs","preload.cjs","preferences.cjs","i18n.cjs","package.json","loading.html","assets/installer.nsh","BUILD-README.md")), "tools/example-recipes.R")
-metadata <- list(title = "Individual Guide: A Friendly Guide", edition = paste0("Beginner edition for release ",getNamespaceVersion("IndividualGuide"),", 2026-10-19"),
+  paste0("tools/desktop/",c("menus.cjs","main.cjs","hosted-renderers.cjs","preload.cjs","preferences.cjs","i18n.cjs","package.json","loading.html","assets/installer.nsh","BUILD-README.md")), "tools/example-recipes.R")
+metadata <- list(title = "Individual Guide: A Friendly Guide", edition = paste0("Beginner edition for release ",getNamespaceVersion("IndividualGuide"),", 2026-10-20"),
   package_version = as.character(getNamespaceVersion("IndividualGuide")), project_format = get_ig("PROJECT_VERSION"),
   R = R.version.string, task_count = length(registry), registry = registry, examples = examples,
   settings = get_ig("ig_default_settings")(), export_formats = get_ig("IG_EXPORT_FORMATS"),
   logging_fields = get_ig("ig_log_fields")(), logging_levels = get_ig("ig_log_levels")(),
   source_md5 = as.list(tools::md5sum(paths)))
 dir.create("docs/book/data", recursive = TRUE, showWarnings = FALSE)
-jsonlite::write_json(metadata, "docs/book/data/app-reference.json", auto_unbox = TRUE, pretty = TRUE,
+# Keep the bytes identical after Git checkout on Windows and Linux: the book
+# and capture records verify this file's hash, so native CRLF would invalidate it.
+json <- jsonlite::toJSON(metadata, auto_unbox = TRUE, pretty = TRUE,
   null = "null", na = "null", dataframe = "rows", digits = NA)
+writeBin(charToRaw(paste0(json, "\n")), "docs/book/data/app-reference.json")
 cat("Recorded", length(registry), "task types and", length(examples), "projects.\n")

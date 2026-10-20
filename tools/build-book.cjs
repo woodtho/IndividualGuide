@@ -68,6 +68,7 @@ const reference = locale.lines([
   '## Useful Windows desktop shortcuts', '',
   'Use the menus while learning. These keys can save time once the actions feel familiar. A text editor or open dialog may use a key for its own controls.', '',
   '| Keys | Action |', '| --- | --- |',
+  '| Ctrl+Shift+O | Open Shiny app |', '| Ctrl+Alt+I | Return to Individual Guide workspace |',
   '| Ctrl+N | New project |', '| Ctrl+O | Open project |',
   '| Ctrl+S | Save project |', '| Ctrl+Shift+S | Save project as |',
   '| Ctrl+Shift+F | Search project |', '| Ctrl+Alt+L | Open Task list |',
@@ -92,7 +93,7 @@ const reference = locale.lines([
   '## Public downloads and help', '',
   '- [Current handbook and downloads](https://woodtho.github.io/IndividualGuide/): the latest reviewed HTML, PDF, EPUB, and Word guide. Books attached to older releases may be earlier editions.',
   '- [Individual Guide releases](https://github.com/woodtho/IndividualGuide/releases/latest): public Windows Setup and R package files.',
-  '- [Release 0.5.0](https://github.com/woodtho/IndividualGuide/releases/tag/v0.5.0): the version used by this guide.',
+  '- [Release 0.6.0](https://github.com/woodtho/IndividualGuide/releases/tag/v0.6.0): the version used by this guide.',
   '- [Report an app issue](https://github.com/woodtho/IndividualGuide/issues): include the version and exact error; check attachments for private information.',
   '- [Download R](https://cran.r-project.org/): needed only for the optional R installation route.',
   '- [Install Pandoc](https://pandoc.org/installing.html): for Word reporting when using your own R installation.', '',
@@ -132,7 +133,7 @@ const bookMetadata=path.join(out,'book-metadata.json');
 const version=metadata.package_version;
 const bookURL='https://woodtho.github.io/IndividualGuide/'+(locale.french?'fr-CA/':'');
 fs.writeFileSync(bookMetadata,JSON.stringify({title:labels.title,subtitle:labels.subtitle,author:labels.author,
-  date:locale.french?`Édition pour débutants · Version ${version} · 19 octobre 2026`:`Beginner edition · Release ${version} · 19 October 2026`,
+  date:locale.french?`Édition pour débutants · Version ${version} · 20 octobre 2026`:`Beginner edition · Release ${version} · 20 October 2026`,
   lang:locale.language,version,labels,'book-url':bookURL,'english-current':!locale.french,'french-current':locale.french},null,2));
 const common = [path.join(out, 'Individual-Guide-Handbook.md'), '--from=markdown+fenced_divs+header_attributes', '--standalone', '--toc', '--toc-depth=2', '--number-sections',
   '--metadata-file='+bookMetadata,
@@ -153,7 +154,7 @@ convert(['--to=html5','--embed-resources','--template=' + path.join(sharedSource
 convert(['--to=epub3','--split-level=1','--css=' + path.join(sharedSource, 'assets/epub.css')], 'Individual-Guide-Handbook.epub');
 convert(['--to=docx'], 'Individual-Guide-Handbook.docx');
 const wordCount = (complete.match(/\S+/g) || []).length;
-const manifest = {title: labels.title, edition:locale.french?`Édition pour débutants · Version ${version} · 19 octobre 2026`:metadata.edition, language:locale.language,sourceDirectory:path.relative(root,source).replaceAll('\\','/'),audience:'New app users; no R knowledge required',
+const manifest = {title: labels.title, edition:locale.french?`Édition pour débutants · Version ${version} · 20 octobre 2026`:metadata.edition, language:locale.language,sourceDirectory:path.relative(root,source).replaceAll('\\','/'),audience:'New app users; no R knowledge required',
   packageVersion:metadata.package_version, projectFormat:metadata.project_format,
   tasks:metadata.registry.map(task=>task.id), examples:metadata.examples.map(example=>example.id),
   exampleSteps:metadata.examples.reduce((n,example)=>n+example.tasks.length,0), words:wordCount,

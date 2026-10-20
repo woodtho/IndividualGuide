@@ -1,3 +1,16 @@
+# Individual Guide 0.6.0
+
+- Open other local Shiny apps from app.R or a ui.R/server.R folder, with a
+  persistent Individual Guide toolbar and a separate supervised R process.
+- Keep the main workspace available while an app runs. Switch views without
+  reloading either app, or close/replace the loaded app with clear save reminders.
+- Show startup/runtime logs and recover from failed apps without losing the
+  pipeline session. Clean up app processes on close and desktop shutdown.
+- Add English and Canadian French controls and matching illustrated handbook
+  instructions for the new app browser. Include two working practice apps.
+- Keep shinyFiles dialogs visible with Bootstrap 5, readable in the dark theme,
+  and preserve file/folder names during translation.
+
 # Individual Guide 0.5.0
 
 - Choose English or Canadian French during Windows installation or in the app.

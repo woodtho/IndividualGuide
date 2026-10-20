@@ -12,9 +12,11 @@
     '.ig-comment-title,.ig-comment-text,.ig-comment-byline strong,.ig-collab-target,.ig-avatar,'+
     '.ig-issue-title,.ig-issue-detail,.ig-accessible-task-row strong,.ig-preflight-row strong,'+
     '.ig-log-preview-message,.ig-log-input-table tbody td:last-child,'+
+    '.sF-fileList .sF-file:not(.sF-file-header),.sF-fileList .sF-directory,'+
+    '.sF-dirList .sF-file-name,.sF-dirContent .sF-file-name,.sF-breadcrumps,'+
     '[data-ig-user-content],[data-ig-no-translate]';
   const metadataTables='#history_dt,#global_search_dt,#project_tools-files,#project_tools-runs';
-  function metadataHeader(element){return Boolean(element?.closest('.dataTable thead')&&element.closest(metadataTables));}
+  function metadataHeader(element){return Boolean((element?.closest('.dataTable thead')&&element.closest(metadataTables))||element?.closest('.sF-file-header'));}
   let engine, frame, applying = false, observer;
   let canvasTypes = {};
   const canvasStates=new WeakMap(),canvasImages=new Map();
@@ -37,7 +39,7 @@
     if (!node.parentElement || node.parentElement.closest('input,textarea') || excluded(node.parentElement) || !node.data.trim()) return;
     let state = texts.get(node);
     if (!state || node.data !== state.rendered) state = { source:node.data };
-    const headings={when:'Time',user:'User',type:'Type',id:'ID',action:'Action',summary:'Summary',task:'Task',file:'File',exists:'Exists',bundled:'Bundled'};
+    const headings={when:'Time',user:'User',type:'Type',id:'ID',action:'Action',summary:'Summary',task:'Task',file:'File',exists:'Exists',bundled:'Bundled',name:'Name',size:'Size',modified:'Modified',created:'Created',accessed:'Accessed'};
     const source=engine.locale==='fr-CA'&&metadataHeader(node.parentElement)?headings[state.source.trim()]||state.source:state.source;
     state.rendered = engine.translate(source);
     texts.set(node,state);

@@ -46,6 +46,9 @@ function Run-Check([string]$Mode,[string]$Name,[string]$Profile,[string[]]$Extra
   $value = Get-Content -LiteralPath $result -Raw -Encoding UTF8 | ConvertFrom-Json
   if (!$value.ok) { throw "Failed: $Name. $($value.error)" }
   if (Get-Process -Id $value.desktop.rPid -ErrorAction SilentlyContinue) { throw 'R survived desktop shutdown.' }
+  foreach($childPid in $value.hostedAppPids) {
+    if(Get-Process -Id $childPid -ErrorAction SilentlyContinue) {throw 'A hosted Shiny app survived desktop shutdown.'}
+  }
 }
 try {
   & (Join-Path $PSScriptRoot 'test-installer-language.ps1') -Installer $setup.FullName -EvidenceDirectory (Join-Path $EvidenceFolder 'language-chooser')
@@ -63,6 +66,7 @@ try {
   Run-Check '--smoke-console' 'console' (Join-Path $profile 'console')
   Run-Check '--smoke-examples' 'examples' (Join-Path $profile 'examples')
   Run-Check '--smoke-restart' 'restart' (Join-Path $profile 'restart')
+  Run-Check '--smoke-shiny-apps' 'shiny-apps' (Join-Path $profile 'shiny-apps')
   $report.checks.offlineWorkflows = $true
   $association = Get-ItemProperty -LiteralPath 'Registry::HKEY_CURRENT_USER\Software\Classes\.igpx' -ErrorAction Stop
   $class = $association.'(default)'

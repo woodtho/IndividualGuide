@@ -4,7 +4,7 @@ You can use Individual Guide without knowing R. The app helps you bring in data,
 
 Think of a project as a recipe. Your data are the ingredients. Each **task** is one step, such as sorting rows or drawing a chart. A **flow**, also called a pipeline, puts those steps together. You can save the recipe and use it again.
 
-This guide covers **Individual Guide 0.5.0**, with **58 task types** and **22 example projects**. Start with installation and the first project. After that, read the task pages you need. You do not need to read the book from start to finish.
+This guide covers **Individual Guide 0.6.0**, with **58 task types** and **22 example projects**. Start with installation and the first project. After that, read the task pages you need. You do not need to read the book from start to finish.
 
 ## Find your starting point
 
@@ -54,7 +54,7 @@ For most Windows users, the Setup installer is the easiest choice. It includes R
 You need a 64-bit Windows 10 or Windows 11 computer. Allow about 1.5 GB for the program, plus space for your projects. You need an internet connection to download Setup. The installed app and its examples can then work offline. Tasks that use an online database still need that connection.
 
 1. Open the [public releases page](https://github.com/woodtho/IndividualGuide/releases/latest).
-2. Under **Assets**, download **IndividualGuide-0.5.0-Setup-Windows-x64.exe** for this edition. If a newer release is shown, read its notes before choosing it. Find this book's matching installer on the [0.5.0 release page](https://github.com/woodtho/IndividualGuide/releases/tag/v0.5.0).
+2. Under **Assets**, download **IndividualGuide-0.6.0-Setup-Windows-x64.exe** for this edition. If a newer release is shown, read its notes before choosing it. Find this book's matching installer on the [0.6.0 release page](https://github.com/woodtho/IndividualGuide/releases/tag/v0.6.0).
 3. Close any running copy of Individual Guide. You do not need the files called **Source code** to use the desktop app.
 4. Double-click the downloaded Setup file. Choose **English** or **Français (Canada)** when it asks for a language, then follow its instructions. The usual installation is for your own Windows account.
 5. Open **Individual Guide** from the Start menu or desktop shortcut.

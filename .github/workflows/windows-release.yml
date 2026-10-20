@@ -74,6 +74,8 @@ jobs:
           ./tools/test-clean-machine.ps1 -ReleaseFolder build/release -EvidenceFolder artifacts/review/clean-machine
       - name: Stage matching English and French handbook downloads
         run: node tools/stage-release-books.cjs build/release
+      - name: Stage complete Shiny practice apps
+        run: Rscript --vanilla tools/stage-shiny-examples.R build/release
       - name: Verify version, archives and checksums
         shell: powershell
         run: |
@@ -90,6 +92,7 @@ jobs:
             build/release/IndividualGuide_*.zip
             build/release/IndividualGuide-*-Setup-Windows-x64.exe
             build/release/Individual-Guide-Handbook-*
+            build/release/IndividualGuide-Shiny-Examples-*.zip
             build/release/SHA256SUMS.txt
             build/release/release-manifest.json
             build/release/README.md

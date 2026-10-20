@@ -49,7 +49,7 @@ run_app()
 
 ## Standalone Windows executable
 
-Download the latest **Setup-Windows-x64.exe** from [GitHub Releases](https://github.com/woodtho/IndividualGuide/releases/latest). Run Setup once, choose **English** or **Français (Canada)**, then launch **Individual Guide** from its Start menu or desktop shortcut. The 0.5.0 installer includes the current Shiny app, reduced R runtime/packages, Pandoc and Electron browser. Windows 10/11 x64 is required; allow roughly 1.5 GB for installation. No separate R installation, administrator access or dependency download is needed for normal use.
+Download the latest **Setup-Windows-x64.exe** from [GitHub Releases](https://github.com/woodtho/IndividualGuide/releases/latest). Run Setup once, choose **English** or **Français (Canada)**, then launch **Individual Guide** from its Start menu or desktop shortcut. The 0.6.0 installer includes the current Shiny app, reduced R runtime/packages, Pandoc and Electron browser. Windows 10/11 x64 is required; allow roughly 1.5 GB for installation. No separate R installation, administrator access or dependency download is needed for normal use.
 
 Change the language later in **Language / Langue** or the app's language selector.
 Your choice is remembered on this computer. Switching keeps the R connection,
@@ -70,6 +70,26 @@ resolved from the package metadata and source, staged in a private library, and
 checked by `tools/desktop/startup.R`. See
 [desktop build instructions](tools/desktop/BUILD-README.md) for paths, retained
 user data, dependency recovery, and the executable smoke test.
+
+## Open other Shiny apps
+
+Choose **Open Shiny app** on the welcome screen, use the window icon in the
+workspace, or choose **File > Open Shiny app...** in the desktop menu. Select an
+`app.R` file or a folder containing `ui.R` and `server.R`, check its path, then
+trust and run it. Keep the app's data and helper files in the same folder.
+
+The app runs in its own R process inside a mostly full-window view. Its top bar
+keeps **Individual Guide**, **Open app...**, **App log** and **Close app** within
+reach. **Individual Guide** returns to your project while the other app keeps
+running; opening its view again preserves its inputs. Only closing or replacing
+the app stops it. A failed app leaves the main workspace and launcher available.
+
+Apps execute R code with your permissions. Extra packages and external software
+are the app author's requirements; opening an app does not install them.
+The ordinary browser route supports local apps on the computer running
+Individual Guide. The loaded app keeps its own language and appearance.
+See the [book's app launcher guide](https://woodtho.github.io/IndividualGuide/#other-shiny-apps)
+or the [matching French instructions](https://woodtho.github.io/IndividualGuide/fr-CA/#other-shiny-apps).
 
 ## What's inside
 
@@ -136,7 +156,7 @@ Script steps can also set their own seed. The app itself is not required to
 run either export, but referenced R packages, input files and database access are.
 
 Save writes an `.igpx` archive; Save As establishes its new path. Format
-0.5.0 reads earlier archives, bundles optional file inputs/exports and run records,
+0.6.0 reads earlier archives, bundles optional file inputs/exports and run records,
 and retains native RDS companions for models,
 plots and other values whose environments or attributes JSON cannot preserve.
 Numeric archive entry names preserve case-distinct and unusual R names on

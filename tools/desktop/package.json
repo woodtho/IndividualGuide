@@ -1,7 +1,7 @@
 {
   "name": "individual-guide-desktop",
   "productName": "Individual Guide",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "private": true,
   "description": "Standalone Individual Guide Shiny desktop application",
   "author": "Thomas Wood",
@@ -23,6 +23,7 @@
     },
     "files": [
       "main.cjs",
+      "hosted-renderers.cjs",
       "preload.cjs",
       "diagnostics.cjs",
       "preferences.cjs",
@@ -42,6 +43,7 @@
       "examples-smoke.cjs",
       "product-smoke.cjs",
       "language-smoke.cjs",
+      "shiny-apps-smoke.cjs",
       "loading.html",
       "package.json",
       "assets/icon.png",

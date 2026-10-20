@@ -1,19 +1,19 @@
 ﻿# English and Canadian French handbook review
 
-This review covers the matching beginner handbooks for Individual Guide 0.5.0.
+This review covers the matching beginner handbooks for Individual Guide 0.6.0.
 The guide assumes no R knowledge and starts with the public Windows installer.
 Optional R instructions use CRAN and the public GitHub release tag. Development
 instructions remain in [BUILDING.md](BUILDING.md).
 
 ## Matching content and images
 
-Both editions contain the same 14 authored chapters, 58 task guides, 22 example
+Both editions contain the same 15 authored chapters, 58 task guides, 22 example
 lessons, task finder, shortcuts and troubleshooting procedures. Structural
 comparison checks headings, stable anchors, paragraphs, lists, tables, code,
 links and figures. The French edition is a complete translation, with Canadian
 French wording and the same practical steps.
 
-Each edition has 36 numbered figures: 34 real application views, a workflow
+Each edition has 38 numbered figures: 36 real application views, a workflow
  diagram and an Iris chart. French views were captured from the French
 interface, including native desktop menus. Diagram and chart labels were
 translated while preserving geometry and plotted data. Captions and alternative
@@ -28,10 +28,20 @@ and a live inventory of all 58 task forms. Focused recaptures corrected affected
 views after text and validation-contrast fixes; unchanged captures retain their
 original provenance. See BUILDING.md for that workflow.
 
+The new chapter covers opening complete Shiny app folders, the public practice
+ZIP, trust, returning to the main workspace, switching, closing and reading app
+logs. Both new figures show the actual app browser. The French running view uses
+the practice app's own French language choice. The app chooser was recaptured
+after improving its button contrast. A later backend correction assigned fresh
+loopback sites and added native renderer cleanup; no pictured controls or styles
+changed. Compatible pictures retain their actual capture times and checksums.
+The Resume driver exercises the final installed app before refreshing the app
+reference association. See BUILDING.md for that compatibility workflow.
+
 ## Verification
 
-- English: 24,693 words, 102 PDF pages and 694 publication checks passed.
-- Canadian French: 26,683 words, 108 PDF pages and 696 checks passed, including
+- English: 25,585 words, 106 PDF pages and 713 publication checks passed.
+- Canadian French: 27,631 words, 112 PDF pages and 715 checks passed, including
   matching English structure and translated figures.
 - All 22 example archives were checked for integrity and coverage, including
   165 saved successful task steps. This does not mean every saved step was
@@ -44,10 +54,10 @@ original provenance. See BUILDING.md for that workflow.
 - All PDF pages were rasterized and inspected in contact sheets. Actual EPUB
   chapters were rendered in a browser in both languages. PDF fonts, text,
   navigation and captions, EPUB resources, and Word media and bookmarks passed.
-- English prose has an estimated Flesch-Kincaid grade of 6.23. French prose
-  averages 11.08 words per sentence; the English grade formula is not applied to
+- English prose has an estimated Flesch-Kincaid grade of 6.18. French prose
+  averages 11.06 words per sentence; the English grade formula is not applied to
   French. Editorial review informed the wording in both languages.
-- The latest real-browser language verification passed 23 checks, including
+- The base language interface passed 23 real-browser checks for release 0.5.0, including
   retained input/caret, preserved user data, French search, reversible canvas
   labels, an uninterrupted R connection and readable validation controls.
 - Native first-run and reopening checks passed language selection, persistence,
@@ -56,7 +66,18 @@ original provenance. See BUILDING.md for that workflow.
   installation and update acceptance on the committed source.
 - Publication checks reject altered English or French downloads and stale
   source inputs. Release checks require matching source, versions and hashes for
-  the R packages, Windows installer and eight handbook downloads.
+  the R packages, Windows installer, eight handbook downloads and practice ZIP.
+- The Shiny app browser passed 15 real-browser checks and 12 native acceptance
+  checks. These cover both app formats, file and folder pickers, relative files,
+  downloads, French controls, invalid selection, startup errors, close/cancel,
+  retained main project/results/inputs, and child-process cleanup. A deliberate
+  JavaScript hang in the guest leaves the main workspace responsive and the
+  close controls usable; the next app also responds. Renderer process IDs are
+  verified as distinct. Native cleanup terminates the frozen renderer and guards
+  against targeting the main renderer or a recycled OS process ID.
+  Returning to the workspace also cancels an open close confirmation, preventing
+  a hidden modal from blocking the main app. Shutdown completes R cleanup before
+  closing the final window.
 
 ## Known issues and verification limits
 

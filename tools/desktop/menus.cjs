@@ -16,6 +16,7 @@ module.exports = function desktopMenus({ command, restart, openLog, openLogs, sa
   }));
   Menu.setApplicationMenu(Menu.buildFromTemplate([
     { label: 'File', submenu: [item('new','New project','CmdOrCtrl+N'), item('open','Open project...','CmdOrCtrl+O'),
+      item('shiny-apps','Open Shiny app...','CmdOrCtrl+Shift+O'), item('close-shiny-app','Close Shiny app'),
       { id: 'recent-projects', label: 'Recent projects', submenu: recentItems.length ? recentItems : [{ label: 'No recent projects', enabled: false }] },
       { id: 'pin-project', label: 'Pin current project', enabled: false, click: pinProject },
       { label:'Unpin a project', submenu: recent.some(x=>x.pinned) ? recent.filter(x=>x.pinned).map((entry,index)=>({
@@ -29,7 +30,8 @@ module.exports = function desktopMenus({ command, restart, openLog, openLogs, sa
     { label: 'Edit', submenu: [{ role: 'undo' }, { role: 'redo' }, { type: 'separator' },
       { role: 'cut' }, { role: 'copy' }, { role: 'paste' }, { role: 'selectAll' }, { type: 'separator' },
       item('undo','Undo project change','CmdOrCtrl+Alt+Z'), item('search','Search project...','CmdOrCtrl+Shift+F')] },
-    { label: 'View', submenu: [item('flow','Process flow','CmdOrCtrl+Alt+F'), item('code','Generated R code','CmdOrCtrl+Alt+K'),
+    { label: 'View', submenu: [{id:'workspace',label:'Individual Guide workspace',accelerator:'CmdOrCtrl+Alt+I',click:()=>command('workspace')},
+      item('flow','Process flow','CmdOrCtrl+Alt+F'), item('code','Generated R code','CmdOrCtrl+Alt+K'),
       item('console','R console','CmdOrCtrl+Alt+C'),
       item('tasks','Task list','CmdOrCtrl+Alt+L'),
       item('history','Change history...'), item('comments','Comments...'), item('review','Review dashboard...'),
@@ -53,14 +55,16 @@ module.exports = function desktopMenus({ command, restart, openLog, openLogs, sa
     const menu = Menu.getApplicationMenu();
     const ready = state.connected && state.startupReady && backend.phase === 'ready' && !state.pending;
     for (const id of ['new','close-project','open','save','save-as','settings','undo','search','flow','code','console','tasks','versions','files','runs','validate','history','comments','review','add-task','help','shortcuts','run','stop']) {
-      let enabled = ready && !state.modal && !state.welcome;
-      if (['new','close-project','open'].includes(id)) enabled = ready && (!state.modal || state.welcome) && (!state.welcome || state.welcomeVisible) && !state.recovery && !state.running;
+      let enabled = ready && !state.modal && !state.welcome && !state.appHost;
+      if (['new','close-project','open'].includes(id)) enabled = ready && (!state.modal || state.welcome) && (!state.welcome || state.welcomeVisible) && !state.recovery && !state.running && !state.appHost;
       if (id === 'run') enabled = enabled && !state.running && state.canRun;
       if (id === 'stop') enabled = state.connected && backend.phase === 'ready' && state.running;
       if (id === 'undo') enabled = enabled && state.canUndo && !state.running;
       menu.getMenuItemById(id).enabled = Boolean(enabled);
     }
-    const canOpen = ready && (!state.modal || state.welcome) && (!state.welcome || state.welcomeVisible) && !state.recovery && !state.running;
+    menu.getMenuItemById('shiny-apps').enabled = Boolean(ready && (!state.modal || state.welcome) && !state.recovery);
+    menu.getMenuItemById('close-shiny-app').enabled = Boolean(ready && state.appHostRunning);
+    const canOpen = ready && (!state.modal || state.welcome) && (!state.welcome || state.welcomeVisible) && !state.recovery && !state.running && !state.appHost;
     for (let i = 0; i < preferences.recent.length; i++) menu.getMenuItemById('recent-' + i).enabled = Boolean(canOpen);
     const pinned = preferences.recent.some(item => item.path.toLowerCase() === state.projectPath?.toLowerCase() && item.pinned);
     menu.getMenuItemById('pin-project').enabled = Boolean(ready && state.projectPath && (pinned || preferences.recent.filter(x=>x.pinned).length < 10));

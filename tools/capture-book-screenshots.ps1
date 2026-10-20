@@ -57,7 +57,12 @@ $arguments = @($appDirectory,'--smoke-product',"--smoke-result=$result","--data-
 if ($DebugPort) { $arguments += "--remote-debugging-port=$DebugPort" }
 $process = Start-Process -FilePath $electron -ArgumentList $arguments -WorkingDirectory $root -WindowStyle Hidden -PassThru `
   -RedirectStandardOutput (Join-Path $scratch 'stdout.log') -RedirectStandardError (Join-Path $scratch 'stderr.log')
-$process.WaitForExit()
+$null = $process.Handle
+if (!$process.WaitForExit(600000)) {
+  & (Join-Path $env:SystemRoot 'System32/taskkill.exe') /PID $process.Id /T /F | Out-Null
+  throw "Capture process did not shut down. Inspect $scratch"
+}
+if ($process.ExitCode -ne 0) { throw "Capture process failed. Inspect $scratch" }
 if (!(Test-Path -LiteralPath $result)) { throw "Capture did not produce a result. Inspect $scratch" }
 $evidence = Get-Content -LiteralPath $result -Raw | ConvertFrom-Json
 if (!$evidence.ok -or !$evidence.checks.allTaskPanels) { throw "Capture failed: $($evidence.error). Inspect $scratch" }

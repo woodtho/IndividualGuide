@@ -15,7 +15,8 @@ const consoleTest = process.argv.includes('--smoke-console');
 const examplesTest = process.argv.includes('--smoke-examples');
 const productTest = process.argv.includes('--smoke-product');
 const languageTest = process.argv.includes('--smoke-language');
-const smoke = process.argv.includes('--smoke-test') || startupOnly || restartTest || process.argv.includes('--smoke-menus') || lifecycleTest || consoleTest || examplesTest || productTest || languageTest;
+const shinyAppsTest = process.argv.includes('--smoke-shiny-apps');
+const smoke = process.argv.includes('--smoke-test') || startupOnly || restartTest || process.argv.includes('--smoke-menus') || lifecycleTest || consoleTest || examplesTest || productTest || languageTest || shinyAppsTest;
 const startedAt = Date.now();
 const smokeResult = option('--smoke-result');
 const menuTest = process.argv.includes('--smoke-menus');
@@ -68,7 +69,7 @@ eventLog('desktop.start', { version: app.getVersion(), electron: process.version
   cpus: os.cpus().length, totalMemoryMiB: Math.round(os.totalmem()/1048576), freeMemoryMiB: Math.round(os.freemem()/1048576),
   pid: process.pid, packaged: app.isPackaged, executable: process.execPath, userData: state,
   launchMode: process.env.PORTABLE_EXECUTABLE_FILE ? 'portable' : app.isPackaged ? 'installed' : 'development' });
-let window, rProcess, stopping = false, finished = false, appURL;
+let window, rProcess, stopping = false, finished = false, appURL, hostedRenderers;
 let smokeEvidence, updateMenu;
 let workspace = { connected: false, dirty: false, projectName: 'Untitled', projectPath: '' };
 let attempt = 0, attemptStarted = 0, projectDialogOpen = false;
@@ -99,6 +100,7 @@ async function pumpProjects() {
   openingProject = true;
   const file = pendingProjects.shift();
   try {
+    if(workspace.appHost) window.webContents.send('ig:command','workspace');
     if (!fs.existsSync(file) || !fs.statSync(file).isFile()) {
       await showMessageBox(window, { type: 'error', title: 'Project unavailable', message: 'This project could not be found.', detail: file });
       return;
@@ -112,6 +114,12 @@ async function requestClose() {
   if (closing || stopping || !window || window.isDestroyed()) return false;
   closing = true;
   try {
+    if(workspace.appHostRunning) {
+      const answer=await showMessageBox(window,{type:'question',title:'Close the loaded Shiny app?',
+        message:'Save any work in the loaded app first. Closing stops its R process.',
+        buttons:['Keep open','Close Individual Guide'],defaultId:0,cancelId:0,noLink:true});
+      if(answer.response!==1)return false;
+    }
     let ok;
     if (workspace.connected) ok = await rendererCommand('exit');
     else if (workspace.dirty) {
@@ -148,6 +156,8 @@ function recordSmoke(value) {
   fs.writeFileSync(smokeResult, JSON.stringify(value, null, 2));
 }
 async function stopR() {
+  try { hostedRenderers?.dispose(); }
+  catch(error) { eventLog('shiny-app.renderer.cleanup.failed',{message:error.message},'WARN'); }
   const child = rProcess;
   if (!child || child.exitCode !== null || child.signalCode) return;
   expectedStops.add(child);
@@ -194,7 +204,8 @@ async function requestRestart() {
     if (alive()) {
       const { response } = await showMessageBox(window, { type: 'warning',
         title: 'Restart R server?', message: 'Restart the R server?',
-        detail: 'Running tasks will stop and unsaved changes may be lost. Save your project first. After restart you can reopen a saved project or restore the latest available autosave.',
+        detail: 'Running tasks will stop and unsaved changes may be lost. Save your project first. After restart you can reopen a saved project or restore the latest available autosave.' +
+          (workspace.appHostRunning ? '\n\nRestarting also closes the loaded Shiny app. Save its work first.' : ''),
         buttons: ['Cancel', 'Restart R server'], defaultId: 0, cancelId: 0, noLink: true });
       if (response !== 1 || stopping) { eventLog('restart.cancelled'); return false; }
       eventLog('restart.confirmed');
@@ -314,6 +325,7 @@ async function start() {
     webPreferences: { preload: path.join(__dirname, 'preload.cjs'), nodeIntegration: false, contextIsolation: true, sandbox: true, webSecurity: true,
       spellcheck: false, backgroundThrottling: false } });
   eventLog('window.created', { sandbox: true, contextIsolation: true, width: 1440, height: 960 });
+  hostedRenderers = require('./hosted-renderers.cjs')({window,app,log:eventLog});
   if (preferences.window?.maximized === true) window.maximize();
   let boundsTimer;
   const saveBounds = () => {
@@ -326,14 +338,19 @@ async function start() {
   });
   window.on('close', event => {
     saveBounds();
-    if (allowClose || stopping || (smoke && finished)) return;
-    event.preventDefault(); requestClose().catch(error => log(error.message));
+    event.preventDefault();
+    if (stopping) return;
+    // Keep the last window alive while asynchronous R shutdown drains. Closing
+    // it first can suspend Chromium's main loop before child-exit callbacks run.
+    if (allowClose || (smoke && finished)) { app.quit(); return; }
+    requestClose().catch(error => log(error.message));
   });
   window.on('page-title-updated', event => { event.preventDefault(); refreshMenus(); });
   window.on('unresponsive', () => eventLog('renderer.unresponsive', undefined, 'WARN'));
   window.on('responsive', () => eventLog('renderer.responsive'));
   const trustedSender = event => event.sender === window.webContents && event.senderFrame === window.webContents.mainFrame &&
     (permitted(event.senderFrame.url) || event.senderFrame.url === require('node:url').pathToFileURL(loadingFile).href);
+  ipcMain.handle('ig:release-shiny-app', (event,url) => trustedSender(event) && hostedRenderers.release(url));
   ipcMain.handle('ig:backend-state', event => trustedSender(event) ? {...backendState,localizedMessage:translate(backendState.message)} : undefined);
   ipcMain.handle('ig:language', event => trustedSender(event) ? languageState() : undefined);
   ipcMain.handle('ig:set-language', (event, locale) => trustedSender(event) ? setLanguage(locale) : false);
@@ -364,8 +381,8 @@ async function start() {
   ipcMain.on('ig:workspace-state', (event, value) => {
     if (!trustedSender(event) || !value || typeof value !== 'object') return;
     const previous = workspace.connected;
-    for (const key of ['connected','dirty','canUndo','pending','modal','welcome','welcomeVisible','running','canRun','recovery','startupReady']) workspace[key] = value[key] === true;
-    for (const key of ['projectName','projectPath','comments','review']) workspace[key] = typeof value[key] === 'string' ? value[key].slice(0,4096) : '';
+    for (const key of ['connected','dirty','canUndo','pending','modal','welcome','welcomeVisible','running','canRun','recovery','startupReady','appHost','appHostRunning']) workspace[key] = value[key] === true;
+    for (const key of ['projectName','projectPath','comments','review','hostName']) workspace[key] = typeof value[key] === 'string' ? value[key].slice(0,4096) : '';
     if (workspace.connected !== previous) eventLog(workspace.connected ? 'workspace.connected' : 'workspace.disconnected',
       { attempt, elapsedMs: Date.now() - attemptStarted, rPid: rProcess?.pid, memoryMiB: Math.round(process.memoryUsage().rss/1048576) });
     refreshMenus();
@@ -407,12 +424,15 @@ async function start() {
     for (const key of Object.keys(headers)) if (key.toLowerCase() === 'x-ig-desktop-token') delete headers[key];
     let own = false;
     try { const target = new URL(details.url), source = new URL(appURL); own = ['http:','ws:'].includes(target.protocol) && target.hostname === source.hostname && target.port === source.port; } catch {}
-    if (own) headers['X-IG-Desktop-Token'] = desktopToken;
+    const sourceURL=details.frame?.url || headers.Origin || headers.origin || details.referrer;
+    const fromWorkspace=details.webContentsId===window.webContents.id &&
+      (details.resourceType==='mainFrame' || permitted(sourceURL));
+    if (own && fromWorkspace) headers['X-IG-Desktop-Token'] = desktopToken;
     callback({ requestHeaders: headers });
   });
   const blockedRequests = [];
   if (smoke) window.webContents.session.webRequest.onBeforeRequest((details, callback) => {
-    const allowed = /^(file:|data:|blob:|devtools:)/.test(details.url) || /^(https?|wss?):\/\/(127\.0\.0\.1|localhost)(:|\/)/.test(details.url);
+    const allowed = /^(file:|data:|blob:|devtools:)/.test(details.url) || /^(https?|wss?):\/\/(127(?:\.[0-9]{1,3}){3}|localhost)(:|\/)/.test(details.url);
     if (!allowed) blockedRequests.push(details.url);
     callback({ cancel: !allowed });
   });
@@ -450,6 +470,11 @@ async function start() {
   }
   if (languageTest) {
     const evidence=await require('./language-smoke.cjs')({window,pause,state,preferences,getProcess:()=>rProcess,getState:()=>backendState,requestRestart});
+    evidence.runtimeDirectory=runtime;evidence.desktop={packaged:app.isPackaged,executable:process.execPath,rPid:rProcess.pid};
+    smokeEvidence=evidence;recordSmoke(evidence);finished=true;window.close();return;
+  }
+  if (shinyAppsTest) {
+    const evidence=await require('./shiny-apps-smoke.cjs')({window,pause,state,runtime,getProcess:()=>rProcess});
     evidence.runtimeDirectory=runtime;evidence.desktop={packaged:app.isPackaged,executable:process.execPath,rPid:rProcess.pid};
     smokeEvidence=evidence;recordSmoke(evidence);finished=true;window.close();return;
   }
@@ -586,10 +611,10 @@ async function launchR() {
         path.join(process.env.SystemRoot, 'System32'), process.env.SystemRoot].join(';'),
       LC_ALL: 'English_Canada.utf8', LANG: 'English_Canada.utf8', IG_LANGUAGE: localization.locale, IG_RUNTIME_DIR: runtime,
       IG_USER_DATA: state, IG_WORK_DIR: app.getPath('documents'), IG_STOP_FILE: stopFile, IG_PORT: String(port), IG_DESKTOP_TOKEN: desktopToken,
-      IG_SMOKE_TEST: smoke && !startupOnly && !restartTest && !menuTest && !lifecycleTest && !consoleTest && !examplesTest && !productTest ? '1' : '0', IG_RUNTIME_RESULT: runtimeResult });
+      IG_SMOKE_TEST: smoke && !startupOnly && !restartTest && !menuTest && !lifecycleTest && !consoleTest && !examplesTest && !productTest && !shinyAppsTest ? '1' : '0', IG_RUNTIME_RESULT: runtimeResult });
     if (smoke) {
       for (const name of Object.keys(environment)) if (/^(https?_proxy|all_proxy|no_proxy)$/i.test(name)) delete environment[name];
-      Object.assign(environment, { http_proxy: 'http://127.0.0.1:9', https_proxy: 'http://127.0.0.1:9', no_proxy: '127.0.0.1,localhost' });
+      Object.assign(environment, { http_proxy: 'http://127.0.0.1:9', https_proxy: 'http://127.0.0.1:9', no_proxy: '127.0.0.1,127.0.0.2,localhost' });
     }
     rProcess = spawn(executable, ['--vanilla', path.join(runtime, 'startup.R')],
       { cwd: state, env: environment, windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'] });
@@ -637,8 +662,9 @@ if (ownsInstance) {
   app.on('open-file', (event, file) => { event.preventDefault(); queueProject(path.resolve(file)); });
   app.on('window-all-closed', () => app.quit());
   app.on('before-quit', event => {
+    event.preventDefault();
     if (stopping) return;
-    event.preventDefault(); stopping = true;
+    stopping = true;
     eventLog('desktop.shutdown.request', { exitCode, rPid: rProcess?.pid, uptimeMs: Date.now() - startedAt });
     stopR().catch(error => log(error.stack || String(error))).finally(() => {
       try { fs.rmSync(work, { recursive: true, force: true }); } catch (error) { log(error.message); }

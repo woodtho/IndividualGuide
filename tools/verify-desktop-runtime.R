@@ -33,9 +33,15 @@ example_differences <- example_files[!vapply(example_files, function(file) ident
   unname(tools::md5sum(file.path(root, "inst/examples", file))),
   unname(tools::md5sum(file.path(runtime, "R/library/IndividualGuide/examples", file)))), logical(1))]
 if (length(example_differences)) asset_differences <- c(asset_differences, paste0("examples/", example_differences))
+shiny_app_files <- list.files("inst/shiny-apps", recursive = TRUE)
+shiny_app_differences <- shiny_app_files[!vapply(shiny_app_files, function(file) identical(
+  unname(tools::md5sum(file.path(root, "inst/shiny-apps", file))),
+  unname(tools::md5sum(file.path(runtime, "R/library/IndividualGuide/shiny-apps", file)))), logical(1))]
+if (length(shiny_app_differences)) asset_differences <- c(asset_differences, paste0("shiny-apps/", shiny_app_differences))
 result <- list(ok = !length(differences) && !length(asset_differences) && constant_matches && identity_matches,
   projectFormatMatches = constant_matches, releaseIdentityMatches = identity_matches, functions = length(definitions),
-  differences = differences, asset_differences = asset_differences, bundledExampleFiles = length(example_files), runtime = runtime)
+  differences = differences, asset_differences = asset_differences, bundledExampleFiles = length(example_files),
+  bundledShinyAppFiles = length(shiny_app_files), runtime = runtime)
 jsonlite::write_json(result, args[[2L]], pretty = TRUE, auto_unbox = TRUE)
 stopifnot(result$ok)
 cat(length(definitions), "R functions and all workspace assets match source.\n")

@@ -6,6 +6,7 @@ contextBridge.exposeInMainWorld('igDesktop', {
   setLanguage: locale => ipcRenderer.invoke('ig:set-language', locale),
   onLanguage: callback => { ipcRenderer.on('ig:language', (_event, value) => callback({locale:value.locale})); },
   publishState: value => ipcRenderer.send('ig:workspace-state', value),
+  releaseShinyApp: url => ipcRenderer.invoke('ig:release-shiny-app', url),
   chooseProjectFile: (kind, defaultPath, dirty) => ipcRenderer.invoke('ig:project-dialog', { kind, defaultPath, dirty }),
   confirmChanges: action => ipcRenderer.invoke('ig:confirm-changes', action),
   commandResult: value => ipcRenderer.send('ig:command-result', value),
