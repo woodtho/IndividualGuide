@@ -6,9 +6,13 @@ on:
       - 'docs/**'
       - 'R/**'
       - 'DESCRIPTION'
+      - 'inst/app/www/**'
       - 'tools/*book*'
       - 'tools/example-recipes.R'
-      - 'tools/desktop/menus.cjs'
+      - 'tools/desktop/*.cjs'
+      - 'tools/desktop/package.json'
+      - 'tools/desktop/loading.html'
+      - 'tools/desktop/assets/installer.nsh'
       - 'tools/desktop/BUILD-README.md'
       - '.github/workflows/book-pages.yml'
   pull_request:
@@ -16,9 +20,13 @@ on:
       - 'docs/**'
       - 'R/**'
       - 'DESCRIPTION'
+      - 'inst/app/www/**'
       - 'tools/*book*'
       - 'tools/example-recipes.R'
-      - 'tools/desktop/menus.cjs'
+      - 'tools/desktop/*.cjs'
+      - 'tools/desktop/package.json'
+      - 'tools/desktop/loading.html'
+      - 'tools/desktop/assets/installer.nsh'
       - 'tools/desktop/BUILD-README.md'
       - '.github/workflows/book-pages.yml'
   workflow_dispatch:
@@ -35,6 +43,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
+      - uses: r-lib/actions/setup-pandoc@v2
+        with:
+          pandoc-version: '3.12.1'
+      - name: Verify matching English and French source structure
+        run: node --test tools/book-parity.test.cjs
       - name: Verify committed books and source identity
         run: node tools/publish-book.cjs --check
       - name: Verify stale and altered books are rejected

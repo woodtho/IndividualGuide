@@ -9,7 +9,7 @@ function numberFigures(markdown,source) {
     return `![Figure ${figure.number}. ${caption}](${file}){#${id}${attributes||' width=15.5cm'}}`;
   });
   if((numbered.match(/!\[/g)||[]).length!==figures.length)throw new Error('Every book image needs a caption and fig- ID.');
-  const complete=numbered.replace(/\[Figure\]\(#(fig-[\w-]+)\)/g,(_match,id)=>{
+  const complete=numbered.replace(/\[Figure\]\(#(fig-[\w-]+)\)/gi,(_match,id)=>{
     const figure=figures.find(figure=>figure.id===id);
     if(!figure)throw new Error('Unknown figure reference: '+id);
     return `[Figure ${figure.number}](#${id})`;

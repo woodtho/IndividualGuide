@@ -14,7 +14,8 @@ const lifecycleTest = process.argv.includes('--smoke-lifecycle');
 const consoleTest = process.argv.includes('--smoke-console');
 const examplesTest = process.argv.includes('--smoke-examples');
 const productTest = process.argv.includes('--smoke-product');
-const smoke = process.argv.includes('--smoke-test') || startupOnly || restartTest || process.argv.includes('--smoke-menus') || lifecycleTest || consoleTest || examplesTest || productTest;
+const languageTest = process.argv.includes('--smoke-language');
+const smoke = process.argv.includes('--smoke-test') || startupOnly || restartTest || process.argv.includes('--smoke-menus') || lifecycleTest || consoleTest || examplesTest || productTest || languageTest;
 const startedAt = Date.now();
 const smokeResult = option('--smoke-result');
 const menuTest = process.argv.includes('--smoke-menus');
@@ -30,9 +31,35 @@ const logPath = diagnostics.file;
 const eventLog = diagnostics.write;
 const { preferences: loadPreferences, windowBounds, projectArgument, projectPath } = require('./preferences.cjs');
 const preferences = loadPreferences(path.join(state, 'desktop-settings.json'), eventLog);
+const languageSupport = require('./i18n.cjs');
+const installation = languageSupport.installationLanguage(path.dirname(process.execPath));
+const localization = languageSupport.create(languageSupport.catalog, languageSupport.initialLanguage(
+  {language:preferences.language,installation:preferences.installation}, installation,
+  Intl.DateTimeFormat().resolvedOptions().locale, option('--language')));
+preferences.saveLanguage(localization.locale, installation?.installation || preferences.installation);
+const translate = value => localization.translate(value);
+app.commandLine.appendSwitch('lang',localization.locale === 'fr-CA' ? 'fr' : 'en-US');
+function localizedDialog(options) {
+  return languageSupport.localizedDialog(options,translate);
+}
+const showMessageBox = (window, options) => dialog.showMessageBox(window,localizedDialog(options));
+const showMessageBoxSync = (window, options) => dialog.showMessageBoxSync(window,localizedDialog(options));
+const showOpenDialog = (window, options) => dialog.showOpenDialog(window,localizedDialog(options));
+const showSaveDialog = (window, options) => dialog.showSaveDialog(window,localizedDialog(options));
+function languageState() { return {locale:localization.locale,strings:languageSupport.catalog.strings}; }
+function setLanguage(locale) {
+  if(!languageSupport.supported.includes(locale))return false;
+  localization.setLanguage(locale);
+  preferences.saveLanguage(locale,installation?.installation || preferences.installation);
+  eventLog('desktop.language',{locale});
+  refreshMenus();
+  if(window&&!window.isDestroyed())window.webContents.send('ig:language',languageState());
+  if(window&&!window.isDestroyed())window.webContents.send('ig:backend-state',{...backendState,localizedMessage:translate(backendState.message)});
+  return true;
+}
 const desktopToken = crypto.randomBytes(32).toString('hex');
 const projectTrust = require('./security.cjs')({ file: path.join(state, 'trusted-projects.json'),
-  confirm: async file => (await dialog.showMessageBox(window, { type: 'warning', title: 'Trust this project?',
+  confirm: async file => (await showMessageBox(window, { type: 'warning', title: 'Trust this project?',
     message: 'Open a project from a trusted source?', detail: 'Projects can contain R code and serialized R objects. Opening or running a project can access files and execute code with your Windows permissions.\n\n' + file,
     buttons: ['Cancel', 'Trust and open'], defaultId: 0, cancelId: 0, noLink: true })).response === 1 });
 const log = text => eventLog('desktop.message', String(text));
@@ -73,7 +100,7 @@ async function pumpProjects() {
   const file = pendingProjects.shift();
   try {
     if (!fs.existsSync(file) || !fs.statSync(file).isFile()) {
-      await dialog.showMessageBox(window, { type: 'error', title: 'Project unavailable', message: 'This project could not be found.', detail: file });
+      await showMessageBox(window, { type: 'error', title: 'Project unavailable', message: 'This project could not be found.', detail: file });
       return;
     }
     const ok = await rendererCommand('open', file);
@@ -88,7 +115,7 @@ async function requestClose() {
     let ok;
     if (workspace.connected) ok = await rendererCommand('exit');
     else if (workspace.dirty) {
-      const choice = await dialog.showMessageBox(window, { type: 'warning', title: 'R server unavailable',
+      const choice = await showMessageBox(window, { type: 'warning', title: 'R server unavailable',
         message: 'Close without saving?', detail: 'The R server is disconnected, so this workspace cannot save. Keep the window open to use the restart and recovery controls.',
         buttons: ['Keep open','Close without saving'], defaultId: 0, cancelId: 0, noLink: true });
       ok = choice.response === 1;
@@ -99,7 +126,7 @@ async function requestClose() {
 }
 function refreshMenus() {
   updateMenu?.(workspace, backendState);
-  if (window && !window.isDestroyed()) window.setTitle('Individual Guide' + (workspace.connected ? ' - ' + (workspace.projectName || 'Untitled') + (workspace.dirty ? ' *' : '') : backendState.phase === 'stopped' ? ' - R server stopped' : ''));
+  if (window && !window.isDestroyed()) window.setTitle('Individual Guide' + (workspace.connected ? ' - ' + (workspace.projectName || translate('Untitled')) + (workspace.dirty ? ' *' : '') : backendState.phase === 'stopped' ? ' - '+translate('R server stopped') : ''));
   pumpProjects();
 }
 let backendState = { phase: 'starting', message: 'Starting your workspace...' };
@@ -144,7 +171,7 @@ function setBackendState(phase, message) {
   eventLog('backend.state', { phase, message, attempt, elapsedMs: Date.now() - attemptStarted });
   if (phase !== 'ready') workspace.connected = false;
   refreshMenus();
-  if (window && !window.isDestroyed()) window.webContents.send('ig:backend-state', backendState);
+  if (window && !window.isDestroyed()) window.webContents.send('ig:backend-state', {...backendState,localizedMessage:translate(backendState.message)});
   const item = Menu.getApplicationMenu()?.getMenuItemById('restart-r');
   if (item) item.enabled = phase !== 'starting';
 }
@@ -165,7 +192,7 @@ async function requestRestart() {
   // Serialize the confirmation too so repeated clicks cannot spawn extra servers.
   restartPromise = (async () => {
     if (alive()) {
-      const { response } = await dialog.showMessageBox(window, { type: 'warning',
+      const { response } = await showMessageBox(window, { type: 'warning',
         title: 'Restart R server?', message: 'Restart the R server?',
         detail: 'Running tasks will stop and unsaved changes may be lost. Save your project first. After restart you can reopen a saved project or restore the latest available autosave.',
         buttons: ['Cancel', 'Restart R server'], defaultId: 0, cancelId: 0, noLink: true });
@@ -182,7 +209,7 @@ async function fail(error) {
   eventLog('desktop.fatal', error.stack || String(error), 'ERROR');
   if (smoke) recordSmoke({ ok: false, error: error.message, stack: error.stack,
     checks: error.smokeChecks, startupLog: logPath });
-  else await dialog.showMessageBox(window, { type: 'error', title: 'Individual Guide could not start',
+  else await showMessageBox(window, { type: 'error', title: 'Individual Guide could not start',
     message: error.message, detail: `Startup details are saved in:\n${logPath}` });
   app.quit();
 }
@@ -221,13 +248,13 @@ async function chooseProjectFile(request) {
     const defaults = request.defaultPath || 'project';
     const defaultPath = path.isAbsolute(defaults) ? defaults : path.join(app.getPath('documents'), path.basename(defaults).replace(/[<>:"/\\|?*\x00-\x1f]/g,'_').replace(/[. ]+$/, '') || 'project');
     if (request.kind === 'open') {
-      const result = await dialog.showOpenDialog(window, { title: 'Open Individual Guide project',
+      const result = await showOpenDialog(window, { title: 'Open Individual Guide project',
         defaultPath, filters: [{ name: 'Individual Guide projects', extensions: ['igpx','igp','rds'] }], properties: ['openFile'] });
       eventLog('project.open.dialog', { cancelled: result.canceled });
       const target = result.canceled || stopping ? '' : result.filePaths[0] || '';
       return target && await projectTrust.trust(target) ? target : '';
     }
-    const result = await dialog.showSaveDialog(window, { title: 'Save Individual Guide project',
+    const result = await showSaveDialog(window, { title: 'Save Individual Guide project',
       defaultPath: /\.igpx$/i.test(defaultPath) ? defaultPath : defaultPath + '.igpx',
       filters: [{ name: 'Individual Guide project', extensions: ['igpx'] }], properties: ['showOverwriteConfirmation'] });
     eventLog('project.save.dialog', { cancelled: result.canceled });
@@ -236,7 +263,7 @@ async function chooseProjectFile(request) {
     if (!/\.igpx$/i.test(target)) {
       target += '.igpx';
       if (fs.existsSync(target)) {
-        const { response } = await dialog.showMessageBox(window, { type: 'warning', title: 'Replace project?',
+        const { response } = await showMessageBox(window, { type: 'warning', title: 'Replace project?',
           message: 'A project with this name already exists. Replace it?', buttons: ['Cancel','Replace'], defaultId: 0, cancelId: 0, noLink: true });
         if (response !== 1) return '';
       }
@@ -246,7 +273,7 @@ async function chooseProjectFile(request) {
 }
 async function saveDiagnosticLog() {
   if (stopping) return;
-  const result = await dialog.showSaveDialog(window, { title: 'Save diagnostic log',
+  const result = await showSaveDialog(window, { title: 'Save diagnostic log',
     defaultPath: path.join(app.getPath('documents'), 'IndividualGuide-diagnostics.log'),
     filters: [{ name: 'Log file', extensions: ['log','txt'] }], properties: ['showOverwriteConfirmation'] });
   if (result.canceled || !result.filePath) { eventLog('diagnostics.export.cancelled'); return; }
@@ -260,13 +287,14 @@ async function saveDiagnosticLog() {
 async function start() {
   eventLog('desktop.ready', { elapsedMs: Date.now() - startedAt, appPath: app.getAppPath() });
   updateMenu = require('./menus.cjs')({ command: sendCommand,
+    translate, setLanguage,
     preferences, openProject: queueProject,
     about: async () => {
       let info = {};
       try { info = JSON.parse(fs.readFileSync(path.join(runtime, 'R/library/IndividualGuide/build-info.json'), 'utf8')); } catch {}
-      await dialog.showMessageBox(window, { type: 'info', title: 'About Individual Guide', message: 'Individual Guide ' + app.getVersion(),
-        detail: ['Build: ' + (info.built_at || 'development'), 'Source: ' + (info.commit || 'source checkout') + (info.dirty ? ' (modified)' : ''),
-          'R: ' + (info.R || 'bundled runtime'), 'Electron: ' + process.versions.electron, 'Chromium: ' + process.versions.chrome,
+      await showMessageBox(window, { type: 'info', title: 'About Individual Guide', message: 'Individual Guide ' + app.getVersion(),
+        detail: ['Build: ' + (info.built_at || translate('development')), 'Source: ' + (info.commit || translate('source checkout')) + (info.dirty ? ' ('+translate('modified')+')' : ''),
+          'R: ' + (info.R || translate('bundled runtime')), 'Electron: ' + process.versions.electron, 'Chromium: ' + process.versions.chrome,
           'MIT © Thomas Wood. Bundled components retain their own licenses.'].join('\n'), buttons: ['Close'] });
     },
     pinProject: () => { preferences.pin(workspace.projectPath); refreshMenus(); },
@@ -276,7 +304,7 @@ async function start() {
     openLog: () => openLocal(logPath), openLogs: () => openLocal(path.dirname(logPath)),
     saveLog: () => saveDiagnosticLog().catch(async error => {
       eventLog('diagnostics.export.failed', error.message, 'ERROR');
-      if (!stopping) await dialog.showMessageBox(window, { type: 'error', title: 'Could not save diagnostic log', message: error.message });
+      if (!stopping) await showMessageBox(window, { type: 'error', title: 'Could not save diagnostic log', message: error.message });
     }), close: () => window.close() });
   const displays = [screen.getPrimaryDisplay(), ...screen.getAllDisplays().filter(d => d.id !== screen.getPrimaryDisplay().id)];
   const bounds = windowBounds(preferences.window, displays);
@@ -306,7 +334,9 @@ async function start() {
   window.on('responsive', () => eventLog('renderer.responsive'));
   const trustedSender = event => event.sender === window.webContents && event.senderFrame === window.webContents.mainFrame &&
     (permitted(event.senderFrame.url) || event.senderFrame.url === require('node:url').pathToFileURL(loadingFile).href);
-  ipcMain.handle('ig:backend-state', event => trustedSender(event) ? backendState : undefined);
+  ipcMain.handle('ig:backend-state', event => trustedSender(event) ? {...backendState,localizedMessage:translate(backendState.message)} : undefined);
+  ipcMain.handle('ig:language', event => trustedSender(event) ? languageState() : undefined);
+  ipcMain.handle('ig:set-language', (event, locale) => trustedSender(event) ? setLanguage(locale) : false);
   ipcMain.handle('ig:restart-r', event => trustedSender(event) ? requestRestart() : false);
   ipcMain.handle('ig:open-log', event => trustedSender(event) ? openLocal(logPath) : undefined);
   ipcMain.handle('ig:project-dialog', (event, request) => trustedSender(event) ? chooseProjectFile(request) : undefined);
@@ -314,7 +344,7 @@ async function start() {
     if (!trustedSender(event) || !['new','close','open','exit'].includes(action) || projectDialogOpen) return 'cancel';
     projectDialogOpen = true;
     try {
-      const result = await dialog.showMessageBox(window, { type:'warning', title:'Unsaved changes',
+      const result = await showMessageBox(window, { type:'warning', title:'Unsaved changes',
         message: 'Save your project before ' + ({ new:'creating a new project', close:'closing the project', open:'opening another project', exit:'closing Individual Guide' }[action]) + '?',
         detail: action === 'exit' && workspace.running ? 'Closing will also stop running tasks.' : 'Discard continues without saving the current changes.',
         buttons:['Cancel','Discard','Save'], defaultId:2, cancelId:0, noLink:true });
@@ -346,7 +376,7 @@ async function start() {
     eventLog(value.event, { action: String(details.action || '').slice(0,40), ok: details.ok === true,
       message: value.event === 'command.error' ? String(details.message || '').slice(0,500) : undefined });
     if (value.event === 'command.error' && workspace.connected && !stopping)
-      dialog.showMessageBox(window, { type: 'error', title: 'Project command failed', message: String(details.message || 'R could not complete the command.').slice(0,500) }).catch(error => log(error.message));
+      showMessageBox(window, { type: 'error', title: 'Project command failed', message: String(details.message || 'R could not complete the command.').slice(0,500) }).catch(error => log(error.message));
   });
   window.webContents.on('did-fail-load', (_event, code, description, _url, mainFrame) => {
     if (mainFrame) eventLog('renderer.load.failed', { code, description, attempt }, 'ERROR');
@@ -403,7 +433,7 @@ async function start() {
       event.preventDefault();
       return;
     }
-    const choice = dialog.showMessageBoxSync(window, { type: 'question', title: 'Unsaved changes',
+    const choice = showMessageBoxSync(window, { type: 'question', title: 'Unsaved changes',
       message: 'Close Individual Guide without saving your project?',
       detail: 'Choose Keep open to save your work first.', buttons: ['Keep open', 'Close without saving'],
       defaultId: 0, cancelId: 0, noLink: true });
@@ -417,6 +447,11 @@ async function start() {
   if (!(await launchR())) {
     if (smoke) throw new Error('The test R server did not start.');
     return;
+  }
+  if (languageTest) {
+    const evidence=await require('./language-smoke.cjs')({window,pause,state,preferences,getProcess:()=>rProcess,getState:()=>backendState,requestRestart});
+    evidence.runtimeDirectory=runtime;evidence.desktop={packaged:app.isPackaged,executable:process.execPath,rPid:rProcess.pid};
+    smokeEvidence=evidence;recordSmoke(evidence);finished=true;window.close();return;
   }
   if (productTest) {
     const evidence = await require('./product-smoke.cjs')({window,pause,state,rendererCommand,appURL});
@@ -549,7 +584,7 @@ async function launchR() {
       PATH: [path.dirname(executable), path.join(runtime, 'pandoc'),
         path.join(process.env.SystemRoot, 'System32', 'WindowsPowerShell', 'v1.0'),
         path.join(process.env.SystemRoot, 'System32'), process.env.SystemRoot].join(';'),
-      LC_ALL: 'English_Canada.utf8', LANG: 'English_Canada.utf8', IG_RUNTIME_DIR: runtime,
+      LC_ALL: 'English_Canada.utf8', LANG: 'English_Canada.utf8', IG_LANGUAGE: localization.locale, IG_RUNTIME_DIR: runtime,
       IG_USER_DATA: state, IG_WORK_DIR: app.getPath('documents'), IG_STOP_FILE: stopFile, IG_PORT: String(port), IG_DESKTOP_TOKEN: desktopToken,
       IG_SMOKE_TEST: smoke && !startupOnly && !restartTest && !menuTest && !lifecycleTest && !consoleTest && !examplesTest && !productTest ? '1' : '0', IG_RUNTIME_RESULT: runtimeResult });
     if (smoke) {

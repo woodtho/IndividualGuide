@@ -1,0 +1,16 @@
+[
+  {
+    "language": "en-CA",
+    "source": "workflow.svg",
+    "svgSha256": "6e1bb246d930a9e7c1e3bc3ca3fe6144a38d3d73156ba4b9f13f1c6ae152ef31",
+    "pngSha256": "e584a9649c0b0fdb30c8bf346343c722da08857de8c2530b8cf21dc3cac410dd",
+    "chartSha256": "f18e8321000e403e792d7a7b3c7f34fe36e44426c76ea72fe73c7deef5530059"
+  },
+  {
+    "language": "fr-CA",
+    "source": "workflow.svg",
+    "svgSha256": "2db4f187acb62e63104b3dd7aec68aff2f9e7631a4e643f5bd00fbcda50e4219",
+    "pngSha256": "1e3f287fb2ca5b20fa315bae62c739c04c3df360a4ad02886dc84a4bb25ce876",
+    "chartSha256": "64e9209d3bb1c13a9f2f45c1cdd12d2c45e8d363b2486c34f7a727948c7b8a86"
+  }
+]

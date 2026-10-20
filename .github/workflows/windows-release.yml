@@ -58,10 +58,22 @@ jobs:
       - name: Desktop JavaScript tests
         working-directory: tools/desktop
         run: node --test *.test.cjs
+      - name: Verify French catalog and matching handbook structure
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Continue'
+          Rscript --vanilla tools/i18n-inventory.R
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node tools/verify-i18n.cjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node --test tools/book-parity.test.cjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Fresh account installation and desktop acceptance
         shell: powershell
         run: |
           ./tools/test-clean-machine.ps1 -ReleaseFolder build/release -EvidenceFolder artifacts/review/clean-machine
+      - name: Stage matching English and French handbook downloads
+        run: node tools/stage-release-books.cjs build/release
       - name: Verify version, archives and checksums
         shell: powershell
         run: |
@@ -77,6 +89,7 @@ jobs:
             build/release/IndividualGuide_*.tar.gz
             build/release/IndividualGuide_*.zip
             build/release/IndividualGuide-*-Setup-Windows-x64.exe
+            build/release/Individual-Guide-Handbook-*
             build/release/SHA256SUMS.txt
             build/release/release-manifest.json
             build/release/README.md

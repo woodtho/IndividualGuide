@@ -10,8 +10,22 @@ stopifnot(identical(version, desktop$version), identical(version, lock$version),
 if (length(args) >= 2L && !identical(args[[2L]], paste0("v", version))) stop("Release tag must match package version.")
 names <- c(paste0("IndividualGuide_", version, ".tar.gz"), paste0("IndividualGuide_", version, ".zip"),
   paste0("IndividualGuide-", version, "-Setup-Windows-x64.exe"))
+book_languages <- c("en-CA","fr-CA")
+book_formats <- c("html","pdf","epub","docx")
+book_names <- unlist(lapply(book_languages,function(language)paste0("Individual-Guide-Handbook-",language,".",book_formats)),use.names=FALSE)
+names <- c(names,book_names)
 files <- file.path(output, names)
 stopifnot(all(file.exists(files)), all(file.info(files)$size > 0))
+for(language in book_languages){
+  directory <- file.path("docs/handbook",if(language=="fr-CA")"fr-CA" else "")
+  book <- jsonlite::read_json(file.path(directory,"manifest.json"))
+  stopifnot(identical(book$language,language),identical(book$packageVersion,version))
+  for(format in book_formats){
+    staged <- file.path(output,paste0("Individual-Guide-Handbook-",language,".",format))
+    source <- file.path(directory,paste0("Individual-Guide-Handbook.",format))
+    stopifnot(identical(digest::digest(file=staged,algo="sha256"),digest::digest(file=source,algo="sha256")))
+  }
+}
 entries <- utils::untar(files[[1L]], list = TRUE)
 stopifnot(!any(grepl("/(build|artifacts|tools|docs|[.]git)/|PROJECT_AUDIT|COMPLETION_REPORT", entries)))
 hashes <- vapply(files, function(file) digest::digest(file = file, algo = "sha256"), character(1))
@@ -47,7 +61,8 @@ stopifnot(identical(binary$version, version), binary$task_count == 58L, binary$e
 result <- list(version = version, source_commit = metadata$commit, built_at = metadata$built_at,
   dependencies_sha256 = metadata$dependencies_sha256,
   checks = list(source_identity = TRUE, binary_installs = TRUE, binary_namespace = TRUE,
-    binary_task_count = binary$task_count, binary_examples = binary$examples, report_logging = TRUE),
+    binary_task_count = binary$task_count, binary_examples = binary$examples, report_logging = TRUE,
+    bilingual_handbooks = TRUE,book_languages = book_languages),
   assets = lapply(seq_along(files), function(i) list(file = names[[i]], bytes = unname(file.info(files[[i]])$size), sha256 = hashes[[i]])))
 jsonlite::write_json(result, file.path(output, "release-manifest.json"), pretty = TRUE, auto_unbox = TRUE)
 cat("Verified release", version, "with", length(files), "assets.\n")

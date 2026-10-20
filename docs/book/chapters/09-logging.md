@@ -31,7 +31,7 @@ For a table-cleaning task, you could use:
 {task_name}: {rows_in} rows in; {rows_out} rows out.
 ```
 
-The words in braces are placeholders. The app fills them with values from the run. Use the picker so you do not need to memorize their spelling. An output count may not exist at task start, so use it in a completion message.
+The words in braces are placeholders. The app fills them with values from the run. Use the picker so you do not need to memorize their spelling. An output count may not exist at task start, so use it in a completion message. The practice text above stays identical in both editions; you can translate the words around the braces in your own messages.
 
 ![Read the rendered entry before running the task. File output preview lets you inspect Text, CSV, or JSON without writing a file.](assets/ui-logging-preview.png){#fig-logging-preview}
 
@@ -66,6 +66,8 @@ TXT is easiest to read as plain text. CSV opens in a spreadsheet with separate f
 If the flow stopped at an earlier error, run Export Log by itself afterwards when possible. It can help you collect the error messages. Its file cannot include the exporter's own later completion message.
 
 ## Put the log in a report
+
+Built-in headings in saved reports keep their original language. This guide quotes **Pipeline execution log** exactly so you can find it in the downloaded file. You can write your own report title, notes, and log messages in French or English.
 
 1. Open a Report task after running the tasks whose logs you need.
 2. Under **Appearance**, check **Include pipeline log in the report**. Set **Minimum log level** to INFO for normal progress, or WARN for warnings and errors only.

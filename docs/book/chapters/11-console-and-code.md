@@ -18,6 +18,8 @@ The result is 5. You do not need to install anything to try this inside the desk
 
 ![The R Console has a command area and transcript. Project-data controls supply working copies for trials; they do not add a step to the flow.](assets/ui-console.png){#fig-console}
 
+Commands, R output, and console messages keep their original text. The buttons use your chosen language.
+
 The console loads copies of available project data when you first run a command. Select **Refresh data** after changing data in the flow. This replaces the imported copies while keeping other console values. Changing a console value does not automatically change the project's table or flow.
 
 ## Read a command before running it

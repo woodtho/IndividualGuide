@@ -13,6 +13,8 @@ all 22 example projects, saving, logging, reports, and troubleshooting. R setup,
 the console, and code exports are optional. It uses the public Windows release,
 CRAN packages, and a GitHub release tag for the R installation route.
 Read it online or download PDF, EPUB, Word, and offline HTML from the page.
+The [Canadian French edition](https://woodtho.github.io/IndividualGuide/fr-CA/)
+has the same chapters, steps, examples and figures, with translated screenshots.
 The editions are also committed in [`docs/handbook`](docs/handbook), with editable
 chapters in [`docs/book`](docs/book/README.md). GitHub Pages publishes verified
 changes automatically. Application downloads are on the
@@ -47,7 +49,11 @@ run_app()
 
 ## Standalone Windows executable
 
-Download the latest **Setup-Windows-x64.exe** from [GitHub Releases](https://github.com/woodtho/IndividualGuide/releases/latest). Run Setup once, then launch **Individual Guide** from its Start menu or desktop shortcut. The 0.4.0 installer includes the current Shiny app, reduced R runtime/packages, Pandoc and Electron browser. Windows 10/11 x64 is required; allow roughly 1.5 GB for installation. No separate R installation, administrator access or dependency download is needed for normal use.
+Download the latest **Setup-Windows-x64.exe** from [GitHub Releases](https://github.com/woodtho/IndividualGuide/releases/latest). Run Setup once, choose **English** or **Français (Canada)**, then launch **Individual Guide** from its Start menu or desktop shortcut. The 0.5.0 installer includes the current Shiny app, reduced R runtime/packages, Pandoc and Electron browser. Windows 10/11 x64 is required; allow roughly 1.5 GB for installation. No separate R installation, administrator access or dependency download is needed for normal use.
+
+Change the language later in **Language / Langue** or the app's language selector.
+Your choice is remembered on this computer. Switching keeps the R connection,
+typed values, project names, data and code intact.
 
 Later launches reuse the installed runtime. Updating with a newer Setup preserves projects and settings. If R disconnects, choose **Session > Restart R server** or **Ctrl+Shift+R**. File, Edit, View, Task and Help menus provide desktop commands; ordinary Shiny/browser launches retain the in-app toolbar. Use **Session** to inspect or export startup diagnostics.
 

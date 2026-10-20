@@ -157,11 +157,11 @@ help_examples_tab <- function() {
         div(tags$label(`for` = "ig-example-search", "Search examples"),
           tags$input(id = "ig-example-search", type = "search", `data-shiny-no-bind-input` = NA, class = "form-control", placeholder = "Data, workflow or task…")),
         div(tags$label(`for` = "ig-example-type", "Task type"),
-          tags$select(id = "ig-example-type", class = "form-select", `data-shiny-no-bind-input` = NA,
+          tags$select(id = "ig-example-type", class = "form-select", `data-shiny-no-bind-input` = NA, `data-ig-choice-labels` = "true",
             tags$option(value = "", "All task types"), lapply(TASK_REGISTRY, function(type)
               tags$option(value = type$id, paste(type$category, "—", type$label))))),
         div(tags$label(`for` = "ig-example-category", "Task category"),
-          tags$select(id = "ig-example-category", class = "form-select", `data-shiny-no-bind-input` = NA,
+          tags$select(id = "ig-example-category", class = "form-select", `data-shiny-no-bind-input` = NA, `data-ig-choice-labels` = "true",
             tags$option(value = "", "All categories"), lapply(unique(vapply(TASK_REGISTRY, `[[`, character(1), "category")), function(category)
               tags$option(value = category, category))))),
       p(id = "ig-example-count", role = "status", `aria-live` = "polite"),
@@ -195,7 +195,7 @@ help_examples_tab <- function() {
       }
       search.addEventListener('input', filter); type.addEventListener('change', filter); category.addEventListener('change', filter); filter();
     })();"))),
-    .help_p("After opening, inspect datasets and charts in the project tree, open a task's Logging tab, ",
+    .help_p("After opening, inspect datasets and charts in the project tree, open a task's Logging section, ",
       "or run the full flow to regenerate the outputs. File exports are written into that example's own folder; ",
       "the Export and Export Log tasks show their destinations. The included README explains the data and workflow.")
   )

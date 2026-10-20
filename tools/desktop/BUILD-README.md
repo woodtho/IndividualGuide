@@ -1,6 +1,6 @@
 # Individual Guide for Windows
 
-Download `IndividualGuide-0.4.0-Setup-Windows-x64.exe` from
+Download `IndividualGuide-0.5.0-Setup-Windows-x64.exe` from
 https://github.com/woodtho/IndividualGuide/releases/latest.
 Run Setup once, then use the Start menu or desktop shortcut. Windows 10/11 x64
 is required; allow approximately 1.5 GB for the program, plus your project data.
@@ -14,6 +14,14 @@ The per-user installation is normally at
 reduced R runtime, required R packages, Pandoc and the Electron/Chromium shell.
 Subsequent launches reuse these files. Running Setup again updates the program;
 use the application shortcut for normal launches.
+
+Setup offers English and Français (Canada). Change language later with the
+Language menu, the app header, or Settings. The choice is remembered on this
+computer. Switching language keeps the R session and typed values in place;
+data, project names, formulas and code retain their original spelling.
+The [English handbook](https://woodtho.github.io/IndividualGuide/) and its
+[matching French edition](https://woodtho.github.io/IndividualGuide/fr-CA/)
+include the same task guides, examples and figures in HTML, PDF, EPUB and Word.
 
 Settings, recovery files, connection settings and startup diagnostics live under
 `%APPDATA%\Individual Guide`. Save project files wherever you choose. Updating

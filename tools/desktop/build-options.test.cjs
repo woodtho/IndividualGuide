@@ -4,6 +4,11 @@ const assert = require('node:assert/strict');
 const path = require('node:path');
 const os = require('node:os');
 const { getConfig } = require('app-builder-lib/out/util/config/config.js');
+// The builder retains its stdout stream before node:test switches to its
+// child protocol. Keep diagnostic writes on stderr so they cannot corrupt
+// the test runner's serialized messages. Assertions and logs stay enabled.
+const {log}=require('builder-util');
+log.stream=process.stderr;
 const buildOptions = require('./build-options.cjs');
 
 test('the builder resolves exactly one selected runtime without mixing old staging', async () => {

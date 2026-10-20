@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 290" role="img" aria-labelledby="title desc">
+<title id="title">Des données au rapport et au journal</title>
+<desc id="desc">L’importation produit une table brute. La préparation produit les données d’analyse. Les résumés et les graphiques alimentent le rapport. Tous les événements des tâches alimentent l’exportation finale du journal.</desc>
+<defs><marker id="a" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0 0L7 3L0 6" fill="#536280"/></marker></defs>
+<rect width="1000" height="290" rx="12" fill="#f6f8fc"/>
+<g stroke="#536280" stroke-width="2" fill="none" marker-end="url(#a)"><path d="M160 96H215"/><path d="M365 96H415"/><path d="M570 96H620"/><path d="M770 96H820"/><path d="M100 135V205H870V135"/><path d="M290 135V205"/><path d="M495 135V205"/><path d="M695 135V205"/></g>
+<g font-family="Arial, sans-serif" text-anchor="middle" font-size="19" fill="#172744">
+<g fill="#e7eeff" stroke="#4361ee" stroke-width="2"><rect x="25" y="55" width="135" height="80" rx="12"/><rect x="215" y="55" width="150" height="80" rx="12"/><rect x="415" y="55" width="155" height="80" rx="12"/><rect x="620" y="55" width="150" height="80" rx="12"/><rect x="820" y="55" width="150" height="80" rx="12"/></g>
+<text x="92" y="88">Importer</text><text x="92" y="114" font-size="15">lire les données</text>
+<text x="290" y="88">Préparer</text><text x="290" y="114" font-size="15">nettoyer la table</text>
+<text x="492" y="88">Résumer</text><text x="492" y="114" font-size="15">vérifier les nombres</text>
+<text x="695" y="88">Tracer</text><text x="695" y="114" font-size="15">montrer la tendance</text>
+<text x="895" y="88">Rapport / Export</text><text x="895" y="114" font-size="15">partager les résultats</text>
+<rect x="365" y="225" width="290" height="42" rx="9" fill="#ecf6ee" stroke="#237a47"/>
+<text x="510" y="252" font-size="17">Enregistrer le journal dans un fichier</text>
+<path d="M510 205V225" stroke="#536280" stroke-width="2" marker-end="url(#a)"/>
+<text x="500" y="35" font-size="15">Gardez les données sources, puis suivez les étapes jusqu’aux résultats</text>
+</g></svg>

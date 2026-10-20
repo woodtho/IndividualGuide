@@ -4,6 +4,8 @@ if (.Platform$OS.type == "windows") Sys.setlocale("LC_CTYPE", ".UTF-8")
 root <- normalizePath(".", winslash = "/")
 output <- Sys.getenv("BOOK_OUTPUT_DIR", file.path(root, "build/book"))
 output <- normalizePath(output, winslash = "/", mustWork = TRUE)
+metadata <- jsonlite::read_json(file.path(output,"book-metadata.json"))
+french <- identical(metadata$lang,"fr-CA")
 edge <- "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"
 if (!nzchar(Sys.getenv("CHROMOTE_CHROME")) && file.exists(edge)) Sys.setenv(CHROMOTE_CHROME = edge)
 options(chromote.timeout = 180)
@@ -45,8 +47,11 @@ main <- function() {
       grepl('^Figure [0-9]+[.]', figure$caption) && figure$width > 150, logical(1))))
   checks$anchors <- evaluate("(() => {const ids=Array.from(document.querySelectorAll('[id]')).map(e=>e.id);return {duplicate:ids.filter((id,i)=>ids.indexOf(id)!==i),missing:Array.from(document.querySelectorAll('a[href^=\"#\"]')).map(a=>a.getAttribute('href').slice(1)).filter(id=>id&&!document.getElementById(decodeURIComponent(id)))};})()")
   stopifnot(length(checks$anchors$duplicate) == 0L, length(checks$anchors$missing) == 0L)
-  checks$sourceEdition <- evaluate("document.body.innerText.includes('0.4.0-Setup-Windows-x64.exe')&&document.body.innerText.includes('58 task')")
-  checks$filter <- evaluate("(() => {const s=document.getElementById('toc-search');s.value='Cluster Analysis';s.dispatchEvent(new Event('input'));const rows=Array.from(document.querySelectorAll('#TOC li')).filter(li=>!li.hidden);const ok=rows.some(li=>li.textContent.includes('Cluster Analysis'))&&rows.length<20;s.value='';s.dispatchEvent(new Event('input'));return ok;})()")
+  checks$language <- evaluate("document.documentElement.lang")
+  stopifnot(identical(checks$language,metadata$lang))
+  checks$sourceEdition <- evaluate(paste0("document.body.innerText.includes(",jsonlite::toJSON(paste0(metadata$version,"-Setup-Windows-x64.exe"),auto_unbox=TRUE),")&&document.body.innerText.includes(",jsonlite::toJSON(if(french)"58 types de tâches" else "58 task",auto_unbox=TRUE),")"))
+  search_text <- if(french)"Analyse de regroupement" else "Cluster Analysis"
+  checks$filter <- evaluate(paste0("(() => {const term=",jsonlite::toJSON(search_text,auto_unbox=TRUE),";const s=document.getElementById('toc-search');s.value=term;s.dispatchEvent(new Event('input'));const rows=Array.from(document.querySelectorAll('#TOC li')).filter(li=>!li.hidden);const ok=rows.some(li=>li.textContent.includes(term))&&rows.length<20;s.value='';s.dispatchEvent(new Event('input'));return ok;})()"))
   stopifnot(isTRUE(checks$sourceEdition), isTRUE(checks$filter))
   shot(file.path(output, "book-desktop.png"))
   checks$layouts <- list()
@@ -69,7 +74,7 @@ main <- function() {
   stopifnot(checks$taskFinderCellPadding > 4, checks$taskFinderCellPadding < 6)
   pdf <- page$Page$printToPDF(printBackground = TRUE, preferCSSPageSize = TRUE,
     displayHeaderFooter = TRUE,
-    headerTemplate = '<div style="font-family:Arial;font-size:8px;width:100%;text-align:center;color:#65748b">Individual Guide · A Friendly Guide · Release 0.4.0</div>',
+    headerTemplate = paste0('<div style="font-family:Arial;font-size:8px;width:100%;text-align:center;color:#65748b">',metadata$title,' · ',if(french)'Version ' else 'Release ',metadata$version,'</div>'),
     footerTemplate = '<div style="font-family:Arial;font-size:8px;width:100%;text-align:center;color:#65748b"><span class="pageNumber"></span> / <span class="totalPages"></span></div>',
     generateTaggedPDF = TRUE, generateDocumentOutline = TRUE)
   pdf_path <- file.path(output, "Individual-Guide-Handbook.pdf")

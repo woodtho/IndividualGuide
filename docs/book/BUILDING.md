@@ -18,17 +18,30 @@ From the repository root:
 
 ```powershell
 Rscript --vanilla tools/book-metadata.R
-Rscript --vanilla tools/render-book.R --assets-only
+Rscript --vanilla tools/build-book-illustrations.R
+node tools/render-book-diagrams.cjs
+node --test tools/book-parity.test.cjs
 node tools/build-book.cjs
 Rscript --vanilla tools/render-book.R
 Rscript --vanilla tools/test-book.R
 node tools/verify-book.cjs
+$env:BOOK_LANGUAGE = 'fr-CA'
+$env:BOOK_OUTPUT_DIR = (Join-Path (Get-Location) 'build/book/fr-CA')
+node tools/build-book.cjs
+Rscript --vanilla tools/render-book.R
+Rscript --vanilla tools/test-book.R
+node tools/verify-book.cjs
+Remove-Item Env:BOOK_LANGUAGE,Env:BOOK_OUTPUT_DIR
 node tools/publish-book.cjs
 ```
 
 Set `PANDOC` or pass `--pandoc <path>` to the Node builder if needed.
 `CHROMOTE_CHROME` can select a Chromium executable. `BOOK_OUTPUT_DIR` overrides
-the output directory. The build creates PDF, offline HTML, EPUB, Word, assembled
+the output directory. `BOOK_LANGUAGE` selects `en-CA` (default) or `fr-CA`.
+French chapters and lesson notes live in `fr-CA/`; all source inputs must stay
+fixed while building both editions. The build checks identical structure,
+identifiers, code and links, and requires matching translated figures.
+The build creates PDF, offline HTML, EPUB, Word, assembled
 Markdown, screenshots, and verification reports under `build/book/` by default.
 
 The final publish command copies only verified reader editions into
@@ -58,6 +71,10 @@ with `npm ci` in `tools/desktop`, then run:
 ```powershell
 ./tools/capture-book-screenshots.ps1 -Runtime '<installed app>/resources/runtime'
 node tools/annotate-book-screenshots.cjs
+./tools/capture-book-screenshots.ps1 -Runtime '<installed app>/resources/runtime' -Language fr-CA
+$env:BOOK_LANGUAGE = 'fr-CA'
+node tools/annotate-book-screenshots.cjs
+Remove-Item Env:BOOK_LANGUAGE
 ```
 
 The script copies the desktop shell into a new temporary folder and replaces
@@ -66,7 +83,11 @@ profile and public practice data, with a fresh R session for each example. It do
 project. A writable practice folder outside user profiles is needed to keep
 personal paths out of the images; use `-PracticeParent` if the drive root is not
 writable. `-Resume` continues a failed capture using the private evidence under
-`artifacts/book-review`. Use it only for the same release and app reference.
+`artifacts/book-review`. Use it only for the same release and compatible UI.
+After a text correction, recapture every affected image and review any retained
+images against the final app reference. Record the correction and its scope in
+the review evidence. A changed screenshot must keep its real capture time and
+checksum; never edit its provenance to disguise an older interface.
 
 The driver opens actual forms, waits for bindings and results, and saves PNGs
 and a 58-task label inventory. `data/screenshots.json` records capture provenance,
@@ -80,10 +101,12 @@ The builder assigns figure numbers and resolves `[Figure](#fig-name)` links in
 all formats. Review the actual screenshots and every figure page in the PDF.
 Automated checks cannot judge whether a cropped label is useful or readable.
 
-Readability uses the Flesch-Kincaid formula with a simple syllable estimate over
+English readability uses the Flesch-Kincaid formula with a simple syllable estimate over
 prose paragraphs, excluding code, headings, tables, links, and inline identifiers.
 It is an editing aid, not proof that every technical term is easy to understand.
 Review the language and rendered pages as well as the reported score.
+French review uses plain-language editing and sentence length; the English
+grade formula is not applied to French prose.
 
 Keep the reader's workflow first. Define a new term before using it. Prefer the
 public release and CRAN/GitHub installation paths. Do not put developer checkouts,

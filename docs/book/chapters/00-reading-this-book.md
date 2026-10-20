@@ -4,7 +4,7 @@ You can use Individual Guide without knowing R. The app helps you bring in data,
 
 Think of a project as a recipe. Your data are the ingredients. Each **task** is one step, such as sorting rows or drawing a chart. A **flow**, also called a pipeline, puts those steps together. You can save the recipe and use it again.
 
-This guide covers **Individual Guide 0.4.0**, with **58 task types** and **22 example projects**. Start with installation and the first project. After that, read the task pages you need. You do not need to read the book from start to finish.
+This guide covers **Individual Guide 0.5.0**, with **58 task types** and **22 example projects**. Start with installation and the first project. After that, read the task pages you need. You do not need to read the book from start to finish.
 
 ## Find your starting point
 
@@ -43,6 +43,8 @@ Some browser controls are icons. Point to an icon to see its name, such as **Sav
 
 The HTML book works offline after you download it. Use **Find a chapter or task** in its contents, or press Ctrl+F to search the page. The PDF is useful for printing. EPUB works in an e-reader, and Word lets you add your own notes.
 
+Read the same guide in [English](https://woodtho.github.io/IndividualGuide/) or [Français (Canada)](https://woodtho.github.io/IndividualGuide/fr-CA/). Both editions have the same chapters, examples, and steps, with screenshots in their own language. Use the same language for the app and the guide so the buttons match the pictures.
+
 # Installation and first launch {#installation}
 
 For most Windows users, the Setup installer is the easiest choice. It includes R and the extra software the app needs. **You do not need to install R or RStudio separately.**
@@ -52,9 +54,9 @@ For most Windows users, the Setup installer is the easiest choice. It includes R
 You need a 64-bit Windows 10 or Windows 11 computer. Allow about 1.5 GB for the program, plus space for your projects. You need an internet connection to download Setup. The installed app and its examples can then work offline. Tasks that use an online database still need that connection.
 
 1. Open the [public releases page](https://github.com/woodtho/IndividualGuide/releases/latest).
-2. Under **Assets**, download **IndividualGuide-0.4.0-Setup-Windows-x64.exe** for this edition. If a newer release is shown, read its notes before choosing it. Find this book's matching installer on the [0.4.0 release page](https://github.com/woodtho/IndividualGuide/releases/tag/v0.4.0).
+2. Under **Assets**, download **IndividualGuide-0.5.0-Setup-Windows-x64.exe** for this edition. If a newer release is shown, read its notes before choosing it. Find this book's matching installer on the [0.5.0 release page](https://github.com/woodtho/IndividualGuide/releases/tag/v0.5.0).
 3. Close any running copy of Individual Guide. You do not need the files called **Source code** to use the desktop app.
-4. Double-click the downloaded Setup file and follow its instructions. The usual installation is for your own Windows account.
+4. Double-click the downloaded Setup file. Choose **English** or **Français (Canada)** when it asks for a language, then follow its instructions. The usual installation is for your own Windows account.
 5. Open **Individual Guide** from the Start menu or desktop shortcut.
 
 The installer is unsigned. Windows may show an unknown-publisher warning. Check that you downloaded it from **woodtho/IndividualGuide** before deciding whether to continue. If your work or school computer blocks it, ask your support team for help.
@@ -68,6 +70,16 @@ The first launch may take longer than later launches. Wait while the startup scr
 ![At the welcome screen, choose Start with a blank canvas to reach the workspace and its Help menu.](assets/ui-welcome.png){#fig-welcome width=12cm}
 
 If startup stops with an error, choose **Open startup log**. See [Troubleshooting](#troubleshooting) for the next step. Repeatedly opening more copies usually does not help.
+
+## Choose or change your language {#language}
+
+The app supports English and Canadian French. The Windows installer passes your choice to the app. You can change it later without restarting R or reopening the project.
+
+1. Choose **English** or **Français (Canada)** in the language list on the welcome screen or beside the app name.
+2. In the desktop app, you can also use the **Language** menu. **Settings > Language** offers the same choice.
+3. Check that the buttons and menus use your chosen language. The app remembers it on this computer.
+
+Language is separate from the project. Opening another project does not change it. Your data, column names, file paths, formulas, and names you entered stay as you typed them. R commands and technical identifiers keep the spelling that R needs.
 
 ## Update the app
 

@@ -1,89 +1,80 @@
-# Handbook review, 19 October 2026
+﻿# English and Canadian French handbook review
 
-This review covers the complete beginner handbook for the public 0.4.0 app.
-Application behaviour and example archives were not changed.
+This review covers the matching beginner handbooks for Individual Guide 0.5.0.
+The guide assumes no R knowledge and starts with the public Windows installer.
+Optional R instructions use CRAN and the public GitHub release tag. Development
+instructions remain in [BUILDING.md](BUILDING.md).
 
-## What changed
+## Matching content and images
 
-Every authored chapter, generated reference section, and example lesson was
-reviewed. The guide assumes no R knowledge. It starts with the public Windows
-installer and a ready-made project. R setup, the console, and code exports remain
-optional. The R route uses CRAN, the public GitHub release tag, and the official
-Pandoc installer. Developer setup stays in the separate build guide.
+Both editions contain the same 14 authored chapters, 58 task guides, 22 example
+lessons, task finder, shortcuts and troubleshooting procedures. Structural
+comparison checks headings, stable anchors, paragraphs, lists, tables, code,
+links and figures. The French edition is a complete translation, with Canadian
+French wording and the same practical steps.
 
-All 58 task types now have numbered steps, with the actual control names,
-expected results, and relevant cautions. Corrections include declaring Script
-outputs, finding report downloads, keeping leading zeroes in imported IDs,
-choosing model settings, and saving versions without losing the original history.
-The 22 example lessons link to their task instructions and explain what to check
-and try. Desktop menus and ordinary browser controls are distinguished.
+Each edition has 36 numbered figures: 34 real application views, a workflow
+ diagram and an Iris chart. French views were captured from the French
+interface, including native desktop menus. Diagram and chart labels were
+translated while preserving geometry and plotted data. Captions and alternative
+text are translated too. Workspace callouts use the same numbers. Embedded
+images are checked against reviewed source PNG files. Figure order and
+identities match between languages.
 
-The book includes 36 numbered figures, including 34 real application views.
-Captures use public practice data in an isolated desktop profile. Captions,
-alternative text, consistent sizing, and three explained workspace callouts help
-readers find controls. Figure numbers and cross-references are generated for all
-editions. Capture provenance and a live 58-task form inventory are recorded in
-`data/screenshots.json`.
-
-| Chapters reviewed | Main focus |
-| --- | --- |
-| Welcome and installation | Public downloads, first launch, basic terms and navigation |
-| First project | Explore Iris, build a small flow, check outputs, save and recover |
-| Running and importing | Run versus preview, files, database copies, queries and scripts |
-| Preparing data | All cleaning, sorting, reshaping and sampling tasks |
-| Describing data | Counts, summaries, distributions and checking results |
-| Charts | Actual inputs, labels, saved images and display limits |
-| Models and multivariate tasks | Available controls, interpretation and required data |
-| Diagnostics, survival and time | Time order, event coding, control charts and forecasts |
-| Control flow | Dependencies, branch paths and working loop examples |
-| Logging | Rules, severity, message fields, previews and Export Log |
-| Reports and exports | Contents, appearance, file formats, destinations and downloads |
-| Console and code | Optional trials, saved scripts and complete-flow handoffs |
-| Review and settings | Notes, comments, task search, saved versions and defaults |
-| Help and optional R | Recovery, troubleshooting and public installation commands |
-| Generated example atlas, task finder and reference | All 22 projects, task links and menus |
+Project-authored names, sample data, R code, raw console output and saved log
+messages retain their original text. The guide explains this distinction.
+Captures use isolated profiles and public practice data. Records include hashes
+and a live inventory of all 58 task forms. Focused recaptures corrected affected
+views after text and validation-contrast fixes; unchanged captures retain their
+original provenance. See BUILDING.md for that workflow.
 
 ## Verification
 
-- Checked source implementation and reviewed all 58 live task forms against the
-  instructions. Screenshot capture used the matching public 0.4.0 R runtime.
-- Verified the integrity, coverage, and saved success records of all 22 example
-  archives, containing 165 saved task steps. This does not mean every saved step
-  was rerun through the graphical interface during this editorial review.
-- Parsed all 10 printed R blocks. Passed 35 worked-example checks, including the
-  eight-task Iris flow, CSV and PNG exports, custom logging, report log appendix,
-  project reopening, and running generated code without the app installed.
-- Tested text IDs through CSV import and conversion, and a fixed SQLite copy
-  through the documented Form connection route.
-- Verified public GitHub-tag installation and an app HTTP response in a temporary
-  R library; required dependencies were reused from the host library.
-- Built HTML, PDF, EPUB and Word editions. Checked offline resources, captions,
-  internal links, Word bookmarks, EPUB XML, embedded PDF fonts and navigation.
-- Checked HTML at desktop, tablet and phone widths. Reviewed the actual captures,
-  rendered PDF pages, and sample EPUB chapters. The PDF has 99 pages.
-- Passed 672 publication checks. Estimated prose reading grade is 6.23 using a
-  simple Flesch-Kincaid syllable estimate. Manual review, rather than that score
-  alone, informed the final wording and introduction of new terms.
+- English: 24,693 words, 102 PDF pages and 694 publication checks passed.
+- Canadian French: 26,683 words, 108 PDF pages and 696 checks passed, including
+  matching English structure and translated figures.
+- All 22 example archives were checked for integrity and coverage, including
+  165 saved successful task steps. This does not mean every saved step was
+  rerun through the graphical interface during this review.
+- Both editions passed 35 worked-example checks. All 10 printed R blocks were
+  parsed. Checks cover the Iris flow, CSV and PNG exports, logging, a report log
+  appendix, reopening projects and running exported code without the app.
+- HTML was checked at widths of 1440, 1024 and 390 pixels, with offline resources,
+  working navigation, internal links and no horizontal overflow.
+- All PDF pages were rasterized and inspected in contact sheets. Actual EPUB
+  chapters were rendered in a browser in both languages. PDF fonts, text,
+  navigation and captions, EPUB resources, and Word media and bookmarks passed.
+- English prose has an estimated Flesch-Kincaid grade of 6.23. French prose
+  averages 11.08 words per sentence; the English grade formula is not applied to
+  French. Editorial review informed the wording in both languages.
+- The latest real-browser language verification passed 23 checks, including
+  retained input/caret, preserved user data, French search, reversible canvas
+  labels, an uninterrupted R connection and readable validation controls.
+- Native first-run and reopening checks passed language selection, persistence,
+  a real R task, stopped-server language changes and server recovery. The actual
+  Setup language chooser was exercised. Release CI separately requires clean
+  installation and update acceptance on the committed source.
+- Publication checks reject altered English or French downloads and stale
+  source inputs. Release checks require matching source, versions and hashes for
+  the R packages, Windows installer and eight handbook downloads.
 
 ## Known issues and verification limits
 
-- In app release 0.4.0, opening the saved **Filter and Sort** task in **US states -
-  import, join and filter** can disconnect Shiny. The guide documents inspecting
-  the saved output or adding a fresh task, plus saving and restarting. A fresh
-  filter was exercised successfully. The application defect remains unresolved.
-- Some bundled projects retain environment records from an earlier app version.
-  The guide explains the resulting version notice and checking a fresh run.
+- Opening the saved **Filter and Sort** task in **US states - import, join and
+  filter** can disconnect Shiny. Both guides explain inspecting its saved output
+  or adding a fresh task, and saving before restarting. A fresh filter was
+  exercised successfully and its single-row result verified. The saved-task
+  defect remains unresolved.
+- Some bundled projects retain environment records from earlier app versions.
+  Both guides explain the version notice and checking a fresh run.
 - External database services, credentials, vendor drivers and every possible
-  model or data combination were not exercised. The local SQLite route and the
-  published controls were checked. macOS and Linux installation instructions
-  were checked against public sources, but not run on those operating systems.
-- Word package structure, media, text and internal links passed. Native Microsoft
-  Word automation could not produce a reliable render on this review machine;
-  Word-specific pagination remains unverified. The published PDF is rendered
-  separately and was visually checked. EPUB chapters were rendered in a browser;
-  pagination in individual e-reader products may vary.
+  model or data combination were not exercised. The local SQLite route and
+  published controls were checked. macOS and Linux installation was not run on
+  those operating systems.
+- Word package structure, media, text and links passed. Native Microsoft Word
+  pagination remains unverified. PDF rendering is checked separately. EPUB
+  chapters were rendered in a browser; individual e-reader pagination may vary.
 
-The editable chapters and visual assets are in `docs/book`. Verified reader
-editions are in `docs/handbook` and published at
-<https://woodtho.github.io/IndividualGuide/>. Build and capture instructions are
-in [BUILDING.md](BUILDING.md).
+Editable sources are in `docs/book` and `docs/book/fr-CA`. Verified reader files
+are in `docs/handbook` and `docs/handbook/fr-CA`. Public editions are linked from
+<https://woodtho.github.io/IndividualGuide/>.

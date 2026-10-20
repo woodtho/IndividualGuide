@@ -27,6 +27,14 @@ function preferences(file, log = () => {}) {
   }
   return {
     get recent() { return data.recent; }, get window() { return data.window; },
+    get language() { return ['en-CA','fr-CA'].includes(data.language) ? data.language : undefined; },
+    get installation() { return typeof data.installation === 'string' ? data.installation : ''; },
+    saveLanguage(language, installation) {
+      if (!['en-CA','fr-CA'].includes(language)) return false;
+      data.language = language;
+      if (typeof installation === 'string' && installation.length <= 100) data.installation = installation;
+      persist(); return true;
+    },
     used(file) {
       if (!projectPath(file)) return;
       const previous = data.recent.find(item => key(item.path) === key(file));

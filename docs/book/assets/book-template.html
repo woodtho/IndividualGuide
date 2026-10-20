@@ -2,31 +2,32 @@
 <html lang="$lang$">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="A friendly guide to Individual Guide. Start with the public download, explore real examples, and use the app without learning R.">
+<meta name="description" content="$labels.description$">
 <title>$pagetitle$</title>
 $for(css)$<link rel="stylesheet" href="$css$">$endfor$
 $if(highlighting-css)$<style>$highlighting-css$</style>$endif$
 </head>
 <body>
-<a class="skip" href="#book-main">Skip contents and read the book</a>
-<nav id="TOC" role="doc-toc" aria-label="Book contents">
-<p class="brand">Individual Guide</p><p class="edition">A friendly guide · release 0.4.0</p>
-<label for="toc-search">Find a chapter or task</label>
-<input id="toc-search" type="search" placeholder="Search contents…" autocomplete="off">
-<p id="toc-count" role="status" aria-live="polite"></p>
+<a class="skip" href="#book-main">$labels.skip$</a>
+<nav id="TOC" role="doc-toc" aria-label="$labels.contentsAria$">
+<p class="brand">Individual Guide</p><p class="edition">$labels.friendly$ · $version$</p>
+<p class="book-languages" aria-label="Language / Langue"><a href="https://woodtho.github.io/IndividualGuide/" lang="en-CA" hreflang="en-CA"$if(english-current)$ aria-current="page"$endif$>English</a> · <a href="https://woodtho.github.io/IndividualGuide/fr-CA/" lang="fr-CA" hreflang="fr-CA"$if(french-current)$ aria-current="page"$endif$>Français (Canada)</a></p>
+<label for="toc-search">$labels.find$</label>
+<input id="toc-search" type="search" placeholder="$labels.search$" autocomplete="off">
+<p id="toc-count" role="status" aria-live="polite" data-matching="$labels.matching$" data-contents="$labels.contents$"></p>
 $table-of-contents$
-<button type="button" onclick="window.print()">Print / save PDF</button>
+<button type="button" onclick="window.print()">$labels.print$</button>
 </nav>
 <main id="book-main">
-<header id="title-block-header"><p class="eyebrow">A friendly guide</p><h1 class="title">Individual Guide</h1><p class="subtitle">Start here, learn by doing, and find the task you need</p><p class="date">$date$</p><p class="cover-note">58 task types · 22 real projects · No R experience needed</p></header>
-<p class="book-downloads" aria-label="Download this guide">Keep a copy:
-<a href="https://woodtho.github.io/IndividualGuide/Individual-Guide-Handbook.pdf">PDF</a> ·
-<a href="https://woodtho.github.io/IndividualGuide/Individual-Guide-Handbook.epub">EPUB</a> ·
-<a href="https://woodtho.github.io/IndividualGuide/Individual-Guide-Handbook.docx">Word</a> ·
-<a href="https://woodtho.github.io/IndividualGuide/Individual-Guide-Handbook.html" download>Offline HTML</a></p>
-<section id="print-contents" class="print-contents" aria-label="Print contents"><h1>Contents</h1></section>
+<header id="title-block-header"><p class="eyebrow">$labels.friendly$</p><h1 class="title">Individual Guide</h1><p class="subtitle">$subtitle$</p><p class="date">$date$</p><p class="cover-note">$labels.cover$</p></header>
+<p class="book-downloads" aria-label="$labels.downloads$">$labels.keep$
+<a href="$book-url$Individual-Guide-Handbook.pdf">PDF</a> ·
+<a href="$book-url$Individual-Guide-Handbook.epub">EPUB</a> ·
+<a href="$book-url$Individual-Guide-Handbook.docx">Word</a> ·
+<a href="$book-url$Individual-Guide-Handbook.html" download>$labels.offline$</a></p>
+<section id="print-contents" class="print-contents" aria-label="$labels.printContents$"><h1>$labels.contents$</h1></section>
 $body$
-<footer>Made for people using Individual Guide 0.4.0. Find downloads and help through the public links in this guide.</footer>
+<footer>Individual Guide $version$. $labels.footer$</footer>
 </main>
 <script>
 (() => {
@@ -39,9 +40,10 @@ $body$
     const q=input.value.toLocaleLowerCase().trim(); let count=0;
     rows.forEach(({li,link})=>{const own=link && link.textContent.toLocaleLowerCase().includes(q);li.hidden=Boolean(q&&!own);if(own)count++;});
     if(q)rows.forEach(({li})=>{if(!li.hidden){let p=li.parentElement.closest('li');while(p){p.hidden=false;p=p.parentElement.closest('li');}}});
-    document.getElementById('toc-count').textContent=q?count+' matching sections':'Contents';
+    const status=document.getElementById('toc-count');status.textContent=q?count+' '+status.dataset.matching:status.dataset.contents;
   };
   input.addEventListener('input',filter);filter();
+  document.querySelectorAll('.book-languages a').forEach(link=>link.addEventListener('click',()=>{link.hash=location.hash;}));
   document.querySelectorAll('main table').forEach(table=>{const wrap=document.createElement('div');wrap.className='table-wrap';table.before(wrap);wrap.append(table);});
 })();
 </script>

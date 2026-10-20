@@ -4,9 +4,10 @@ const path = require('node:path');
 const crypto = require('node:crypto');
 const {spawnSync} = require('node:child_process');
 const root = path.resolve(__dirname, '..');
-const source = path.join(root, 'docs/book');
-const out = path.resolve(process.env.BOOK_OUTPUT_DIR || path.join(root, 'build/book'));
-const metadataPath = path.join(source, 'data/app-reference.json');
+const locale=require('./book-locales.cjs');
+const {source,sharedSource,labels}=locale;
+const out = path.resolve(process.env.BOOK_OUTPUT_DIR || path.join(root, 'build/book',locale.french?'fr-CA':''));
+const metadataPath = path.join(sharedSource, 'data/app-reference.json');
 const lessonsPath = path.join(source, 'data/example-lessons.json');
 const metadata = JSON.parse(fs.readFileSync(metadataPath, 'utf8'));
 const bookInputs = require('./book-inputs.cjs').snapshot();
@@ -17,9 +18,9 @@ const digest = (file, algorithm = 'sha256') => crypto.createHash(algorithm).upda
 const taskLink = type => {
   const task = metadata.registry.find(task => task.id === type);
   if (!task) throw new Error('Unknown example task: ' + type);
-  return `[${task.label}](#task-${type})`;
+  return `[${locale.ui(task.label)}](#task-${type})`;
 };
-const exampleLink = example => `[${example.title}](#example-${example.id})`;
+const exampleLink = example => `[${locale.ui(example.title)}](#example-${example.id})`;
 for (const [relative, expected] of Object.entries(metadata.source_md5)) {
   if (digest(path.join(root, relative), 'md5') !== expected) throw new Error('Book metadata is stale: ' + relative);
 }
@@ -31,7 +32,7 @@ for (const task of metadata.registry) {
 if (Object.keys(lessons).sort().join() !== metadata.examples.map(example => example.id).sort().join()) {
   throw new Error('Example lessons must match the actual example catalogue.');
 }
-const atlas = [
+const atlas = locale.lines([
   '# Choose an example project {#examples}', '',
   'All 22 projects below come with data, configured tasks, saved results, logging, and output files. They use public sample data supplied with R or its packages. You do not need a separate data download to explore them.', '',
   '## Find an example by task', '',
@@ -46,23 +47,23 @@ const atlas = [
   '## Before you rerun an example', '',
   'Read its notes and inspect its saved results first. Check Export and Export Log destinations before running the flow. Each opened example gets a separate working copy, but you should still choose folders and Overwrite settings that suit your own work.', '',
   'These projects teach app controls. Their model and cleaning choices are examples, not a claim that those choices fit every dataset.', ''
-];
+]);
 for (const example of metadata.examples) {
   const lesson = lessons[example.id];
   for (const field of ['data', 'check', 'try']) if (!lesson[field]) throw new Error('Missing lesson: ' + example.id + '/' + field);
-  atlas.push(`## ${example.title} {#example-${example.id}}`, '',
-    example.description, '', `**Data:** ${lesson.data}`, '',
-    '**Tasks to find:** ' + arr(example.task_types).map(taskLink).join(', ') + '.', '',
-    `**Check the result:** ${lesson.check}`, '', `**Try this next:** ${lesson.try}`, '',
-    'Open its report and log exports, then save your project copy if you want to keep your changes.', '');
+  atlas.push(`## ${locale.ui(example.title)} {#example-${example.id}}`, '',
+    locale.ui(example.description), '', `**${locale.text('Data:')}** ${lesson.data}`, '',
+    '**'+locale.text('Tasks to find:')+'** ' + arr(example.task_types).map(taskLink).join(', ') + '.', '',
+    `**${locale.text('Check the result:')}** ${lesson.check}`, '', `**${locale.text('Try this next:')}** ${lesson.try}`, '',
+    locale.text('Open its report and log exports, then save your project copy if you want to keep your changes.'), '');
 }
-const finder = [
+const finder = locale.lines([
   '# Task finder {#task-finder}', '',
   'Find a task below, then follow its link for setup steps. The example links show up to three projects you can open from Help. Use the app\'s task filter to find all matches. Start by inspecting a completed example rather than rebuilding it from scratch.', '',
   '| Task | Where to find it in Add Task | Examples to open |', '| --- | --- | --- |'
-];
-for (const task of metadata.registry) finder.push(`| ${taskLink(task.id)} | ${md(task.category)} | ${metadata.examples.filter(example => arr(example.task_types).includes(task.id)).slice(0,3).map(exampleLink).join('; ')} |`);
-const reference = [
+]);
+for (const task of metadata.registry) finder.push(`| ${taskLink(task.id)} | ${md(locale.ui(task.category))} | ${metadata.examples.filter(example => arr(example.task_types).includes(task.id)).slice(0,3).map(exampleLink).join('; ')} |`);
+const reference = locale.lines([
   '# Shortcuts and everyday terms {#working-reference}', '',
   '## Useful Windows desktop shortcuts', '',
   'Use the menus while learning. These keys can save time once the actions feel familiar. A text editor or open dialog may use a key for its own controls.', '',
@@ -91,32 +92,50 @@ const reference = [
   '## Public downloads and help', '',
   '- [Current handbook and downloads](https://woodtho.github.io/IndividualGuide/): the latest reviewed HTML, PDF, EPUB, and Word guide. Books attached to older releases may be earlier editions.',
   '- [Individual Guide releases](https://github.com/woodtho/IndividualGuide/releases/latest): public Windows Setup and R package files.',
-  '- [Release 0.4.0](https://github.com/woodtho/IndividualGuide/releases/tag/v0.4.0): the version used by this guide.',
+  '- [Release 0.5.0](https://github.com/woodtho/IndividualGuide/releases/tag/v0.5.0): the version used by this guide.',
   '- [Report an app issue](https://github.com/woodtho/IndividualGuide/issues): include the version and exact error; check attachments for private information.',
   '- [Download R](https://cran.r-project.org/): needed only for the optional R installation route.',
   '- [Install Pandoc](https://pandoc.org/installing.html): for Word reporting when using your own R installation.', '',
   'The example data come from R\'s datasets package and the survival package. The example notes describe prepared fields and teaching choices. Individual Guide is an open-source project by Thomas Wood.', ''
-];
+]);
 fs.mkdirSync(out, {recursive: true});
 fs.mkdirSync(path.join(out, 'generated'), {recursive: true});
-fs.cpSync(path.join(source, 'assets'), path.join(out, 'assets'), {recursive: true});
+fs.cpSync(path.join(sharedSource, 'assets'), path.join(out, 'assets'), {recursive: true});
+if(locale.french)fs.cpSync(path.join(source,'assets'),path.join(out,'assets'),{recursive:true});
 const generated = {'14-examples.md': atlas.join('\n'), '15-task-finder.md': finder.join('\n'), '16-reference.md': reference.join('\n')};
 // Only the current generated chapters belong in the reader edition.
 for (const file of fs.readdirSync(path.join(out, 'generated'))) {
   if (/^\d{2}-[\w-]+\.md$/.test(file) && !Object.hasOwn(generated, file)) fs.unlinkSync(path.join(out, 'generated', file));
 }
 for (const [file, content] of Object.entries(generated)) fs.writeFileSync(path.join(out, 'generated', file), content + '\n');
-const numbered=require('./book-figures.cjs').numberFigures(authored+'\n\n'+Object.values(generated).join('\n\n'),source);
-const complete=numbered.markdown,figures=numbered.figures;
-fs.writeFileSync(path.join(out, 'Individual-Guide-Handbook.md'), complete);
 const args = process.argv.slice(2), custom = args.indexOf('--pandoc');
 const candidates = [custom >= 0 ? args[custom + 1] : '', process.env.PANDOC,
   path.join(process.env.LOCALAPPDATA || '', 'Pandoc/pandoc.exe'), 'pandoc'].filter(Boolean);
 const pandoc = candidates.find(command => spawnSync(command, ['--version'], {encoding:'utf8', windowsHide:true}).status === 0);
 if (!pandoc) throw new Error('Pandoc not found; set PANDOC or --pandoc.');
+let assembled=authored+'\n\n'+Object.values(generated).join('\n\n');
+let englishMarkdown;
+if(locale.french){
+  const englishOut=path.resolve(process.env.BOOK_ENGLISH_OUTPUT_DIR||path.join(root,'build/book'));
+  const englishManifest=JSON.parse(fs.readFileSync(path.join(englishOut,'manifest.json'),'utf8'));
+  if(englishManifest.packageVersion!==metadata.package_version||JSON.stringify(englishManifest.bookInputs)!==JSON.stringify(bookInputs)){
+    throw Error('Build the current English handbook before the matching French edition.');
+  }
+  englishMarkdown=fs.readFileSync(path.join(englishOut,'Individual-Guide-Handbook.md'),'utf8');
+  assembled=require('./book-parity.cjs').parallelHeadings(pandoc,englishMarkdown,assembled);
+}
+const numbered=require('./book-figures.cjs').numberFigures(assembled,source);
+const complete=numbered.markdown,figures=numbered.figures;
+if(locale.french)require('./book-parity.cjs').assertParity(pandoc,englishMarkdown,complete);
+fs.writeFileSync(path.join(out, 'Individual-Guide-Handbook.md'), complete);
+const bookMetadata=path.join(out,'book-metadata.json');
+const version=metadata.package_version;
+const bookURL='https://woodtho.github.io/IndividualGuide/'+(locale.french?'fr-CA/':'');
+fs.writeFileSync(bookMetadata,JSON.stringify({title:labels.title,subtitle:labels.subtitle,author:labels.author,
+  date:locale.french?`Édition pour débutants · Version ${version} · 19 octobre 2026`:`Beginner edition · Release ${version} · 19 October 2026`,
+  lang:locale.language,version,labels,'book-url':bookURL,'english-current':!locale.french,'french-current':locale.french},null,2));
 const common = [path.join(out, 'Individual-Guide-Handbook.md'), '--from=markdown+fenced_divs+header_attributes', '--standalone', '--toc', '--toc-depth=2', '--number-sections',
-  '--metadata=title:Individual Guide: A Friendly Guide', '--metadata=subtitle:Start here, learn by doing, and find the task you need',
-  '--metadata=author:Individual Guide project documentation', '--metadata=date:Beginner edition for release 0.4.0 · 19 October 2026', '--metadata=lang:en-CA',
+  '--metadata-file='+bookMetadata,
   '--resource-path=' + source, '--syntax-highlighting=pygments'];
 function convert(extra, name) {
   const result = spawnSync(pandoc, [...common, ...extra, '-o', path.join(out, name)], {encoding:'utf8', windowsHide:true, maxBuffer:10*1024*1024});
@@ -130,11 +149,11 @@ function convert(extra, name) {
   }
   console.log('Rendered', name);
 }
-convert(['--to=html5','--embed-resources','--template=' + path.join(source, 'assets/book-template.html'), '--css=' + path.join(source, 'assets/book.css')], 'Individual-Guide-Handbook.html');
-convert(['--to=epub3','--split-level=1','--css=' + path.join(source, 'assets/epub.css')], 'Individual-Guide-Handbook.epub');
+convert(['--to=html5','--embed-resources','--template=' + path.join(sharedSource, 'assets/book-template.html'), '--css=' + path.join(sharedSource, 'assets/book.css')], 'Individual-Guide-Handbook.html');
+convert(['--to=epub3','--split-level=1','--css=' + path.join(sharedSource, 'assets/epub.css')], 'Individual-Guide-Handbook.epub');
 convert(['--to=docx'], 'Individual-Guide-Handbook.docx');
 const wordCount = (complete.match(/\S+/g) || []).length;
-const manifest = {title: metadata.title, edition: metadata.edition, audience:'New app users; no R knowledge required',
+const manifest = {title: labels.title, edition:locale.french?`Édition pour débutants · Version ${version} · 19 octobre 2026`:metadata.edition, language:locale.language,sourceDirectory:path.relative(root,source).replaceAll('\\','/'),audience:'New app users; no R knowledge required',
   packageVersion:metadata.package_version, projectFormat:metadata.project_format,
   tasks:metadata.registry.map(task=>task.id), examples:metadata.examples.map(example=>example.id),
   exampleSteps:metadata.examples.reduce((n,example)=>n+example.tasks.length,0), words:wordCount,

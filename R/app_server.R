@@ -1720,6 +1720,7 @@ app_server <- function(input, output, session) {
       easyClose = FALSE,
       size      = "m",
       div(class = "ig-splash",
+        div(class = "d-flex justify-content-center mb-3", ig_language_picker("ig-welcome-language")),
         div(class = "ig-splash-logo",
           icon("share-nodes", class = "ig-splash-icon"),
           h2(class = "ig-splash-title", "Individual Guide"),
@@ -1773,6 +1774,7 @@ app_server <- function(input, output, session) {
   session$onFlushed(function() { start_session_ui() }, once = TRUE)
 
   observeEvent(input$recover_restore, {
+    if(!isTRUE(isolate(recovery_pending())))return()
     recovery_pending(FALSE)
     workspace_welcome(FALSE)
     removeModal()
@@ -1791,6 +1793,7 @@ app_server <- function(input, output, session) {
   })
 
   observeEvent(input$recover_discard, {
+    if(!isTRUE(isolate(recovery_pending())))return()
     recovery_pending(FALSE)
     removeModal()
     project_clear_recovery()
@@ -2265,6 +2268,11 @@ app_server <- function(input, output, session) {
         modalButton("Cancel"),
         actionButton("settings_apply", "Apply", class = "btn btn-primary")
       ),
+      selectInput("settings_language", "Language",
+        choices = c("English" = "en-CA", "Français (Canada)" = "fr-CA"),
+        selected = ig_language(), width = "100%"),
+      p(class = "small text-muted", "Language is saved on this computer, not in the project.",
+        " Language changes take effect immediately."),
       radioButtons("settings_theme_mode", "Appearance",
         choices = c("Dark" = "dark", "Light" = "light"),
         selected = theme_mode(), inline = TRUE,
@@ -2297,7 +2305,7 @@ app_server <- function(input, output, session) {
       checkboxInput("settings_background_tasks", "Run supported tasks in the background", value = !isFALSE(s$background_tasks)),
       p(class = "text-muted small mb-0",
         icon("circle-info"),
-        " Settings are saved with the project and restored on load.")
+        " Other settings are saved with the project and restored on load.")
     ))
   }
 

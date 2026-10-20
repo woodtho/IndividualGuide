@@ -337,7 +337,7 @@ store_search_index <- function(store) {
   for (tid in names(tasks)) {
     task <- tasks[[tid]]
     add("task", tid, task$label %||% tid,
-      paste(task$type, task$r_code %||% "", task$note %||% "", collapse = " "))
+      paste(task$type, ig_task_search_text(task$type), task$r_code %||% "", task$note %||% "", collapse = " "))
   }
   for (nm in names(tables)) {
     add("dataset", nm, nm, paste(nm, paste(names(tables[[nm]]), collapse = " ")))

@@ -3,7 +3,10 @@
 // is preserved at its original resolution; the raw capture remains in evidence.
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
 const {Resvg}=require('./desktop/node_modules/@resvg/resvg-js');
-const root=path.resolve(__dirname,'..'),book=path.join(root,'docs/book');
+const root=path.resolve(__dirname,'..'),language=process.env.BOOK_LANGUAGE||'en-CA';
+if(!['en-CA','fr-CA'].includes(language))throw Error('Unsupported book language.');
+const book=path.join(root,'docs/book',language==='fr-CA'?'fr-CA':'');
+const evidence=path.join(root,'artifacts/book-review',language==='fr-CA'?'fr-CA':'');
 const file=path.join(book,'data/screenshots.json');
 const metadata=JSON.parse(fs.readFileSync(file,'utf8'));
 const shot=metadata.screenshots.find(shot=>shot.id==='workspace');
@@ -12,12 +15,12 @@ const sha=bytes=>crypto.createHash('sha256').update(bytes).digest('hex');
 const target=path.join(book,shot.file);let original=fs.readFileSync(target);
 if(sha(original)!==shot.sha256)throw new Error('The workspace capture differs from its provenance.');
 if(process.argv.includes('--refresh')&&shot.annotations){
-  const raw=fs.readFileSync(path.join(root,'artifacts/book-review/raw-ui-workspace.png'));
+  const raw=fs.readFileSync(path.join(evidence,'raw-ui-workspace.png'));
   if(sha(raw)!==shot.annotations.originalSha256)throw new Error('The raw workspace capture differs from its provenance.');
   original=raw;delete shot.annotations;
 }
 if(!shot.annotations){
-  const evidence=path.join(root,'artifacts/book-review');fs.mkdirSync(evidence,{recursive:true});
+  fs.mkdirSync(evidence,{recursive:true});
   fs.writeFileSync(path.join(evidence,'raw-ui-workspace.png'),original);
   const {width,height}=shot.pixels;
   const markers=[{number:1,x:.257,y:.188,toX:.20,toY:.188,label:'Project tree'},

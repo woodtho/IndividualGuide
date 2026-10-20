@@ -5,12 +5,18 @@ const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypt
 const {Menu,dialog,desktopCapturer,screen}=require('electron');
 module.exports=async({window,pause,state,rendererCommand})=>{
   const root=process.env.IG_BOOK_ROOT || path.resolve(__dirname,'..');
-  const assets=path.join(root,'docs/book/assets');
-  const evidence=path.join(root,'artifacts/book-review');
+  const language=process.env.IG_BOOK_LANGUAGE||'en-CA';
+  if(!['en-CA','fr-CA'].includes(language))throw Error('Unsupported capture language.');
+  const french=language==='fr-CA';
+  const book=path.join(root,'docs/book',french?'fr-CA':'');
+  const assets=path.join(book,'assets');
+  const evidence=path.join(root,'artifacts/book-review',french?'fr-CA':'');
+  fs.mkdirSync(assets,{recursive:true});fs.mkdirSync(path.join(book,'data'),{recursive:true});
+  const translate=require('./i18n.cjs').create(require('./i18n.cjs').catalog,language).translate;
   fs.mkdirSync(evidence,{recursive:true});
   const reference=JSON.parse(fs.readFileSync(path.join(root,'docs/book/data/app-reference.json'),'utf8'));
   const resume=process.env.IG_BOOK_RESUME==='1';
-  const records=resume&&fs.existsSync(path.join(evidence,'screenshots-in-progress.json'))?JSON.parse(fs.readFileSync(path.join(evidence,'screenshots-in-progress.json'),'utf8')).filter(record=>fs.existsSync(path.join(root,'docs/book',record.file))):[];
+  const records=resume&&fs.existsSync(path.join(evidence,'screenshots-in-progress.json'))?JSON.parse(fs.readFileSync(path.join(evidence,'screenshots-in-progress.json'),'utf8')).filter(record=>record.language===language&&record.packageVersion===reference.package_version&&fs.existsSync(path.join(book,record.file))):[];
   const panels=resume&&fs.existsSync(path.join(evidence,'ui-inventory.json'))?JSON.parse(fs.readFileSync(path.join(evidence,'ui-inventory.json'),'utf8')):[];
   const practice=process.env.IG_BOOK_PRACTICE;
   if(!practice||!fs.existsSync(practice))throw Error('Supply an existing, isolated IG_BOOK_PRACTICE folder.');
@@ -52,7 +58,7 @@ module.exports=async({window,pause,state,rendererCommand})=>{
     }
     let image,region;
     if(nativeMenu){
-      const item=Menu.getApplicationMenu().items.find(item=>item.label.replaceAll('&','')===nativeMenu);
+      const item=Menu.getApplicationMenu().items.find(item=>item.label.replaceAll('&','')===translate(nativeMenu));
       if(!item?.submenu)throw Error('Missing native menu: '+nativeMenu);
       window.setAlwaysOnTop(true);window.show();window.moveTop();window.focus();await pause(600);item.submenu.popup({window,x:8,y:2});await pause(500);
       const display=screen.getDisplayMatching(window.getBounds());
@@ -63,7 +69,7 @@ module.exports=async({window,pause,state,rendererCommand})=>{
       region.width=Math.min(region.width,size.width-region.x);region.height=Math.min(region.height,size.height-region.y);
       image=source.thumbnail.crop(region);
       // Keep the real native menu and its title bar; omit the distant canvas.
-      const crop={x:0,y:0,width:Math.min(620,image.getSize().width),height:Math.min(nativeMenu==='File'?1060:440,image.getSize().height)};
+      const crop={x:0,y:0,width:Math.min(french?800:620,image.getSize().width),height:Math.min(nativeMenu==='File'?1060:440,image.getSize().height)};
       image=image.crop(crop);region={...region,menuCrop:crop};
       item.submenu.closePopup(window);
     }else{
@@ -78,7 +84,7 @@ module.exports=async({window,pause,state,rendererCommand})=>{
     const bytes=image.toPNG(),size=image.getSize();
     const file='ui-'+name+'.png';fs.writeFileSync(path.join(assets,file),bytes);
     records.push({id:name,file:'assets/'+file,description,example:example||null,task:task||null,tab:tab||null,
-      source:'live Individual Guide desktop application',packageVersion:reference.package_version,
+      source:'live Individual Guide desktop application',packageVersion:reference.package_version,language,
       pixels:size,zoom,region:region||null,sha256:hash(bytes),capturedAt:new Date().toISOString()});
     fs.writeFileSync(path.join(evidence,'screenshots-in-progress.json'),JSON.stringify(records,null,2)+'\n');
     console.log('Captured '+name+' '+size.width+'x'+size.height);
@@ -89,11 +95,14 @@ module.exports=async({window,pause,state,rendererCommand})=>{
       // Keep form observers and unsaved practice edits from one example out
       // of the next capture. This restarts only the isolated book profile.
       menu('restart-r').click();
+      let discarded=false;
       await wait(async()=>{
-        if(await js("Boolean(document.getElementById('recover_discard')?.getClientRects().length)"))await js("document.getElementById('recover_discard').click()");
-        return menu('open').enabled&&await js("Boolean(document.getElementById('splash_fresh')?.getClientRects().length)&&document.getElementById('splash_fresh').classList.contains('shiny-bound-input')");
+        if(!discarded&&await js("Boolean(document.querySelector('.modal.show #recover_discard')?.classList.contains('shiny-bound-input'))")){
+          await js("document.querySelector('.modal.show #recover_discard').click()");discarded=true;
+        }
+        return menu('open').enabled&&await js("Boolean(document.querySelector('.modal.show #splash_fresh')?.classList.contains('shiny-bound-input'))&&!bootstrap.Modal.getInstance(document.querySelector('.modal.show'))?._isTransitioning");
       },'fresh example session');
-      await js("document.getElementById('splash_fresh').click()");await idle();
+      await js("document.querySelector('.modal.show #splash_fresh').click()");await idle();
     }
     await idle();menu('help').click();
     await wait(()=>js("Boolean(document.querySelector('.modal.show #help_example_iris'))&&!bootstrap.Modal.getInstance(document.querySelector('.modal.show'))?._isTransitioning"),'example catalogue visible');
@@ -120,16 +129,19 @@ module.exports=async({window,pause,state,rendererCommand})=>{
     await js("(()=>{const e=document.querySelector('#panel_filtersort_1 select[id$=\"-input_table\"]');e.selectize.setValue('states');})()");await settle();
     await js("document.querySelector('#panel_filtersort_1 button[id$=\"-add_filter\"]').click()");await settle();
     await wait(()=>js("document.querySelector('#panel_filtersort_1 select[id*=\"-ffcol_\"]')?.value==='Population'&&!document.documentElement.classList.contains('shiny-busy')"),'fresh filter columns');
-    await wait(()=>js("Boolean(document.querySelector('#panel_filtersort_1 input[id*=\"-fval_\"]'))"),'filter value');
+    await wait(()=>js("(()=>{const e=document.querySelector('#panel_filtersort_1 input[id*=\"-fval_\"]');return e?.classList.contains('shiny-bound-input')&&Object.keys(Shiny.shinyapp.$inputValues).some(key=>key.split(':')[0]===e.id);})()"),'bound filter value');
     await js("(()=>{const e=document.querySelector('#panel_filtersort_1 input[id*=\"-fval_\"]');e.value='3615';e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));})()");await settle();
-    await wait(()=>js("!document.documentElement.classList.contains('shiny-busy')"),'filter value settled');
+    await wait(()=>js("(()=>{const e=document.querySelector('#panel_filtersort_1 input[id*=\"-fval_\"]');return e?.value==='3615'&&Object.entries(Shiny.shinyapp.$inputValues).some(([key,value])=>key.split(':')[0]===e.id&&String(value)==='3615')&&!document.documentElement.classList.contains('shiny-busy');})()"),'filter value settled and sent');
     await js("document.getElementById('panel_run_btn_filtersort_1').click()");
-    await wait(()=>js("/ran [0-9]/.test(document.getElementById('panel_status_filtersort_1')?.textContent||'')"),'fresh filter run');
+    await wait(()=>js("Boolean(document.querySelector('#panel_status_filtersort_1 .ig-status-success'))"),'fresh filter run');
+    await tab(task,'Results');
+    await wait(()=>js("[...document.querySelectorAll('#panel_filtersort_1 table.dataTable')].some(table=>jQuery.fn.dataTable.isDataTable(table)&&jQuery(table).DataTable().page.info()?.recordsTotal===1)"),'one state matches Population 3615');
     await tab(task,'Filter Data');
+    await wait(()=>js("document.querySelector('#panel_filtersort_1 input[id*=\"-fval_\"]')?.value==='3615'"),'filter condition retained');
     return task;
   }
   async function tab(task,text){
-    const found=await js(`(()=>{const p=document.getElementById(${JSON.stringify('panel_'+task.id)});const a=[...p.querySelectorAll('a[data-bs-toggle="tab"],a[data-toggle="tab"]')].find(a=>a.textContent.trim()===${JSON.stringify(text)});if(!a)return false;a.click();return true;})()`);
+    const found=await js(`(()=>{const p=document.getElementById(${JSON.stringify('panel_'+task.id)});const a=[...p.querySelectorAll('a[data-bs-toggle="tab"],a[data-toggle="tab"]')].find(a=>a.getAttribute('data-value')===${JSON.stringify(text)}||a.textContent.trim()===${JSON.stringify(translate(text))});if(!a)return false;a.click();return true;})()`);
     if(!found)throw Error('Missing task tab: '+task.type+'/'+text);
     await settle();
   }
@@ -153,7 +165,7 @@ module.exports=async({window,pause,state,rendererCommand})=>{
   dialog.showMessageBox=async()=>({response:1});
   try{
     await wait(()=>menu('open').enabled&&js("Boolean(document.getElementById('splash_fresh')?.classList.contains('shiny-bound-input'))"),'welcome');
-    await wait(()=>js("Boolean(document.querySelector('.modal.show .ig-splash'))&&!bootstrap.Modal.getInstance(document.querySelector('.modal.show'))?._isTransitioning"),'welcome dialog visible');
+    await wait(()=>js(`Boolean(document.querySelector('.modal.show .ig-splash'))&&window.igI18n?.locale===${JSON.stringify(language)}&&!bootstrap.Modal.getInstance(document.querySelector('.modal.show'))?._isTransitioning`),'welcome dialog visible in '+language);
     await shot('welcome',{selector:'.modal.show .modal-dialog',description:'Welcome choices before opening a project'});
     await js("document.getElementById('splash_fresh').click()");await idle();
     const iris=reference.examples.find(example=>example.id==='iris');await openExample(iris);
@@ -190,7 +202,7 @@ module.exports=async({window,pause,state,rendererCommand})=>{
           await js(`(()=>{const e=document.querySelector('#panel_${task.id} input[id$="-output_name"]');e.value='states';e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));})()`);
           await settle();
           await js(`document.querySelector('#panel_${task.id} button[id$="-btn_refresh"]').click()`);
-          await wait(()=>js(`document.getElementById('panel_${task.id}').innerText.includes('of 50 entries')`),'50 state rows imported');
+          await wait(()=>js(`[...document.querySelectorAll('#panel_${task.id} table.dataTable')].some(table=>jQuery.fn.dataTable.isDataTable(table)&&jQuery(table).DataTable().page.info()?.recordsTotal===50)`),'50 state rows imported');
           await tab(task,'Setup');
         }
         if(task.type==='query_builder'){
@@ -251,7 +263,7 @@ module.exports=async({window,pause,state,rendererCommand})=>{
     await js("document.querySelector('#code-view input[value=complete]').click()");
     await wait(()=>js("document.getElementById('code-code_display')?.textContent.includes('Generated by Individual Guide')&&Boolean(document.getElementById('code-dl_bundle')?.getAttribute('href'))"),'complete generated script and download ready');
     await shot('code',{selector:'#panel_code',description:'Download the complete script or a bundle with supporting functions',example:'iris'});
-    fs.writeFileSync(path.join(root,'docs/book/data/screenshots.json'),JSON.stringify({packageVersion:reference.package_version,referenceSha256:hash(fs.readFileSync(path.join(root,'docs/book/data/app-reference.json'))),source:'Real application captures with public tutorial data',screenshots:records,reviewedTaskPanels:panels},null,2)+'\n');
+    fs.writeFileSync(path.join(book,'data/screenshots.json'),JSON.stringify({packageVersion:reference.package_version,language,referenceSha256:hash(fs.readFileSync(path.join(root,'docs/book/data/app-reference.json'))),source:'Real application captures with public tutorial data',screenshots:records,reviewedTaskPanels:panels},null,2)+'\n');
     return{ok:true,checks:{screenshots:true,allTaskPanels:seen.size===58},screenshots:records.length,taskPanels:seen.size};
   }finally{window.setAlwaysOnTop(false);dialog.showMessageBox=originalMessage;dialog.showSaveDialog=originalSave;}
 };

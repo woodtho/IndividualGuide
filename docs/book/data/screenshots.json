@@ -1,6 +1,7 @@
 {
-  "packageVersion": "0.4.0",
-  "referenceSha256": "812f071a162b5c29a36321e1b86e234a1751b9818ca1a2a7563bc4dfdaa24047",
+  "packageVersion": "0.5.0",
+  "language": "en-CA",
+  "referenceSha256": "23d4d0032d982c24dcda59d3d08a6ff918e884183cace6fdf3f663dc3817129d",
   "source": "Real application captures with public tutorial data",
   "screenshots": [
     {
@@ -11,78 +12,21 @@
       "task": null,
       "tab": null,
       "source": "live Individual Guide desktop application",
-      "packageVersion": "0.4.0",
+      "packageVersion": "0.5.0",
+      "language": "en-CA",
       "pixels": {
         "width": 1200,
-        "height": 944
+        "height": 1048
       },
       "zoom": 1.2,
       "region": {
         "x": 283,
         "y": 24,
         "width": 600,
-        "height": 472
+        "height": 524
       },
-      "sha256": "caf364a41168115326667406f496483475c1aa57cc9216cd0676a73e8af0ed89",
-      "capturedAt": "2026-10-19T21:09:32.070Z"
-    },
-    {
-      "id": "file-menu",
-      "file": "assets/ui-file-menu.png",
-      "description": "Actual Windows File menu with Save and Save As",
-      "example": "iris",
-      "task": null,
-      "tab": null,
-      "source": "live Individual Guide desktop application",
-      "packageVersion": "0.4.0",
-      "pixels": {
-        "width": 620,
-        "height": 1060
-      },
-      "zoom": 1.2,
-      "region": {
-        "x": 0,
-        "y": 0,
-        "width": 2360,
-        "height": 1720,
-        "menuCrop": {
-          "x": 0,
-          "y": 0,
-          "width": 620,
-          "height": 1060
-        }
-      },
-      "sha256": "1a5a3abd5d9710344a510e8fde959a3abd3120782fc99ee622a9eabe76197b68",
-      "capturedAt": "2026-10-19T21:10:06.257Z"
-    },
-    {
-      "id": "session-menu",
-      "file": "assets/ui-session-menu.png",
-      "description": "Actual Windows Session menu with restart and diagnostic commands",
-      "example": "iris",
-      "task": null,
-      "tab": null,
-      "source": "live Individual Guide desktop application",
-      "packageVersion": "0.4.0",
-      "pixels": {
-        "width": 620,
-        "height": 440
-      },
-      "zoom": 1.2,
-      "region": {
-        "x": 0,
-        "y": 0,
-        "width": 2360,
-        "height": 1720,
-        "menuCrop": {
-          "x": 0,
-          "y": 0,
-          "width": 620,
-          "height": 440
-        }
-      },
-      "sha256": "789cffab26f8874825e9346ead88808ef48e5b13e95b7bfea2aaffea0d745e44",
-      "capturedAt": "2026-10-19T21:10:08.450Z"
+      "sha256": "76d718a9e0c39a005330a3007bd307fea5b6617f6919516c5d16886c95d2d697",
+      "capturedAt": "2026-10-20T01:58:57.595Z"
     },
     {
       "id": "workspace",
@@ -92,18 +36,19 @@
       "task": null,
       "tab": null,
       "source": "live Individual Guide desktop application",
-      "packageVersion": "0.4.0",
+      "packageVersion": "0.5.0",
+      "language": "en-CA",
       "pixels": {
         "width": 2334,
         "height": 1598
       },
       "zoom": 1.2,
       "region": null,
-      "sha256": "88ae4a2556a43a3d2c919cc00299091369aa4cd7acdc8e2b317bccfb54343881",
-      "capturedAt": "2026-10-19T21:16:42.125Z",
+      "sha256": "4d26ba0b60305e3f9b31fc8a39df9f1782387847ed5cf0bf8618f44dc72d5e97",
+      "capturedAt": "2026-10-20T01:59:29.312Z",
       "annotations": {
         "kind": "Numbered callouts over an unchanged live screenshot",
-        "originalSha256": "73c7822d07849f923c971150eddc08171a182f229de50c17d676a31211c99abd",
+        "originalSha256": "7f61d11f254849c275fd34dd66549e2edfb8e363832a56cea26a3140e19657fd",
         "markers": [
           {
             "number": 1,
@@ -133,6 +78,66 @@
       }
     },
     {
+      "id": "file-menu",
+      "file": "assets/ui-file-menu.png",
+      "description": "Actual Windows File menu with Save and Save As",
+      "example": "iris",
+      "task": null,
+      "tab": null,
+      "source": "live Individual Guide desktop application",
+      "packageVersion": "0.5.0",
+      "language": "en-CA",
+      "pixels": {
+        "width": 620,
+        "height": 1060
+      },
+      "zoom": 1.2,
+      "region": {
+        "x": 0,
+        "y": 0,
+        "width": 2360,
+        "height": 1720,
+        "menuCrop": {
+          "x": 0,
+          "y": 0,
+          "width": 620,
+          "height": 1060
+        }
+      },
+      "sha256": "cc82c485526c709f4150bb8a600aa4c066599b6311344c0659cf89e052f6321b",
+      "capturedAt": "2026-10-20T01:59:32.925Z"
+    },
+    {
+      "id": "session-menu",
+      "file": "assets/ui-session-menu.png",
+      "description": "Actual Windows Session menu with restart and diagnostic commands",
+      "example": "iris",
+      "task": null,
+      "tab": null,
+      "source": "live Individual Guide desktop application",
+      "packageVersion": "0.5.0",
+      "language": "en-CA",
+      "pixels": {
+        "width": 620,
+        "height": 440
+      },
+      "zoom": 1.2,
+      "region": {
+        "x": 0,
+        "y": 0,
+        "width": 2360,
+        "height": 1720,
+        "menuCrop": {
+          "x": 0,
+          "y": 0,
+          "width": 620,
+          "height": 440
+        }
+      },
+      "sha256": "339eda308e9c9b941ecddbe7e53fa39cabfe1ea0286262132bdedd0646550761",
+      "capturedAt": "2026-10-20T01:59:35.096Z"
+    },
+    {
       "id": "examples",
       "file": "assets/ui-examples.png",
       "description": "Find working projects with the Task type filter",
@@ -140,7 +145,8 @@
       "task": null,
       "tab": null,
       "source": "live Individual Guide desktop application",
-      "packageVersion": "0.4.0",
+      "packageVersion": "0.5.0",
+      "language": "en-CA",
       "pixels": {
         "width": 1200,
         "height": 1464
@@ -148,12 +154,12 @@
       "zoom": 1.2,
       "region": {
         "x": 283,
-        "y": 24,
+        "y": 32,
         "width": 600,
         "height": 732
       },
-      "sha256": "f8f7296a915b3dda4b3c6590251c6c09e9da029ce861db942d286e80f09c0462",
-      "capturedAt": "2026-10-19T21:16:44.001Z"
+      "sha256": "c8e1dd1972162408a4a06c4fe4d18c4832db9cd4a0a2c1eb2f3ab2a0fa7d8af1",
+      "capturedAt": "2026-10-20T01:59:37.277Z"
     },
     {
       "id": "summary-settings",
@@ -163,7 +169,8 @@
       "task": "example_summary",
       "tab": null,
       "source": "live Individual Guide desktop application",
-      "packageVersion": "0.4.0",
+      "packageVersion": "0.5.0",
+      "language": "en-CA",
       "pixels": {
         "width": 1438,
         "height": 1240
@@ -176,7 +183,7 @@
         "height": 620
       },
       "sha256": "beac57fb5c6f68534241b0967c7e558c69cf8ac4948148d8bf5b265a7c8d1929",
-      "capturedAt": "2026-10-19T21:17:11.709Z"
+      "capturedAt": "2026-10-20T02:00:43.372Z"
     },
     {
       "id": "summary-result",
@@ -186,7 +193,8 @@
       "task": "example_summary",
       "tab": "Results > Data",
       "source": "live Individual Guide desktop application",
-      "packageVersion": "0.4.0",
+      "packageVersion": "0.5.0",
+      "language": "en-CA",
       "pixels": {
         "width": 1438,
         "height": 1240
@@ -199,7 +207,7 @@
         "height": 620
       },
       "sha256": "8815bb7d53378a4719b78b32c46333e4ef306a67d5afe5f859d8c065202f3f07",
-      "capturedAt": "2026-10-19T21:17:14.774Z"
+      "capturedAt": "2026-10-20T02:00:45.665Z"
     },
     {
       "id": "group-summary",
@@ -209,7 +217,8 @@
       "task": "example_groups",
       "tab": null,
       "source": "live Individual Guide desktop application",
-      "packageVersion": "0.4.0",
+      "packageVersion": "0.5.0",
+      "language": "en-CA",
       "pixels": {
         "width": 1438,
         "height": 1240
@@ -222,7 +231,7 @@
         "height": 620
       },
       "sha256": "69dcdccb0835b3741fa649e239724f7fec5e515ea0305cd94aab0951968f2e69",
-      "capturedAt": "2026-10-19T21:17:20.988Z"
+      "capturedAt": "2026-10-20T02:00:54.158Z"
     },
     {
       "id": "chart-settings",
@@ -232,7 +241,8 @@
       "task": "example_chart",
       "tab": null,
       "source": "live Individual Guide desktop application",
-      "packageVersion": "0.4.0",
+      "packageVersion": "0.5.0",
+      "language": "en-CA",
       "pixels": {
         "width": 1438,
         "height": 1240
@@ -245,7 +255,7 @@
         "height": 620
       },
       "sha256": "76c5da13e1532f21231fe91c4fb7a4f87896f429b28dedb3b3574a33827fbfe3",
-      "capturedAt": "2026-10-19T21:17:30.310Z"
+      "capturedAt": "2026-10-20T02:01:02.267Z"
     },
     {
       "id": "export",
@@ -255,7 +265,8 @@
       "task": "example_csv",
       "tab": null,
       "source": "live Individual Guide desktop application",
-      "packageVersion": "0.4.0",
+      "packageVersion": "0.5.0",
+      "language": "en-CA",
       "pixels": {
         "width": 1438,
         "height": 1240
@@ -267,8 +278,8 @@
         "width": 719,
         "height": 620
       },
-      "sha256": "36e4d41b98a103c9590486ec01bc19666d34c7a91bf4d9b265a120bde2351058",
-      "capturedAt": "2026-10-19T21:17:37.413Z"
+      "sha256": "c8095786a072d129881bc52a8d46dc28da8f42d9b0afb080c4d28c177db830d5",
+      "capturedAt": "2026-10-20T02:01:15.941Z"
     },
     {
       "id": "report-content",
@@ -278,7 +289,8 @@
       "task": "example_report",
       "tab": null,
       "source": "live Individual Guide desktop application",
-      "packageVersion": "0.4.0",
+      "packageVersion": "0.5.0",
+      "language": "en-CA",
       "pixels": {
         "width": 1438,
         "height": 1240
@@ -291,7 +303,7 @@
         "height": 620
       },
       "sha256": "6bd4b279136fd5d8755565ff557155c82d42cb1d866a0498f61984c4ec06bf7f",
-      "capturedAt": "2026-10-19T21:17:47.618Z"
+      "capturedAt": "2026-10-20T02:01:24.138Z"
     },
     {
       "id": "report-log",
@@ -301,7 +313,8 @@
       "task": "example_report",
       "tab": "Appearance",
       "source": "live Individual Guide desktop application",
-      "packageVersion": "0.4.0",
+      "packageVersion": "0.5.0",
+      "language": "en-CA",
       "pixels": {
         "width": 1438,
         "height": 1240
@@ -314,7 +327,31 @@
         "height": 620
       },
       "sha256": "6cb9d30feacacd0b28cfcdd5108fee4c8742907766d3ae3e7c5d53d3a6f389eb",
-      "capturedAt": "2026-10-19T21:17:48.534Z"
+      "capturedAt": "2026-10-20T02:01:25.066Z"
+    },
+    {
+      "id": "export-log",
+      "file": "assets/ui-export-log.png",
+      "description": "Configured Export Log task",
+      "example": "iris",
+      "task": "example_log",
+      "tab": null,
+      "source": "live Individual Guide desktop application",
+      "packageVersion": "0.5.0",
+      "language": "en-CA",
+      "pixels": {
+        "width": 1438,
+        "height": 1240
+      },
+      "zoom": 1.2,
+      "region": {
+        "x": 390,
+        "y": 140,
+        "width": 719,
+        "height": 620
+      },
+      "sha256": "80da8e9e196d018f6bb48e67ec296513890ff18b2e3715ec26f3d68474c1423a",
+      "capturedAt": "2026-10-20T02:01:37.303Z"
     },
     {
       "id": "regression",
@@ -324,7 +361,8 @@
       "task": "example_model",
       "tab": null,
       "source": "live Individual Guide desktop application",
-      "packageVersion": "0.4.0",
+      "packageVersion": "0.5.0",
+      "language": "en-CA",
       "pixels": {
         "width": 1438,
         "height": 1240
@@ -337,7 +375,7 @@
         "height": 620
       },
       "sha256": "6b6ccd1a6d773da92fa8d09734a53cd35fab1629715d160b03b72410bf3799a3",
-      "capturedAt": "2026-10-19T21:18:24.442Z"
+      "capturedAt": "2026-10-20T02:02:56.309Z"
     },
     {
       "id": "cleaning",
@@ -347,7 +385,8 @@
       "task": "example_remove_dups",
       "tab": null,
       "source": "live Individual Guide desktop application",
-      "packageVersion": "0.4.0",
+      "packageVersion": "0.5.0",
+      "language": "en-CA",
       "pixels": {
         "width": 1438,
         "height": 1240
@@ -360,7 +399,7 @@
         "height": 620
       },
       "sha256": "140de14ab4413f7b54768270c0cb1da83847212db1c9b96543592ae9fd3dbd14",
-      "capturedAt": "2026-10-19T21:18:50.014Z"
+      "capturedAt": "2026-10-20T02:03:34.717Z"
     },
     {
       "id": "import",
@@ -370,7 +409,8 @@
       "task": "example_import",
       "tab": null,
       "source": "live Individual Guide desktop application",
-      "packageVersion": "0.4.0",
+      "packageVersion": "0.5.0",
+      "language": "en-CA",
       "pixels": {
         "width": 1438,
         "height": 1240
@@ -382,8 +422,8 @@
         "width": 719,
         "height": 620
       },
-      "sha256": "0b08eaa43eafc722bbd8db88e630c4b7457d50c5bd6dbae4fcf690e09b88b5ff",
-      "capturedAt": "2026-10-19T21:28:09.621Z"
+      "sha256": "f451ccda840fa4bbaa3aafc41856c335f242b1b5db82cfbc140da02850b27ee4",
+      "capturedAt": "2026-10-20T02:36:53.053Z"
     },
     {
       "id": "query",
@@ -393,7 +433,8 @@
       "task": "example_query",
       "tab": null,
       "source": "live Individual Guide desktop application",
-      "packageVersion": "0.4.0",
+      "packageVersion": "0.5.0",
+      "language": "en-CA",
       "pixels": {
         "width": 1438,
         "height": 1240
@@ -406,53 +447,7 @@
         "height": 620
       },
       "sha256": "3f034f6b5bc5bac79080879c6d21fc2a878147ed47bd5d36f259d6997eef49db",
-      "capturedAt": "2026-10-19T21:28:16.497Z"
-    },
-    {
-      "id": "export-log",
-      "file": "assets/ui-export-log.png",
-      "description": "Configured Export Log task",
-      "example": "iris",
-      "task": "example_log",
-      "tab": null,
-      "source": "live Individual Guide desktop application",
-      "packageVersion": "0.4.0",
-      "pixels": {
-        "width": 1438,
-        "height": 1240
-      },
-      "zoom": 1.2,
-      "region": {
-        "x": 390,
-        "y": 140,
-        "width": 719,
-        "height": 620
-      },
-      "sha256": "f952dd37095f2ef12fc4039857f8413341b43bc67c96825f282843b1fa5eb1da",
-      "capturedAt": "2026-10-19T22:00:18.344Z"
-    },
-    {
-      "id": "filter",
-      "file": "assets/ui-filter.png",
-      "description": "Configured Filter and Sort task",
-      "example": "query-joins",
-      "task": "filtersort_1",
-      "tab": null,
-      "source": "live Individual Guide desktop application",
-      "packageVersion": "0.4.0",
-      "pixels": {
-        "width": 1438,
-        "height": 1240
-      },
-      "zoom": 1.2,
-      "region": {
-        "x": 390,
-        "y": 140,
-        "width": 719,
-        "height": 620
-      },
-      "sha256": "0dbc9c881f8f9ec14cdf968847803ee2d23520473156439e9971b094716772e1",
-      "capturedAt": "2026-10-19T22:00:57.747Z"
+      "capturedAt": "2026-10-20T02:36:58.619Z"
     },
     {
       "id": "reshape",
@@ -462,7 +457,8 @@
       "task": "example_stack_columns",
       "tab": null,
       "source": "live Individual Guide desktop application",
-      "packageVersion": "0.4.0",
+      "packageVersion": "0.5.0",
+      "language": "en-CA",
       "pixels": {
         "width": 1438,
         "height": 1240
@@ -475,7 +471,7 @@
         "height": 620
       },
       "sha256": "9cb41541f606d7b31cef84ff0b27956035eec9b50dd052d4312bf4bebce9c032",
-      "capturedAt": "2026-10-19T22:01:28.090Z"
+      "capturedAt": "2026-10-20T02:37:50.250Z"
     },
     {
       "id": "sample",
@@ -485,7 +481,8 @@
       "task": "example_random_sample",
       "tab": null,
       "source": "live Individual Guide desktop application",
-      "packageVersion": "0.4.0",
+      "packageVersion": "0.5.0",
+      "language": "en-CA",
       "pixels": {
         "width": 1438,
         "height": 1240
@@ -498,7 +495,7 @@
         "height": 620
       },
       "sha256": "299f7dd2f57edfcd5d1b0c43c0d3521eebd7a467667bf7501b364a5bd64ce9d4",
-      "capturedAt": "2026-10-19T22:02:01.931Z"
+      "capturedAt": "2026-10-20T02:39:19.072Z"
     },
     {
       "id": "frequencies",
@@ -508,7 +505,8 @@
       "task": "example_one_way_freq",
       "tab": null,
       "source": "live Individual Guide desktop application",
-      "packageVersion": "0.4.0",
+      "packageVersion": "0.5.0",
+      "language": "en-CA",
       "pixels": {
         "width": 1438,
         "height": 1240
@@ -521,7 +519,7 @@
         "height": 620
       },
       "sha256": "cd0bbf836e162397fb93a9cb7a9e489587fd009260603c055898267ba328fe2e",
-      "capturedAt": "2026-10-19T22:02:25.488Z"
+      "capturedAt": "2026-10-20T02:41:00.505Z"
     },
     {
       "id": "bar-chart",
@@ -531,7 +529,8 @@
       "task": "example_bar_chart",
       "tab": null,
       "source": "live Individual Guide desktop application",
-      "packageVersion": "0.4.0",
+      "packageVersion": "0.5.0",
+      "language": "en-CA",
       "pixels": {
         "width": 1438,
         "height": 1240
@@ -544,7 +543,7 @@
         "height": 620
       },
       "sha256": "408e6d41f31de0872357383a9230a0d816d7f4aa52bffacfcb3ac76e73a87af0",
-      "capturedAt": "2026-10-19T22:17:06.663Z"
+      "capturedAt": "2026-10-20T02:42:09.737Z"
     },
     {
       "id": "survival",
@@ -554,7 +553,8 @@
       "task": "example_life_tables",
       "tab": null,
       "source": "live Individual Guide desktop application",
-      "packageVersion": "0.4.0",
+      "packageVersion": "0.5.0",
+      "language": "en-CA",
       "pixels": {
         "width": 1438,
         "height": 1240
@@ -567,7 +567,7 @@
         "height": 620
       },
       "sha256": "759427f2a161f1ba41d707097ebf7d53c4651145615c5391f7a6a727dddc205f",
-      "capturedAt": "2026-10-19T22:17:47.232Z"
+      "capturedAt": "2026-10-20T02:48:42.889Z"
     },
     {
       "id": "forecast",
@@ -577,7 +577,8 @@
       "task": "example_arima_forecast",
       "tab": null,
       "source": "live Individual Guide desktop application",
-      "packageVersion": "0.4.0",
+      "packageVersion": "0.5.0",
+      "language": "en-CA",
       "pixels": {
         "width": 1438,
         "height": 1240
@@ -590,7 +591,7 @@
         "height": 620
       },
       "sha256": "6f7554763a21f85984b607fa74d77300fecd687ff4572e0375fe3560a24f0e2a",
-      "capturedAt": "2026-10-19T22:18:30.642Z"
+      "capturedAt": "2026-10-20T02:49:28.157Z"
     },
     {
       "id": "control-chart",
@@ -600,7 +601,8 @@
       "task": "example_control_charts",
       "tab": null,
       "source": "live Individual Guide desktop application",
-      "packageVersion": "0.4.0",
+      "packageVersion": "0.5.0",
+      "language": "en-CA",
       "pixels": {
         "width": 1438,
         "height": 1240
@@ -613,7 +615,7 @@
         "height": 620
       },
       "sha256": "8cc7076a4195e5f46d44c6e0ab77b8a249d4d2a9858b33ccd467e003378a3877",
-      "capturedAt": "2026-10-19T22:19:35.569Z"
+      "capturedAt": "2026-10-20T02:50:12.580Z"
     },
     {
       "id": "branch",
@@ -623,7 +625,8 @@
       "task": "example_branch",
       "tab": null,
       "source": "live Individual Guide desktop application",
-      "packageVersion": "0.4.0",
+      "packageVersion": "0.5.0",
+      "language": "en-CA",
       "pixels": {
         "width": 1438,
         "height": 1240
@@ -636,7 +639,7 @@
         "height": 620
       },
       "sha256": "479d80351adece3ba2ee83d3fe977d1907811347c424809ed4e8310e62194369",
-      "capturedAt": "2026-10-19T22:20:08.239Z"
+      "capturedAt": "2026-10-20T02:51:00.566Z"
     },
     {
       "id": "loop",
@@ -646,7 +649,8 @@
       "task": "example_loop",
       "tab": null,
       "source": "live Individual Guide desktop application",
-      "packageVersion": "0.4.0",
+      "packageVersion": "0.5.0",
+      "language": "en-CA",
       "pixels": {
         "width": 1438,
         "height": 1240
@@ -659,7 +663,7 @@
         "height": 620
       },
       "sha256": "7806d1c645b3f80d7303255de8578a66a985a76d84875fd1d2e8385da6a89729",
-      "capturedAt": "2026-10-19T22:20:37.631Z"
+      "capturedAt": "2026-10-20T02:51:30.708Z"
     },
     {
       "id": "script-outputs",
@@ -669,7 +673,8 @@
       "task": "example_source",
       "tab": null,
       "source": "live Individual Guide desktop application",
-      "packageVersion": "0.4.0",
+      "packageVersion": "0.5.0",
+      "language": "en-CA",
       "pixels": {
         "width": 1324,
         "height": 266
@@ -682,7 +687,7 @@
         "height": 133
       },
       "sha256": "783956c37408ab394109c505cb5256480da0eacce6e08cf688c3c04f66a0a9a9",
-      "capturedAt": "2026-10-19T22:21:34.946Z"
+      "capturedAt": "2026-10-20T02:52:30.422Z"
     },
     {
       "id": "logging",
@@ -692,7 +697,8 @@
       "task": "example_source",
       "tab": null,
       "source": "live Individual Guide desktop application",
-      "packageVersion": "0.4.0",
+      "packageVersion": "0.5.0",
+      "language": "en-CA",
       "pixels": {
         "width": 1438,
         "height": 1250
@@ -705,7 +711,7 @@
         "height": 625
       },
       "sha256": "9ea0865a6c596b19d51b278961b2e1692e918005b504fa1b670284e80880327d",
-      "capturedAt": "2026-10-19T22:21:35.437Z"
+      "capturedAt": "2026-10-20T02:52:30.982Z"
     },
     {
       "id": "logging-preview",
@@ -715,7 +721,8 @@
       "task": "example_source",
       "tab": null,
       "source": "live Individual Guide desktop application",
-      "packageVersion": "0.4.0",
+      "packageVersion": "0.5.0",
+      "language": "en-CA",
       "pixels": {
         "width": 1400,
         "height": 852
@@ -728,7 +735,7 @@
         "height": 426
       },
       "sha256": "152ccb84785d83ff1229c38d17d41f5b21123606aad23c1984107cb18828e0eb",
-      "capturedAt": "2026-10-19T22:21:36.283Z"
+      "capturedAt": "2026-10-20T02:52:31.832Z"
     },
     {
       "id": "console",
@@ -738,7 +745,8 @@
       "task": null,
       "tab": null,
       "source": "live Individual Guide desktop application",
-      "packageVersion": "0.4.0",
+      "packageVersion": "0.5.0",
+      "language": "en-CA",
       "pixels": {
         "width": 1438,
         "height": 1240
@@ -751,7 +759,7 @@
         "height": 620
       },
       "sha256": "dd056335b6f4b5f840126de9f21b605e67d0f9da2da97cbdf5d186c061d5c29a",
-      "capturedAt": "2026-10-19T22:21:41.185Z"
+      "capturedAt": "2026-10-20T02:52:37.900Z"
     },
     {
       "id": "task-list",
@@ -761,7 +769,8 @@
       "task": null,
       "tab": null,
       "source": "live Individual Guide desktop application",
-      "packageVersion": "0.4.0",
+      "packageVersion": "0.5.0",
+      "language": "en-CA",
       "pixels": {
         "width": 2262,
         "height": 1480
@@ -773,31 +782,8 @@
         "width": 1131,
         "height": 740
       },
-      "sha256": "a3ae6996c31d41f48b639c6f852187c7fc9da4556dc79c3c359eeeb679ace66b",
-      "capturedAt": "2026-10-19T22:21:42.704Z"
-    },
-    {
-      "id": "validation",
-      "file": "assets/ui-validation.png",
-      "description": "Validate the flow before a run",
-      "example": "iris",
-      "task": null,
-      "tab": null,
-      "source": "live Individual Guide desktop application",
-      "packageVersion": "0.4.0",
-      "pixels": {
-        "width": 1500,
-        "height": 1480
-      },
-      "zoom": 1.5,
-      "region": {
-        "x": 209,
-        "y": 30,
-        "width": 750,
-        "height": 740
-      },
-      "sha256": "a29a5d7a56f3c7408ac716782bc8ebaacacb8b8e0170e4a6c83bd9796f4da8db",
-      "capturedAt": "2026-10-19T22:21:44.026Z"
+      "sha256": "e88d764b27918bfe064b89f2e13072e9ffcb382f767b510829e4431c720f7259",
+      "capturedAt": "2026-10-20T02:52:39.918Z"
     },
     {
       "id": "settings",
@@ -807,7 +793,8 @@
       "task": null,
       "tab": null,
       "source": "live Individual Guide desktop application",
-      "packageVersion": "0.4.0",
+      "packageVersion": "0.5.0",
+      "language": "en-CA",
       "pixels": {
         "width": 1200,
         "height": 1502
@@ -819,8 +806,8 @@
         "width": 600,
         "height": 751
       },
-      "sha256": "a35f093d26d5c48e92a173d74d3afd332ee65c2f49504212d53ec6354510db6a",
-      "capturedAt": "2026-10-19T22:21:45.739Z"
+      "sha256": "262b86bcfe74b021347c7712cb2dbea7711ae81ce87c2b0fe2d6c4de6a24e3b1",
+      "capturedAt": "2026-10-20T02:52:43.622Z"
     },
     {
       "id": "review",
@@ -830,7 +817,8 @@
       "task": null,
       "tab": null,
       "source": "live Individual Guide desktop application",
-      "packageVersion": "0.4.0",
+      "packageVersion": "0.5.0",
+      "language": "en-CA",
       "pixels": {
         "width": 1500,
         "height": 1480
@@ -843,7 +831,7 @@
         "height": 740
       },
       "sha256": "f414d9ab85930675e2bfa65e32dbc298020e9b4edf260d4151669a6937d144a3",
-      "capturedAt": "2026-10-19T22:21:47.456Z"
+      "capturedAt": "2026-10-20T02:52:45.685Z"
     },
     {
       "id": "code",
@@ -853,7 +841,8 @@
       "task": null,
       "tab": null,
       "source": "live Individual Guide desktop application",
-      "packageVersion": "0.4.0",
+      "packageVersion": "0.5.0",
+      "language": "en-CA",
       "pixels": {
         "width": 1438,
         "height": 1240
@@ -866,7 +855,55 @@
         "height": 620
       },
       "sha256": "ec472810048f191f6c5d8edd76a5f4b99e35f18a98bdadc8617bf369c3d92242",
-      "capturedAt": "2026-10-19T22:31:29.482Z"
+      "capturedAt": "2026-10-20T02:52:48.939Z"
+    },
+    {
+      "id": "filter",
+      "file": "assets/ui-filter.png",
+      "description": "Configured Filter and Sort task",
+      "example": "query-joins",
+      "task": "filtersort_1",
+      "tab": null,
+      "source": "live Individual Guide desktop application",
+      "packageVersion": "0.5.0",
+      "language": "en-CA",
+      "pixels": {
+        "width": 1438,
+        "height": 1240
+      },
+      "zoom": 1.2,
+      "region": {
+        "x": 390,
+        "y": 140,
+        "width": 719,
+        "height": 620
+      },
+      "sha256": "50732e524944b3351892f5cd64dfe7aeed1558ba01f1fd265048938f8f78c31c",
+      "capturedAt": "2026-10-20T03:23:26.744Z"
+    },
+    {
+      "id": "validation",
+      "file": "assets/ui-validation.png",
+      "description": "Validate the flow before a run",
+      "example": "iris",
+      "task": null,
+      "tab": null,
+      "source": "live Individual Guide desktop application",
+      "packageVersion": "0.5.0",
+      "language": "en-CA",
+      "pixels": {
+        "width": 1500,
+        "height": 1480
+      },
+      "zoom": 1.5,
+      "region": {
+        "x": 209,
+        "y": 30,
+        "width": 750,
+        "height": 740
+      },
+      "sha256": "b67173852a0b1753d151b7c809f9426cb3af7428750671d83efc4a8bb2260bd5",
+      "capturedAt": "2026-10-20T03:25:01.760Z"
     }
   ],
   "reviewedTaskPanels": [

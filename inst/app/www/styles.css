@@ -3086,3 +3086,14 @@ html:not([data-ig-theme="light"]) .modal-footer .btn-primary { color: #fff; back
   .ig-console-highlight { display: none; }
   .ig-console-input-wrap .ig-console-editor { color: CanvasText !important; -webkit-text-fill-color: CanvasText; }
 }
+
+/* The language choice stays available before a project is opened. */
+.ig-language-control{flex:0 0 auto;margin:0}.ig-language-control select{width:auto;max-width:180px;min-width:110px;font-size:12px}
+.ig-preflight-row .btn-outline-secondary {
+  color: inherit !important;
+  border-color: currentColor !important;
+}
+.ig-preflight-row .btn-outline-secondary:hover {
+  color: inherit !important;
+  background-color: rgba(0, 0, 0, .08) !important;
+}

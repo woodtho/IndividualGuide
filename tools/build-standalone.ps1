@@ -22,6 +22,8 @@ function Invoke-BuildCommand([string]$FilePath, [object[]]$CommandArguments) {
 $projectRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 $buildRoot = Join-Path $projectRoot 'build'
 $desktopRoot = Join-Path $PSScriptRoot 'desktop'
+$env:LC_ALL = 'English_Canada.utf8'
+$env:LANG = 'English_Canada.utf8'
 if (!$RHome) {
   $rOnPath = Get-Command Rscript.exe -ErrorAction SilentlyContinue
   if ($rOnPath) { $RHome = (& $rOnPath.Source --vanilla -e 'cat(R.home())') }
@@ -47,8 +49,6 @@ $rscript = Join-Path $RHome 'bin\Rscript.exe'
 if (!(Test-Path -LiteralPath $rscript)) { throw "Rscript not found: $rscript" }
 if (!(Test-Path -LiteralPath $Pandoc)) { throw "Pandoc not found: $Pandoc" }
 New-Item -ItemType Directory -Path $buildRoot -Force | Out-Null
-$env:LC_ALL = 'English_Canada.utf8'
-$env:LANG = 'English_Canada.utf8'
 Push-Location $projectRoot
 try {
   if ($SkipRuntime) { Invoke-BuildCommand $rscript @('--vanilla', 'tools/check-runtime-lock.R', (Join-Path $RuntimeDirectory 'R/library')) }

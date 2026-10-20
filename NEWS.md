@@ -1,3 +1,12 @@
+# Individual Guide 0.5.0
+
+- Choose English or Canadian French during Windows installation or in the app.
+- Remember the language on this computer independently of saved projects.
+- Change interface language without restarting R or losing input values.
+- Provide matching English and Canadian French handbooks with localized screenshots.
+- Search task types in English or French in the picker, Help, task list and project search.
+- Ignore duplicate recovery actions so a restarted session opens one welcome screen.
+
 # Individual Guide 0.4.0
 
 - Expand the offline library to 22 complete projects covering all 58 enabled task types.

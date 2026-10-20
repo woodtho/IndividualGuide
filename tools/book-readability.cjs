@@ -1,12 +1,17 @@
 'use strict';
 // A rough editing aid for English prose, not a guarantee of reading difficulty.
-function readability(markdown) {
+function readability(markdown,language='en-CA') {
   const text = markdown.replace(/```[\s\S]*?```/g, '')
     .split(/\r?\n/).filter(line => !/^\s*(?:#|\||!\[)/.test(line)).join('\n')
     .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1').replace(/`[^`]+`/g, '')
     .replace(/https?:\/\/\S+/g, '').replace(/\{#[^}]+\}/g, '')
     .replace(/^\s*\d+\.\s*/gm, '').replace(/\*+/g, '');
   const sentences = text.split(/[.!?]+(?:\s|$)/).map(s => s.trim()).filter(s => /[a-z]/i.test(s));
+  if(language==='fr-CA'){
+    const words=text.match(/\p{L}+(?:['’]\p{L}+)?/gu)||[];
+    return {method:'French editorial review; prose sentence length (English grade formula does not apply)',
+      words:words.length,sentences:sentences.length,averageSentenceWords:Number((words.length/Math.max(1,sentences.length)).toFixed(2))};
+  }
   const words = text.match(/[A-Za-z]+(?:['’][a-z]+)?/g) || [];
   function syllables(word) {
     word = word.toLowerCase().replace(/['’]/g, '');

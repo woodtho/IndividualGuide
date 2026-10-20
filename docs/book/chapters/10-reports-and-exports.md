@@ -63,7 +63,7 @@ Check Overwrite before rerunning. Append is available for CSV and TSV when suppo
 | Structured data for a program | JSON | The format expected by that program |
 | An R result for another R user | RDS or RData | The recipient's R and package support |
 
-You do not need to learn every format. Choose the one your reader or next tool can use. If leading zeros disappear in a spreadsheet, import the ID column as text in that spreadsheet.
+You do not need to learn every format. Choose the one your reader or next tool can use. If leading zeros disappear in a spreadsheet, import the ID column as text in that spreadsheet. If a CSV opens as one column, use the spreadsheet's text/CSV import command and choose comma as the separator.
 
 ## Check a finished delivery
 

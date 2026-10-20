@@ -1,0 +1,112 @@
+{
+  "iris": {
+    "data": "150 fleurs, dont 50 de chacune des trois espèces.",
+    "check": "Ouvrez le résumé par espèce. Les longueurs moyennes des pétales sont d’environ 1,462, 4,260 et 5,552 centimètres.",
+    "try": "Remplacez la colonne Y du nuage de points par Petal.Width. Relancez le graphique et le rapport."
+  },
+  "air-quality": {
+    "data": "153 observations quotidiennes de la qualité de l’air à New York, avec des mesures manquantes.",
+    "check": "Comparez la table brute, le bilan des valeurs manquantes et le résultat nettoyé. Le remplacement par la moyenne sert ici à l’apprentissage.",
+    "try": "Lisez les paramètres de remplacement. Dans une copie, essayez une autre méthode offerte et comparez le résumé. Gardez les données brutes."
+  },
+  "fuel-economy": {
+    "data": "32 voitures, avec la consommation de carburant, le poids, la puissance et d’autres mesures.",
+    "check": "Ouvrez les coefficients et les valeurs ajustées du modèle. Le poids est exprimé en milliers de livres.",
+    "try": "Retirez un prédicteur dans une copie. Relancez le modèle et le rapport, puis comparez les résultats."
+  },
+  "data-cleaning": {
+    "data": "32 voitures d’origine, plus une ligne en double ajoutée pour l’exercice.",
+    "check": "La suppression des doublons fait passer les 33 lignes à 32. Examinez les colonnes renommées et les étiquettes de transmission.",
+    "try": "Ouvrez les tâches de nettoyage dans l’ordre. Comparez la table avant et après chacune, puis changez une étiquette dans une copie enregistrée."
+  },
+  "query-joins": {
+    "data": "Un CSV fourni avec 50 États américains, plus une table reliant chaque État à sa région.",
+    "check": "La jointure gauche devrait garder les États et ajouter les régions. Le filtre suivant garde Income d’au moins 4500 et trie en ordre décroissant.",
+    "try": "Dans la version 0.4.0, laissez fermé le panneau Filtrer et trier enregistré; son guide explique la déconnexion connue. Ajoutez une nouvelle tâche pour essayer un seuil Income, puis vérifiez les lignes et le tri décroissant."
+  },
+  "reshape": {
+    "data": "Les 150 fleurs d’iris, avec un identifiant de fleur ajouté.",
+    "check": "Empiler quatre colonnes de mesures produit 600 lignes. L’identifiant aide à remettre les mesures en colonnes. L’ajout de deux sous-ensembles d’espèces donne 100 lignes.",
+    "try": "Comparez les tables longue et large. Examinez Comparer des données avant de supposer que l’aller-retour a tout conservé."
+  },
+  "sampling": {
+    "data": "Les mesures de 32 voitures.",
+    "check": "Examinez les colonnes de rang et standardisées avant l’échantillon de dix lignes. La graine utilisée est 2026.",
+    "try": "Relancez l’échantillon avec les mêmes données, puis changez la graine. Comparez l’identité des lignes en plus de leur nombre."
+  },
+  "descriptive": {
+    "data": "60 observations de croissance des dents, avec des groupes de supplément et de dose.",
+    "check": "Comparez les fréquences, le tableau dose par supplément et les résumés numériques. La dose est stockée comme catégorie pour les exemples groupés.",
+    "try": "Choisissez un autre regroupement dans une copie. Vérifiez ce que comptent les effectifs et les pourcentages avant de les décrire."
+  },
+  "category-charts": {
+    "data": "150 fleurs dans trois groupes d’espèces de même taille.",
+    "check": "Chaque espèce compte 50 fleurs. Comparez les barres, les secteurs et les boîtes à moustaches par groupe dans le rapport.",
+    "try": "Changez les titres ou les styles de catégories. Vérifiez que les figures statiques du rapport se mettent à jour après une nouvelle exécution."
+  },
+  "numeric-charts": {
+    "data": "Les quatre mesures numériques des 150 fleurs d’iris.",
+    "check": "Comparez l’histogramme, les bulles, les contours, le nuage de points et la matrice. Chaque vue répond à une question différente.",
+    "try": "Changez les classes de l’histogramme ou une mesure choisie. Vérifiez les étiquettes d’axes et la limite de données du graphique."
+  },
+  "time-charts": {
+    "data": "240 températures mensuelles de Nottingham, avec des dates ajoutées pour les graphiques.",
+    "check": "Comparez la courbe mensuelle au graphique de moyenne et d’étendue annuelles. L’étendue annuelle n’est pas un intervalle de confiance.",
+    "try": "Examinez l’ordre des dates. Ajoutez les unités de température à un titre et vérifiez les deux axes."
+  },
+  "anova": {
+    "data": "30 poids de plantes dans un groupe témoin et deux groupes de traitement.",
+    "check": "L’ANOVA utilise les trois groupes. Le test t utilise un sous-ensemble préparé de deux groupes. Ces tests ne posent donc pas exactement la même question.",
+    "try": "Examinez le sous-ensemble avant le test t. Lisez les effectifs et les moyennes des groupes avant les tables des tests."
+  },
+  "binary-model": {
+    "data": "32 voitures, dont la transmission est codée 0 pour automatique et 1 pour manuelle.",
+    "check": "Les probabilités ajustées décrivent l’issue codée 1. Leur échelle diffère de celle des coefficients.",
+    "try": "Examinez le codage de la réponse, puis essayez un autre prédicteur dans une copie. Lisez tous les avertissements d’ajustement."
+  },
+  "count-model": {
+    "data": "54 nombres de ruptures de fils, avec des groupes de laine et de tension.",
+    "check": "Le modèle utilise la famille Poisson pour des effectifs. Lisez les renseignements d’ajustement plutôt que de voir sa fin comme une preuve de qualité.",
+    "try": "Examinez la réponse et les groupes choisis. Comparez les résumés des effectifs aux résultats du modèle."
+  },
+  "nonlinear": {
+    "data": "Des mesures de l’enzyme Puromycin, filtrées pour garder l’échantillon traité.",
+    "check": "L’exemple ajuste une courbe de puissance aux concentrations et aux vitesses positives. Lisez le filtre de préparation et comparez la courbe aux points.",
+    "try": "Examinez la courbe choisie et la plage d’entrée. Évitez d’expliquer des prédictions loin des mesures observées."
+  },
+  "multivariate": {
+    "data": "Quatre mesures numériques de 150 fleurs; l’espèce reste une étiquette connue.",
+    "check": "Comparez les corrélations, les composantes principales mises à l’échelle et trois groupes. Le regroupement n’utilise pas automatiquement la même mise à l’échelle que l’ACP.",
+    "try": "Examinez la taille des groupes et les affectations. Comparez-les aux espèces sans supposer qu’ils doivent correspondre."
+  },
+  "survival": {
+    "data": "228 observations d’origine sur le cancer du poumon, avec une table d’analyse préparée distincte.",
+    "check": "La préparation transforme le code d’état d’origine 2 en événement 1 et sélectionne les cas complets. Comparez le nombre de lignes avant et après.",
+    "try": "Lisez les paramètres de temps et d’événement avant les courbes ou le modèle. Utilisez cet exemple pour apprendre les commandes, pas pour prendre des décisions de soins."
+  },
+  "forecast": {
+    "data": "144 nombres mensuels de passagers aériens dans l’ordre du temps.",
+    "check": "L’horizon est de 12 pas futurs. Examinez le résumé du modèle et les intervalles. C’est un exemple simple, pas une analyse saisonnière optimisée automatiquement.",
+    "try": "Changez l’horizon dans une copie. Vérifiez le nombre de lignes de prévision et expliquez ce qu’un pas représente."
+  },
+  "quality-control": {
+    "data": "100 observations annuelles du débit du Nil dans leur ordre d’origine.",
+    "check": "Lisez les indicateurs de la carte de contrôle avec la fonction de répartition et le graphique de probabilité normale. Les limites sont estimées à partir de ces observations.",
+    "try": "Examinez les points inhabituels et leurs années. Gardez l’ordre temporel et distinguez les limites du graphique des exigences externes."
+  },
+  "branching": {
+    "data": "150 fleurs et une condition exigeant au moins 100 lignes.",
+    "check": "Le résumé suit le chemin de branchement choisi. Vérifiez son réglage Exécuter après le chemin de branchement/boucle, pas seulement sa table d’entrée.",
+    "try": "Montez le seuil au-dessus de 150 dans une copie. Relancez et examinez la décision et le travail ignoré dans le journal."
+  },
+  "looping": {
+    "data": "150 fleurs divisées en trois groupes d’espèces.",
+    "check": "Trouvez species_summary_1, species_summary_2 et species_summary_3. Chacun résume un groupe de 50 fleurs.",
+    "try": "Lisez les entrées d’itération dans le journal. Vérifiez que le rapport final et l’exportation du journal se trouvent hors du corps répété."
+  },
+  "report-audit": {
+    "data": "32 voitures, un résumé numérique et un avertissement personnalisé pour l’apprentissage.",
+    "check": "Ouvrez la section Pipeline execution log du rapport et comparez les exportations TXT, CSV et JSON. La dernière exportation peut inclure la fin du rapport.",
+    "try": "Réglez l’annexe du rapport à WARN et relancez-le. Comparez son journal réduit à la version INFO et à l’exportation complète."
+  }
+}

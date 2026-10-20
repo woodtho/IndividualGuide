@@ -2,6 +2,9 @@
 // The sandbox exposes only fixed desktop operations, never Node or arbitrary IPC.
 const { ipcRenderer, contextBridge } = require('electron');
 contextBridge.exposeInMainWorld('igDesktop', {
+  getLanguage: () => ipcRenderer.invoke('ig:language'),
+  setLanguage: locale => ipcRenderer.invoke('ig:set-language', locale),
+  onLanguage: callback => { ipcRenderer.on('ig:language', (_event, value) => callback({locale:value.locale})); },
   publishState: value => ipcRenderer.send('ig:workspace-state', value),
   chooseProjectFile: (kind, defaultPath, dirty) => ipcRenderer.invoke('ig:project-dialog', { kind, defaultPath, dirty }),
   confirmChanges: action => ipcRenderer.invoke('ig:confirm-changes', action),
@@ -10,19 +13,28 @@ contextBridge.exposeInMainWorld('igDesktop', {
   report: (event, details) => ipcRenderer.send('ig:renderer-event', { event, details }),
   onCommand: callback => { ipcRenderer.on('ig:command', (_event, command) => callback(command)); }
 });
-let state;
+let state, language = {locale:'en-CA',strings:{}};
+const translate = value => typeof value === 'string' && language.locale === 'fr-CA' ? language.strings[value.trim()] || value : value;
+ipcRenderer.on('ig:language', (_event, value) => {language=value;render();});
 ipcRenderer.on('ig:backend-state', (_event, value) => { state = value; render(); });
-let panel, message, restart, logButton;
+let panel, message, restart, logButton, title, detail;
 function render() {
   if (!panel || !state) return;
+  document.documentElement.lang=language.locale;
+  panel.setAttribute('aria-label',translate('R server recovery'));
+  title.textContent=translate('Reconnect your workspace');
+  detail.textContent=translate('Restarting stops running tasks. Unsaved changes may be lost. You can reopen a saved project or restore the latest available autosave after restarting.');
+  restart.textContent=translate('Restart R server');
+  logButton.textContent=translate('Open startup log');
   const disconnected = Boolean(document.getElementById('shiny-disconnected-overlay'));
   const loading = document.body.dataset.desktopLoading === 'true';
   const show = state.phase === 'stopped' || (disconnected && state.phase === 'ready');
   panel.hidden = !show;
-  message.textContent = state.phase === 'stopped' ? state.message : 'The workspace lost its connection to R.';
+  message.textContent = state.phase === 'stopped' ? state.localizedMessage || translate(state.message) : translate('The workspace lost its connection to R.');
   restart.disabled = state.phase === 'starting';
   if (loading) {
-    document.getElementById('desktop-status').textContent = state.phase === 'starting' ? state.message : 'The R server is unavailable.';
+    document.getElementById('desktop-status').textContent = state.phase === 'starting' ? state.localizedMessage || translate(state.message) : translate('The R server is unavailable.');
+    document.querySelector('.spinner').setAttribute('aria-label',translate('Starting'));
     document.querySelector('.spinner').hidden = state.phase !== 'starting';
   }
 }
@@ -33,9 +45,9 @@ window.addEventListener('DOMContentLoaded', async () => {
   panel = document.createElement('section');
   panel.id = 'ig-desktop-recovery'; panel.hidden = true;
   panel.setAttribute('role', 'alert'); panel.setAttribute('aria-label', 'R server recovery');
-  const title = document.createElement('h2'); title.textContent = 'Reconnect your workspace';
+  title = document.createElement('h2'); title.textContent = 'Reconnect your workspace';
   message = document.createElement('p');
-  const detail = document.createElement('p');
+  detail = document.createElement('p');
   detail.textContent = 'Restarting stops running tasks. Unsaved changes may be lost. You can reopen a saved project or restore the latest available autosave after restarting.';
   restart = document.createElement('button'); restart.id = 'ig-restart-r'; restart.type = 'button'; restart.textContent = 'Restart R server';
   logButton = document.createElement('button'); logButton.type = 'button'; logButton.textContent = 'Open startup log';
@@ -52,5 +64,6 @@ window.addEventListener('DOMContentLoaded', async () => {
     if (records.some(record => [...record.addedNodes, ...record.removedNodes]
       .some(node => node.id === 'shiny-disconnected-overlay'))) render();
   }).observe(document.body, { childList: true });
+  language = await ipcRenderer.invoke('ig:language') || language;
   state = await ipcRenderer.invoke('ig:backend-state'); render();
 });

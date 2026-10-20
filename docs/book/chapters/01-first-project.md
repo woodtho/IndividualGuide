@@ -20,7 +20,7 @@ An example may show a software-version notice because its saved run came from an
 
 The left side lists the project's tasks and data. The **Flow** tab shows connected steps. Select the source task and read its notes. Open its flower table and look at the column names.
 
-The example uses labels that describe each step's job. Select **Summarize measurements**, **Compare mean petal length by species**, and **Explore relationships** to open the Summary Statistics, Summary Tables, and Scatter Plot tasks. The task type appears in each panel. Open **Results** to inspect the saved result before running anything again.
+The example uses labels that describe each step's job. Select **Summarize measurements**, **Compare mean petal length by species**, and **Explore relationships** to open the Summary Statistics, Summary Tables, and Scatter Plot tasks. The task type appears in each panel. Open **Results** to inspect the saved result before running anything again. Names given to steps within a project stay in their original language.
 
 ![Callout 1 marks the project tree; 2 marks the connected flow; 3 marks the Flow, Code, and R Console tabs. Select a task to open its settings.](assets/ui-workspace.png){#fig-workspace}
 

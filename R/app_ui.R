@@ -36,11 +36,12 @@ ig_theme <- function() {
 # ── UI ─────────────────────────────────────────────────────────────────────────
 app_ui <- function() bslib::page_sidebar(
   theme    = ig_theme(),
-  lang     = "en",          # WCAG 3.1.1 — document language
+  lang     = "en-CA",       # Updated in place by the selected presentation language.
   fillable = TRUE,
   title    = div(
     class = "d-flex align-items-center gap-3 w-100",
     strong("Individual Guide"),
+    ig_language_picker(),
     div(id = "ig-run-status", class = "ig-run-status", hidden = NA,
       span(id = "ig-run-description", role = "status", `aria-live` = "polite"),
       tags$progress(id = "ig-run-progress", max = 1, value = 0, `aria-label` = "Run progress"),
@@ -125,6 +126,8 @@ app_ui <- function() bslib::page_sidebar(
   # ── JS helpers ───────────────────────────────────────────────────────────────
   tags$head(
     tags$link(rel = "stylesheet", href = "www/styles.css"),
+    tags$script(src = "www/i18n/core.js"),
+    tags$script(src = "www/ig_i18n.js"),
     tags$script(src = "www/ig_tree.js"),
     tags$script(src = "www/ig_desktop.js"),
     tags$script(src = "www/ig_run.js"),

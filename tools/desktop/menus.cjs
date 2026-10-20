@@ -1,11 +1,15 @@
 'use strict';
 const { Menu } = require('electron');
-module.exports = function desktopMenus({ command, restart, openLog, openLogs, saveLog, close, about, preferences, openProject, pinProject, unpinProject, clearRecent }) {
+module.exports = function desktopMenus({ command, restart, openLog, openLogs, saveLog, close, about, preferences, openProject, pinProject, unpinProject, clearRecent, translate = value=>value, setLanguage = ()=>{} }) {
+  const roles = {undo:'Undo',redo:'Redo',cut:'Cut',copy:'Copy',paste:'Paste',selectAll:'Select all',resetZoom:'Actual Size',zoomIn:'Zoom In',zoomOut:'Zoom Out',togglefullscreen:'Toggle Full Screen'};
+  const localize = entry => ({...entry,
+    ...(entry.label || roles[entry.role] ? {label:translate(entry.label || roles[entry.role])} : {}),
+    ...(entry.submenu ? {submenu:entry.submenu.map(localize)} : {})});
   const item = (id, label, accelerator) => ({ id, label, accelerator, enabled: false, click: () => command(id) });
   let recentSnapshot;
   function install() {
   const recent = preferences.recent;
-  recentSnapshot = JSON.stringify(recent);
+  recentSnapshot = JSON.stringify([recent,preferences.language]);
   const recentItems = [...recent.filter(x => x.pinned), ...recent.filter(x => !x.pinned)].map((entry, index) => ({
     id: 'recent-' + index, label: (entry.pinned ? '★ ' : '') + entry.path.replace(/&/g, '&&'), enabled: false,
     click: () => openProject(entry.path)
@@ -36,12 +40,16 @@ module.exports = function desktopMenus({ command, restart, openLog, openLogs, sa
     { label: 'Session', submenu: [{ id: 'restart-r', label: 'Restart R server...', accelerator: 'CmdOrCtrl+Shift+R', enabled: false, click: restart },
       { type: 'separator' }, { label: 'Open startup log', click: openLog },
       { label: 'Open logs folder', click: openLogs }, { label: 'Save diagnostic log...', click: saveLog }] },
-    { label: 'Help', submenu: [item('help','Application help','F1'), item('shortcuts','Keyboard shortcuts...'), {type:'separator'}, { id:'about', label:'About Individual Guide...', click:about }] }
-  ]));
+    { label: 'Help', submenu: [item('help','Application help','F1'), item('shortcuts','Keyboard shortcuts...'), {type:'separator'}, { id:'about', label:'About Individual Guide...', click:about }] },
+    { label:'Language', submenu:[
+      {id:'language-en-CA',label:'English',type:'radio',checked:preferences.language !== 'fr-CA',click:()=>setLanguage('en-CA')},
+      {id:'language-fr-CA',label:'Français (Canada)',type:'radio',checked:preferences.language === 'fr-CA',click:()=>setLanguage('fr-CA')}
+    ]}
+  ].map(localize)));
   }
   install();
   return function update(state, backend) {
-    if (recentSnapshot !== JSON.stringify(preferences.recent)) install();
+    if (recentSnapshot !== JSON.stringify([preferences.recent,preferences.language])) install();
     const menu = Menu.getApplicationMenu();
     const ready = state.connected && state.startupReady && backend.phase === 'ready' && !state.pending;
     for (const id of ['new','close-project','open','save','save-as','settings','undo','search','flow','code','console','tasks','versions','files','runs','validate','history','comments','review','add-task','help','shortcuts','run','stop']) {
@@ -56,11 +64,11 @@ module.exports = function desktopMenus({ command, restart, openLog, openLogs, sa
     for (let i = 0; i < preferences.recent.length; i++) menu.getMenuItemById('recent-' + i).enabled = Boolean(canOpen);
     const pinned = preferences.recent.some(item => item.path.toLowerCase() === state.projectPath?.toLowerCase() && item.pinned);
     menu.getMenuItemById('pin-project').enabled = Boolean(ready && state.projectPath && (pinned || preferences.recent.filter(x=>x.pinned).length < 10));
-    menu.getMenuItemById('pin-project').label = pinned ? 'Unpin current project' : 'Pin current project';
-    menu.getMenuItemById('save').label = state.dirty ? 'Save project *' : 'Save project';
+    menu.getMenuItemById('pin-project').label = translate(pinned ? 'Unpin current project' : 'Pin current project');
+    menu.getMenuItemById('save').label = translate(state.dirty ? 'Save project *' : 'Save project');
     for (const id of ['comments','review']) {
       const count = /^\d{1,4}$/.test(state[id] || '') ? ` (${state[id]})` : '';
-      menu.getMenuItemById(id).label = (id === 'comments' ? 'Comments' : 'Review dashboard') + count + '...';
+      menu.getMenuItemById(id).label = translate((id === 'comments' ? 'Comments' : 'Review dashboard') + count + '...');
     }
     menu.getMenuItemById('restart-r').enabled = backend.phase !== 'starting';
   };

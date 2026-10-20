@@ -15,13 +15,18 @@ $install = Join-Path $env:LOCALAPPDATA 'Programs\IndividualGuide Release Test'
 $executable = Join-Path $install 'IndividualGuide.exe'
 if (Test-Path -LiteralPath $executable) { throw 'Use a fresh test account; a release test installation already exists.' }
 $report = [ordered]@{ ok=$false; account=$env:USERNAME; checks=[ordered]@{}; installer=$setup.Name }
-function Install-Release([string]$Installer = $setup.FullName) {
-  $p = Start-Process -FilePath $Installer -ArgumentList @('/S',('/D=' + $install)) -WindowStyle Hidden -PassThru -Wait
+function Install-Release([string]$Installer = $setup.FullName,[string]$Language = '') {
+  $arguments = @('/S')
+  if ($Language) { $arguments += "/LANG=$Language" }
+  $arguments += ('/D=' + $install)
+  $p = Start-Process -FilePath $Installer -ArgumentList $arguments -WindowStyle Hidden -PassThru -Wait
   if ($p.ExitCode -ne 0 -or !(Test-Path -LiteralPath $executable)) { throw 'Silent installation failed.' }
 }
-function Run-Check([string]$Mode,[string]$Name,[string]$Profile) {
+function Run-Check([string]$Mode,[string]$Name,[string]$Profile,[string[]]$Extra = @()) {
   $result = Join-Path $EvidenceFolder ($Name + '.json')
-  $p = Start-Process -FilePath $executable -ArgumentList @($Mode,('"--smoke-result={0}"' -f $result),('"--data-dir={0}"' -f $Profile)) -WindowStyle Hidden -PassThru
+  $arguments = @($Mode,('"--smoke-result={0}"' -f $result),('"--data-dir={0}"' -f $Profile)) + $Extra
+  $p = Start-Process -FilePath $executable -ArgumentList $arguments -WindowStyle Hidden -PassThru
+  $null = $p.Handle
   if (!$p.WaitForExit(480000)) {
     & (Join-Path $env:SystemRoot 'System32\taskkill.exe') /PID $p.Id /T /F | Out-Null
     throw "Timed out: $Name"
@@ -43,12 +48,14 @@ function Run-Check([string]$Mode,[string]$Name,[string]$Profile) {
   if (Get-Process -Id $value.desktop.rPid -ErrorAction SilentlyContinue) { throw 'R survived desktop shutdown.' }
 }
 try {
+  & (Join-Path $PSScriptRoot 'test-installer-language.ps1') -Installer $setup.FullName -EvidenceDirectory (Join-Path $EvidenceFolder 'language-chooser')
+  $report.checks.languageChooser = $true
   $env:PATH = "$env:SystemRoot\System32;$env:SystemRoot"
   $env:R_HOME = 'C:\No-Host-R'; $env:R_LIBS_USER = 'C:\No-Host-Library'; $env:RSTUDIO_PANDOC = 'C:\No-Host-Pandoc'
   Remove-Item Env:ELECTRON_RUN_AS_NODE -ErrorAction SilentlyContinue
   Remove-Item Env:IG_RUNTIME_OVERRIDE -ErrorAction SilentlyContinue
   if ($PreviousInstaller) { Install-Release (Resolve-Path -LiteralPath $PreviousInstaller).Path; $report.upgradeScenario='previous release to current' }
-  else { Install-Release; $report.upgradeScenario='in-place reinstall; provide PreviousInstaller for a version upgrade' }
+  else { Install-Release -Language 'en-CA'; $report.upgradeScenario='in-place reinstall; provide PreviousInstaller for a version upgrade' }
   $report.checks.install = $true
   $profile = Join-Path $env:APPDATA 'Individual Guide'
   Run-Check '--smoke-test' 'workflow' (Join-Path $profile 'workflow')
@@ -75,6 +82,15 @@ try {
   Run-Check '--smoke-startup' 'after-upgrade' (Join-Path $profile 'startup')
   Run-Check '--smoke-product' 'product' (Join-Path $profile 'product')
   $report.checks.upgradePreservesProject = $true
+  # An explicit installer choice applies once, then app preferences win on reopen.
+  Install-Release -Language 'fr-CA'
+  $installedLanguage = Get-Content -LiteralPath (Join-Path $install 'installation-language.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+  if ($installedLanguage.locale -ne 'fr-CA') { throw 'French installer choice was not stored.' }
+  $languageProfile = Join-Path $profile 'language'
+  Run-Check '--smoke-language' 'language-first-launch' $languageProfile @('--expect-language=fr-CA','--finish-language=en-CA')
+  Install-Release
+  Run-Check '--smoke-language' 'language-reopen-and-upgrade' $languageProfile @('--expect-language=en-CA','--finish-language=fr-CA')
+  $report.checks.installerLanguageAndPersistentChoice = $true
   $uninstallers = @(Get-ChildItem -LiteralPath $install -Filter '*Uninstall*.exe' -File)
   if ($uninstallers.Count -ne 1) { throw 'Uninstaller missing.' }
   $p = Start-Process -FilePath $uninstallers[0].FullName -ArgumentList '/S' -WindowStyle Hidden -Wait -PassThru

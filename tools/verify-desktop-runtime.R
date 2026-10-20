@@ -17,7 +17,7 @@ for (file in list.files("R", pattern = "[.]R$", full.names = TRUE)) {
 signature <- function(fn) list(formals = deparse(formals(fn), width.cutoff = 100L), body = deparse(body(fn), width.cutoff = 100L))
 differences <- names(definitions)[!vapply(names(definitions), function(name)
   exists(name, ns, inherits = FALSE) && identical(signature(definitions[[name]]), signature(get(name, ns))), logical(1))]
-assets <- c("styles.css", "ig_desktop.js", "ig_run.js", "ig_tree.js", "ig_console.js", "ig_console_tools.js")
+assets <- list.files("inst/app/www", recursive = TRUE, pattern = "[.](js|json|css)$")
 version_expression <- Filter(function(expr) is.call(expr) && identical(expr[[1L]], as.name("<-")) &&
   identical(expr[[2L]], as.name("PROJECT_VERSION")), as.list(parse("R/project.R", encoding = "UTF-8")))[[1L]]
 constant_matches <- identical(eval(version_expression[[3L]], baseenv()), get("PROJECT_VERSION", ns))

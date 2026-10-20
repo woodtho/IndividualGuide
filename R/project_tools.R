@@ -144,12 +144,13 @@ project_tools_server <- function(id, store, load_project, open_task, relink_task
       tasks <- store$tasks; order <- store$task_order
       query <- tolower(trimws(input$task_search %||% ""))
       matches <- Filter(function(id) !nzchar(query) || grepl(query, tolower(paste(id, tasks[[id]]$label,
-        task_type_info(tasks[[id]]$type)$label, tasks[[id]]$status, paste(task_output_names(tasks[[id]]), collapse = " "))), fixed = TRUE), order)
+        ig_task_search_text(tasks[[id]]$type), tasks[[id]]$status, paste(task_output_names(tasks[[id]]), collapse = " "))), fixed = TRUE), order)
       if (!length(matches)) return(p("No matching tasks."))
       div(class = "ig-accessible-task-list", lapply(matches, function(id) {
         task <- tasks[[id]]
         div(class = "ig-accessible-task-row", div(strong(task$label %||% id),
-          div(class = "small text-muted", paste(id, task_type_info(task$type)$label, task$status, sep = " · "))),
+          div(class = "small text-muted", tags$code(id), " · ",
+            span(task_type_info(task$type)$label), " · ", span(task$status))),
           tags$button(type = "button", class = "btn btn-sm btn-outline-primary", `aria-label` = paste("Open task", task$label %||% id),
             onclick = ig_input_event_js(ns("open_task"), id), "Open task"))
       }))
