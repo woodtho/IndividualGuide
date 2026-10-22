@@ -11,10 +11,11 @@ runtime <- normalizePath(Sys.getenv("IG_RUNTIME_DIR"), winslash = "/", mustWork 
 state <- Sys.getenv("IG_USER_DATA")
 if (!nzchar(state)) stop("The desktop shell did not supply a writable data directory.")
 dir.create(state, recursive = TRUE, showWarnings = FALSE)
-user_library <- file.path(state, "R-library", paste(R.version$major, strsplit(R.version$minor, ".", fixed = TRUE)[[1]][1], sep = "."))
-dir.create(user_library, recursive = TRUE, showWarnings = FALSE)
 bundle_library <- file.path(runtime, "R/library")
-.libPaths(c(bundle_library, user_library), include.site = FALSE)
+.libPaths(bundle_library, include.site = FALSE)
+bootstrap <- new.env(parent = baseenv())
+sys.source(file.path(runtime, "package-library.R"), envir = bootstrap)
+bootstrap$ig_package_initialize(state, fallback = bundle_library)
 startup_log("library.paths", paste(.libPaths(), collapse = "; "))
 options(repos = c(CRAN = "https://cloud.r-project.org"), timeout = 600)
 manifest <- read.csv(file.path(runtime, "packages.csv"), stringsAsFactors = FALSE)
@@ -22,11 +23,7 @@ missing <- manifest$Package[!vapply(manifest$Package, function(name)
   file.exists(file.path(bundle_library, name, "DESCRIPTION")), logical(1))]
 startup_log("dependency.manifest", sprintf("packages=%d missing=%d", nrow(manifest), length(missing)))
 if (length(missing)) {
-  # Recovery is explicit. A healthy self-contained build never downloads code.
-  if (!identical(Sys.getenv("IG_ALLOW_PACKAGE_INSTALL"), "1"))
-    stop("Bundled dependencies are missing: ", paste(missing, collapse = ", "), ". Re-extract the application from its executable.")
-  if ("IndividualGuide" %in% missing) stop("The application package is missing. Re-extract the executable.")
-  install.packages(missing, lib = user_library, type = "binary")
+  stop("Bundled dependencies are missing: ", paste(missing, collapse = ", "), ". Reinstall Individual Guide to repair them.")
 }
 # Optional database/report/model packages initialize when their tasks use them.
 # Loading the whole manifest here triples startup memory and delays even an

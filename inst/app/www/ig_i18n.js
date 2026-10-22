@@ -15,7 +15,7 @@
     '.sF-fileList .sF-file:not(.sF-file-header),.sF-fileList .sF-directory,'+
     '.sF-dirList .sF-file-name,.sF-dirContent .sF-file-name,.sF-breadcrumps,'+
     '[data-ig-user-content],[data-ig-no-translate]';
-  const metadataTables='#history_dt,#global_search_dt,#project_tools-files,#project_tools-runs';
+  const metadataTables='#history_dt,#global_search_dt,#project_tools-files,#project_tools-runs,#packages-packages';
   function metadataHeader(element){return Boolean((element?.closest('.dataTable thead')&&element.closest(metadataTables))||element?.closest('.sF-file-header'));}
   let engine, frame, applying = false, observer;
   let canvasTypes = {};

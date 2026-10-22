@@ -43,7 +43,8 @@ module.exports = function desktopMenus({ command, restart, openLog, openLogs, sa
       item('close-shiny-app','Close Shiny app')] },
     { label: 'Task', submenu: [item('add-task','Add task...','CmdOrCtrl+Alt+N'), item('validate','Validate active flow...'), item('runs','Run records...'), { type:'separator' },
       item('run','Run active flow','CmdOrCtrl+Alt+R'), item('stop','Stop run','CmdOrCtrl+Shift+F5')] },
-    { label: 'Session', submenu: [{ id: 'restart-r', label: 'Restart R server...', accelerator: 'CmdOrCtrl+Shift+R', enabled: false, click: restart },
+    { label: 'Session', submenu: [item('packages','R packages...'),
+      { id: 'restart-r', label: 'Restart R server...', accelerator: 'CmdOrCtrl+Shift+R', enabled: false, click: restart },
       { type: 'separator' }, { label: 'Open startup log', click: openLog },
       { label: 'Open logs folder', click: openLogs }, { label: 'Save diagnostic log...', click: saveLog }] },
     { label: 'Help', submenu: [item('help','Application help','F1'), item('shortcuts','Keyboard shortcuts...'), {type:'separator'}, { id:'about', label:'About Individual Guide...', click:about }] },
@@ -67,6 +68,7 @@ module.exports = function desktopMenus({ command, restart, openLog, openLogs, sa
       menu.getMenuItemById(id).enabled = Boolean(enabled);
     }
     menu.getMenuItemById('shiny-apps').enabled = Boolean(ready && (!state.modal || state.welcome) && !state.recovery);
+    menu.getMenuItemById('packages').enabled = Boolean(ready && !state.modal && !state.appHost && !state.running && !state.recovery);
     const runningApp = menu.getMenuItemById('running-shiny-app');
     runningApp.enabled = Boolean(ready && state.appHostRunning && (!state.modal || state.welcome));
     runningApp.checked = Boolean(state.appHost && state.appHostRunning);

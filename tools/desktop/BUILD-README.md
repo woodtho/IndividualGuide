@@ -29,6 +29,21 @@ Settings, recovery files, connection settings and startup diagnostics live under
 and uninstalling preserve user data. Use `--data-dir=<directory>` for a separate
 profile. Closing the application stops its R processes.
 
+## R packages
+
+Session > R packages opens the package manager. Packages install into a writable
+IG-specific library under the app's user-data directory, separated by R
+major/minor version, with bundled packages as a fallback. Exact versions are
+pinned automatically; unpin before updating. Export and restore an IG package
+lockfile to reproduce the selected versions on the same R version.
+
+Changes are staged and checked in a separate process. Save your project and use
+Session > Restart R server to apply them. Running workspaces, consoles, task
+workers and guest apps keep their current environment until that restart. Undo
+last package change and Use bundled packages provide recovery without deleting
+libraries still in use. Base R and Individual Guide are managed by the installer.
+Older CRAN versions may require Rtools; it is not bundled with the application.
+
 ## Other Shiny apps
 
 Choose Apps > Open Shiny app, then select app.R or a folder with ui.R and

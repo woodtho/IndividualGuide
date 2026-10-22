@@ -71,6 +71,37 @@ checked by `tools/desktop/startup.R`. See
 [desktop build instructions](tools/desktop/BUILD-README.md) for paths, retained
 user data, dependency recovery, and the executable smoke test.
 
+## Manage R packages
+
+Choose **Session > R packages...** in the desktop app, or **Settings > R
+packages...** in a local browser. IG keeps its own writable library under its
+application data folder, separated by R major/minor version. This library takes
+priority over bundled packages and does not change your ordinary R libraries.
+
+Select a package or enter its CRAN name. **Install / update** with a blank
+version requests the latest version; entering an exact version installs and
+pins it. **Pin installed version** preserves the selected installed version.
+Unpin a package before updating it. Dependency changes that conflict with a pin
+are rejected. Older packages may require Rtools to compile on Windows.
+
+Changes are installed and checked in a separate library. Save your project,
+then use **Session > Restart R server...** (or restart R and relaunch a browser
+session) to apply them consistently to the workspace, console, task workers and
+hosted Shiny apps. Active sessions keep their existing versions until restarted.
+
+For browser use, start a fresh R session with
+`source(system.file("launch.R", package = "IndividualGuide"))`. This activates
+IG's library before loading the app's dependencies, so pins also apply to Shiny
+and other packages imported by IG itself.
+
+**Export package lockfile** records exact package versions and explicit pins;
+**Restore lockfile** recreates them for the same R version. Pins apply to this IG
+installation, across projects. **Undo last package change** selects the previous
+library, and **Use bundled packages** removes all overrides from the selected
+environment. Previous library folders remain available for running processes.
+R base packages and Individual Guide itself are updated through the app installer.
+Package changes are available only from a local browser or desktop session.
+
 ## Open other Shiny apps
 
 In the desktop app, choose **Apps > Open Shiny app...**. In a normal browser,

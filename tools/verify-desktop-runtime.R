@@ -38,6 +38,11 @@ shiny_app_differences <- shiny_app_files[!vapply(shiny_app_files, function(file)
   unname(tools::md5sum(file.path(root, "inst/shiny-apps", file))),
   unname(tools::md5sum(file.path(runtime, "R/library/IndividualGuide/shiny-apps", file)))), logical(1))]
 if (length(shiny_app_differences)) asset_differences <- c(asset_differences, paste0("shiny-apps/", shiny_app_differences))
+for (file in c("startup.R", "package-library.R")) {
+  source <- if (file == "startup.R") "tools/desktop/startup.R" else "R/package_library.R"
+  if (!file.exists(file.path(runtime, file)) || !identical(unname(tools::md5sum(source)), unname(tools::md5sum(file.path(runtime, file)))))
+    asset_differences <- c(asset_differences, file)
+}
 result <- list(ok = !length(differences) && !length(asset_differences) && constant_matches && identity_matches,
   projectFormatMatches = constant_matches, releaseIdentityMatches = identity_matches, functions = length(definitions),
   differences = differences, asset_differences = asset_differences, bundledExampleFiles = length(example_files),

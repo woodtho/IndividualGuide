@@ -18,6 +18,9 @@ app_server <- function(input, output, session) {
   store <- make_store()
   store_init_ui_reactivity(store)
   store_init_background(store, session)
+  packages <- ig_package_manager_server("packages", store)
+  observeEvent(input$open_package_manager, packages$show())
+  observeEvent(input$settings_packages, packages$show())
   startup_ready <- reactiveVal(FALSE)
   recovery_pending <- reactiveVal(file.exists(project_recovery_path()))
   workspace_welcome <- reactiveVal(TRUE)
@@ -2275,6 +2278,7 @@ app_server <- function(input, output, session) {
       title = div(icon("gear"), " Settings"),
       size = "m",
       footer = tagList(
+        actionButton("settings_packages", "R packages..."),
         modalButton("Cancel"),
         actionButton("settings_apply", "Apply", class = "btn btn-primary")
       ),

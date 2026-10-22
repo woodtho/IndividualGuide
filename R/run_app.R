@@ -30,6 +30,7 @@ app_sys <- function(...) {
 #'   run_app()
 #' }
 run_app <- function(...) {
+  ig_package_initialize(fallback = getOption("ig.package.launch.fallback", .libPaths()))
   # Serve packaged static assets (styles.css, ig_tree.js) under /www
   shiny::addResourcePath("www", app_sys("app", "www"))
   shiny::shinyApp(ui = app_ui(), server = app_server, ...)

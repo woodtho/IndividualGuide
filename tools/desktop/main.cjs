@@ -594,7 +594,7 @@ async function launchR() {
     fs.rmSync(stopFile, { force: true });
     const rHome = path.join(runtime, 'R');
     const manifest = JSON.parse(fs.readFileSync(path.join(runtime, 'runtime.json'), 'utf8'));
-    eventLog('runtime.manifest', { ...manifest, library: path.join(rHome, 'library'), pandoc: path.join(runtime, 'pandoc'), userLibrary: path.join(state, 'R-library') });
+    eventLog('runtime.manifest', { ...manifest, library: path.join(rHome, 'library'), pandoc: path.join(runtime, 'pandoc'), userLibrary: path.join(state, 'packages') });
     const executable = path.join(rHome, 'bin', 'x64', 'Rscript.exe');
     if (!fs.existsSync(executable)) throw new Error('The bundled R runtime is missing. Reinstall Individual Guide to repair it.');
     const port = await freePort();
@@ -604,7 +604,7 @@ async function launchR() {
     for (const name of Object.keys(environment)) {
       if (/^(R_HOME|R_LIBS.*|R_PROFILE.*|R_ENVIRON.*|RSTUDIO.*|ELECTRON_RUN_AS_NODE|PATH)$/i.test(name)) delete environment[name];
     }
-    Object.assign(environment, { R_HOME: rHome, R_LIBS_USER: path.join(state, 'R-library'), R_LIBS_SITE: '',
+    Object.assign(environment, { R_HOME: rHome, R_LIBS_USER: '', R_LIBS_SITE: '',
       R_ENVIRON_USER: 'NUL', R_PROFILE_USER: 'NUL', RSTUDIO_PANDOC: path.join(runtime, 'pandoc'),
       PATH: [path.dirname(executable), path.join(runtime, 'pandoc'),
         path.join(process.env.SystemRoot, 'System32', 'WindowsPowerShell', 'v1.0'),

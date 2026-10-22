@@ -110,6 +110,7 @@
       flush(); Shiny.setInputValue('product_action', action, { priority: 'event' }); return;
     }
     flush();
+    if (action === 'packages') { Shiny.setInputValue('open_package_manager', Date.now(), { priority: 'event' }); return; }
     var buttons = { undo: 'btn_undo', search: 'btn_search', history: 'btn_history', settings: 'btn_settings',
       help: 'btn_help', shortcuts: 'btn_shortcuts', comments: 'btn_comments', review: 'btn_review', 'add-task': 'btn_add_task' };
     if (['flow','code','console'].includes(action)) Shiny.setInputValue('shortcut_open_tab', action, { priority: 'event' });

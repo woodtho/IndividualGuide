@@ -153,9 +153,16 @@ ig_environment_info <- function() {
     df <- read.csv(csv, stringsAsFactors = FALSE)
     stats::setNames(as.list(df$Version), df$Package)
   } else list()
+  # Read the generation this process actually started with. The package manager
+  # may already have selected a different generation for the next R restart.
+  library <- Sys.getenv("IG_PACKAGE_LIBRARY", "")
+  profile <- if (nzchar(library)) file.path(dirname(library), "profile.rds") else ""
+  selected <- if (nzchar(profile) && file.exists(profile)) readRDS(profile) else NULL
+  if (!is.null(selected)) for (name in names(selected$packages)) packages[[name]] <- selected$packages[[name]]
   for (name in loadedNamespaces()) packages[[name]] <- as.character(getNamespaceVersion(name))
   list(app = as.character(getNamespaceVersion("IndividualGuide")), R = getRversion() |> as.character(),
-    platform = R.version$platform, packages = packages[order(names(packages))])
+    platform = R.version$platform, package_profile = Sys.getenv("IG_PACKAGE_PROFILE", ""),
+    package_pins = if (is.null(selected)) list() else as.list(selected$pins), packages = packages[order(names(packages))])
 }
 
 ig_environment_changes <- function(previous) {

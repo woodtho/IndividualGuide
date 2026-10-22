@@ -10,7 +10,7 @@ main <- function() {
   environment <- Sys.getenv()
   environment <- environment[!grepl("^(R_HOME|R_LIBS.*|R_PROFILE.*|R_ENVIRON.*|RSTUDIO.*|ELECTRON_RUN_AS_NODE|PATH)$", names(environment), ignore.case = TRUE)]
   rhome <- file.path(runtime, "R"); executable <- file.path(rhome, "bin/x64/Rscript.exe")
-  environment <- c(environment, R_HOME = rhome, R_LIBS_USER = file.path(state, "R-library"), R_LIBS_SITE = "",
+  environment <- c(environment, R_HOME = rhome, R_LIBS_USER = "", R_LIBS_SITE = "",
     R_ENVIRON_USER = "NUL", R_PROFILE_USER = "NUL", RSTUDIO_PANDOC = file.path(runtime, "pandoc"),
     PATH = paste(c(dirname(executable), file.path(runtime, "pandoc"),
       file.path(Sys.getenv("SystemRoot"), "System32/WindowsPowerShell/v1.0"),

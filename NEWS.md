@@ -1,3 +1,9 @@
+# Development
+
+- Add an IG-specific R package library and a package manager for installing,
+  pinning and restoring exact CRAN package versions. Validate changes in a
+  separate library, apply them after restarting R, and retain rollback profiles.
+
 # Individual Guide 0.6.0
 
 - Open other local Shiny apps from app.R or a ui.R/server.R folder, with a

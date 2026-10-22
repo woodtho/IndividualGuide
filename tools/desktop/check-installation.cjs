@@ -22,7 +22,7 @@ const archive = path.join(installed, 'resources/app.asar');
 for (const file of ['main.cjs', 'preload.cjs', 'diagnostics.cjs', 'preferences.cjs', 'security.cjs', 'menus.cjs', 'smoke.cjs', 'menu-smoke.cjs', 'lifecycle-smoke.cjs', 'restart-smoke.cjs', 'console-smoke.cjs', 'examples-smoke.cjs', 'product-smoke.cjs', 'loading.html', 'assets/icon.png', 'assets/icon-LICENSE.txt']) {
   assert.ok(asar.extractFile(archive, file).equals(fs.readFileSync(path.join(__dirname, file))), `Installed desktop source differs: ${file}`);
 }
-for (const file of ['startup.R', 'runtime.json', 'R/library/IndividualGuide/DESCRIPTION', 'R/library/IndividualGuide/build-info.json',
+for (const file of ['startup.R', 'package-library.R', 'runtime.json', 'R/library/IndividualGuide/DESCRIPTION', 'R/library/IndividualGuide/build-info.json',
   'R/library/IndividualGuide/R/IndividualGuide.rdb', 'R/library/IndividualGuide/R/IndividualGuide.rdx',
   'R/library/IndividualGuide/app/www/styles.css', 'R/library/IndividualGuide/app/www/ig_desktop.js', 'R/library/IndividualGuide/app/www/ig_run.js', 'R/library/IndividualGuide/app/www/ig_console.js', 'R/library/IndividualGuide/app/www/ig_console_tools.js']) {
   assert.ok(fs.readFileSync(path.join(installed, 'resources/runtime', file)).equals(

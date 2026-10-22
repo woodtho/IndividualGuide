@@ -23,6 +23,10 @@ module.exports = async ({ window, pause, state, logPath, sendCommand, saveDiagno
   assert.equal(await js("typeof require === 'undefined' && typeof process === 'undefined' && !window.ipcRenderer"), true);
   checks.desktopMenusReplaceHeader = true; checks.sandbox = true;
   await js("document.getElementById('splash_fresh').click()"); await idle();
+  command('packages');
+  await wait(() => js("Boolean(document.getElementById('packages-install')?.classList.contains('shiny-bound-input'))"), 'native package manager');
+  checks.nativePackageManager = true;
+  await closeModal();
   command('add-task');
   await wait(() => js("Boolean(document.querySelector('[onclick*=\"picker_select\"][onclick*=\"script\"]'))"), 'script picker');
   await js("document.querySelector('[onclick*=\"picker_select\"][onclick*=\"script\"]').click()");

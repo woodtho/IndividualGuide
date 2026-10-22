@@ -58,7 +58,9 @@ if (!$result.checks.secondLaunch) { throw 'Opening the executable twice was not 
 # .libPaths() expands them. Compare the expanded private library and require
 # the runtime home suffix instead of comparing two representations literally.
 $expectedLibrary = [IO.Path]::GetFullPath((Join-Path $result.runtimeDirectory 'R/library')).Replace('\','/')
-if (!$result.runtime.library_paths[0].Replace('\','/').Equals($expectedLibrary, [StringComparison]::OrdinalIgnoreCase) -or
+$expectedUserLibraryRoot = [IO.Path]::GetFullPath((Join-Path $dataRoot 'packages')).Replace('\','/') + '/'
+if (!$result.runtime.library_paths[0].Replace('\','/').StartsWith($expectedUserLibraryRoot, [StringComparison]::OrdinalIgnoreCase)) { throw 'The app did not prioritize its IG-specific package library.' }
+if (!(@($result.runtime.library_paths | ForEach-Object { $_.Replace('\','/') }) -contains $expectedLibrary) -or
     !$result.runtime.r_home.Replace('\','/').EndsWith('/runtime/R', [StringComparison]::OrdinalIgnoreCase)) { throw 'The executable used an R installation outside its bundle.' }
 if (Get-Process -Id $result.desktop.rPid -ErrorAction SilentlyContinue) { throw 'The R process survived closing the app.' }
 $firstLogLine = Get-Content -LiteralPath (Join-Path $dataRoot 'logs\startup.log') -TotalCount 1

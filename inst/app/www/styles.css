@@ -3144,6 +3144,14 @@ html:not([data-ig-theme="light"]) .modal-footer .btn-primary { color: #fff; back
 .ig-desktop .shiny-input-container:has(#settings_language),
 .ig-desktop .shiny-input-container:has(#settings_language) + p,
 .ig-desktop .ig-appbar > button { display:none !important; }
+#shiny-modal.ig-package-manager .modal-dialog {
+  width:min(1140px,calc(100vw - 24px));
+  max-width:calc(100vw - 24px);
+  margin-left:auto;
+  margin-right:auto;
+}
+.ig-package-manager .dataTables_wrapper { min-width:0;max-width:100%;overflow-x:auto; }
+.ig-package-manager .modal-footer { flex-wrap:wrap;gap:8px; }
 .ig-app-brand { display:none; }
 .ig-desktop .ig-app-brand { display:inline-flex;align-items:center;gap:8px;flex:0 0 auto;font-size:.8rem;font-weight:600; }
 .ig-desktop .ig-app-brand svg { color:var(--ig-primary,#8c9bff); }
