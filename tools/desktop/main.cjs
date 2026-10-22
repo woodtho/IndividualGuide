@@ -381,7 +381,7 @@ async function start() {
   ipcMain.on('ig:workspace-state', (event, value) => {
     if (!trustedSender(event) || !value || typeof value !== 'object') return;
     const previous = workspace.connected;
-    for (const key of ['connected','dirty','canUndo','pending','modal','welcome','welcomeVisible','running','canRun','recovery','startupReady','appHost','appHostRunning']) workspace[key] = value[key] === true;
+    for (const key of ['connected','dirty','canUndo','pending','modal','welcome','welcomeVisible','running','canRun','recovery','startupReady','appHost','appHostRunning','appHostLog']) workspace[key] = value[key] === true;
     for (const key of ['projectName','projectPath','comments','review','hostName']) workspace[key] = typeof value[key] === 'string' ? value[key].slice(0,4096) : '';
     if (workspace.connected !== previous) eventLog(workspace.connected ? 'workspace.connected' : 'workspace.disconnected',
       { attempt, elapsedMs: Date.now() - attemptStarted, rPid: rProcess?.pid, memoryMiB: Math.round(process.memoryUsage().rss/1048576) });

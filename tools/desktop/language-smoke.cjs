@@ -41,9 +41,10 @@ module.exports=async({window,pause,state,preferences,getProcess,getState,request
  assert.equal(await js("document.getElementById('scr_script_1-output_name').value"),'Mean');
  assert.equal(await js('Shiny.shinyapp.$socket===languageSocket&&languageSocket.readyState===1'),true);
  assert.equal(getProcess(),server);checks.switchKeepsProcessConnectionAndInput=true;
- await js("(()=>{const e=document.getElementById('ig-language-choice');e.value='fr-CA';e.dispatchEvent(new Event('change',{bubbles:true}));})()");
- await wait(()=>preferences.language==='fr-CA'&&Menu.getApplicationMenu().items[0].label==='Fichier','header updates native menu');
- checks.headerUpdatesNativeLanguage=true;
+ assert.equal(await js("[...document.querySelectorAll('.ig-language-control')].every(e=>!e.getClientRects().length)"),true);
+ await change('fr-CA');
+ assert.equal(Menu.getApplicationMenu().items.find(item=>item.submenu?.getMenuItemById('shiny-apps')).label,'Applications');
+ checks.languageAndAppsMenusReplacePageControls=true;
  await js("(()=>{const e=document.getElementById('scr_script_1-output_defs');e.value='Mean: table';e.dispatchEvent(new Event('change',{bubbles:true}));ace.edit('scr_script_1-code').setValue('Mean <- data.frame(value = 21 * 2)',-1);})()");
  await pause(600);await js("document.getElementById('panel_run_btn_script_1').click()");
  await wait(()=>js("Boolean(document.querySelector('#panel_status_script_1 .ig-status-success'))"),'real R task in French');

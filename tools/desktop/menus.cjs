@@ -16,7 +16,6 @@ module.exports = function desktopMenus({ command, restart, openLog, openLogs, sa
   }));
   Menu.setApplicationMenu(Menu.buildFromTemplate([
     { label: 'File', submenu: [item('new','New project','CmdOrCtrl+N'), item('open','Open project...','CmdOrCtrl+O'),
-      item('shiny-apps','Open Shiny app...','CmdOrCtrl+Shift+O'), item('close-shiny-app','Close Shiny app'),
       { id: 'recent-projects', label: 'Recent projects', submenu: recentItems.length ? recentItems : [{ label: 'No recent projects', enabled: false }] },
       { id: 'pin-project', label: 'Pin current project', enabled: false, click: pinProject },
       { label:'Unpin a project', submenu: recent.some(x=>x.pinned) ? recent.filter(x=>x.pinned).map((entry,index)=>({
@@ -37,6 +36,11 @@ module.exports = function desktopMenus({ command, restart, openLog, openLogs, sa
       item('history','Change history...'), item('comments','Comments...'), item('review','Review dashboard...'),
       { type: 'separator' }, { role: 'resetZoom' }, { role: 'zoomIn' }, { role: 'zoomOut' },
       { type: 'separator' }, { role: 'togglefullscreen' }] },
+    { label: 'Apps', submenu: [item('shiny-apps','Open Shiny app...','CmdOrCtrl+Shift+O'),
+      { ...item('running-shiny-app','Return to running app','CmdOrCtrl+Alt+A'), type:'checkbox', checked:false,
+        click:entry=>{entry.checked=true;command('running-shiny-app');} },
+      { type:'separator' }, { ...item('shiny-app-log','App log'), type:'checkbox', checked:false },
+      item('close-shiny-app','Close Shiny app')] },
     { label: 'Task', submenu: [item('add-task','Add task...','CmdOrCtrl+Alt+N'), item('validate','Validate active flow...'), item('runs','Run records...'), { type:'separator' },
       item('run','Run active flow','CmdOrCtrl+Alt+R'), item('stop','Stop run','CmdOrCtrl+Shift+F5')] },
     { label: 'Session', submenu: [{ id: 'restart-r', label: 'Restart R server...', accelerator: 'CmdOrCtrl+Shift+R', enabled: false, click: restart },
@@ -63,6 +67,12 @@ module.exports = function desktopMenus({ command, restart, openLog, openLogs, sa
       menu.getMenuItemById(id).enabled = Boolean(enabled);
     }
     menu.getMenuItemById('shiny-apps').enabled = Boolean(ready && (!state.modal || state.welcome) && !state.recovery);
+    const runningApp = menu.getMenuItemById('running-shiny-app');
+    runningApp.enabled = Boolean(ready && state.appHostRunning && (!state.modal || state.welcome));
+    runningApp.checked = Boolean(state.appHost && state.appHostRunning);
+    runningApp.label = translate('Return to running app') + (state.appHostRunning && state.hostName ? ' — ' + state.hostName.slice(0,80).replace(/&/g,'&&') : '');
+    menu.getMenuItemById('shiny-app-log').enabled = Boolean(ready && !state.recovery && (!state.modal || state.welcome));
+    menu.getMenuItemById('shiny-app-log').checked = Boolean(state.appHost && state.appHostLog);
     menu.getMenuItemById('close-shiny-app').enabled = Boolean(ready && state.appHostRunning);
     const canOpen = ready && (!state.modal || state.welcome) && (!state.welcome || state.welcomeVisible) && !state.recovery && !state.running && !state.appHost;
     for (let i = 0; i < preferences.recent.length; i++) menu.getMenuItemById('recent-' + i).enabled = Boolean(canOpen);

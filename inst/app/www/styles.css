@@ -3136,3 +3136,78 @@ html:not([data-ig-theme="light"]) .modal-footer .btn-primary { color: #fff; back
 #btn_shiny_apps.ig-app-running::after { content:'';position:absolute;right:2px;top:2px;width:7px;height:7px;border-radius:50%;background:#77d8a4;box-shadow:0 0 0 2px var(--bs-body-bg,#1a1a2e); }
 #ig-shiny-apps #sf_shiny_app, #ig-shiny-apps #sf_shiny_folder { color:var(--bs-body-color,#e0e0f0);border:1px solid var(--bs-border-color,#777a91);background:transparent; }
 #ig-shiny-apps #sf_shiny_app:hover, #ig-shiny-apps #sf_shiny_folder:hover { background:var(--bs-tertiary-bg,#303248); }
+
+/* Desktop commands live in native menus. Ordinary browser sessions retain
+   their controls, including the welcome screen's language/app choices. */
+.ig-desktop .ig-browser-only,
+.ig-desktop .ig-language-control,
+.ig-desktop .shiny-input-container:has(#settings_language),
+.ig-desktop .shiny-input-container:has(#settings_language) + p,
+.ig-desktop .ig-appbar > button { display:none !important; }
+.ig-app-brand { display:none; }
+.ig-desktop .ig-app-brand { display:inline-flex;align-items:center;gap:8px;flex:0 0 auto;font-size:.8rem;font-weight:600; }
+.ig-desktop .ig-app-brand svg { color:var(--ig-primary,#8c9bff); }
+.ig-desktop .ig-appbar { min-height:42px;padding:6px 16px;gap:16px; }
+.ig-desktop .ig-app-heading { flex-direction:row;align-items:center;gap:12px;border-left:1px solid var(--bs-border-color);padding-left:16px; }
+.ig-desktop #ig-app-name { font-size:.8rem;max-width:45%; }
+.ig-desktop #ig-app-status { overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0; }
+
+/* Keep the canvas and task editor usable at laptop sizes. */
+.ig-app-header { gap:12px;flex-wrap:wrap;min-width:0; }
+.ig-app-header > strong { flex-shrink:0; }
+.ig-app-header .ig-desktop-menu-controls { gap:4px !important;flex-wrap:wrap; }
+.ig-desktop .ig-primary-actions { margin-left:auto; }
+.bslib-sidebar-layout > .main { padding:12px;min-width:0; }
+.bslib-page-sidebar { --bslib-page-main-min-width:0px; }
+.ig-workspace,#ig-tab-strip,.ig-panel-container,.ig-task-panel { min-width:0;max-width:100%; }
+/* bslib writes the explicit sidebar width into this property inline. */
+.bslib-sidebar-layout:has(> #main_sidebar) { --_sidebar-width:clamp(220px,23.5vw,290px) !important; }
+.ig-panel-container { padding:8px 0 0; }
+.ig-panel-toolbar { flex-wrap:wrap;gap:8px;padding:6px 8px; }
+.ig-panel-task-info { flex-wrap:wrap;overflow-wrap:anywhere; }
+.ig-panel-task-id { max-width:100%;overflow:hidden;text-overflow:ellipsis; }
+.ig-tab-pill { min-height:36px;padding:4px 10px;gap:7px; }
+.ig-tab-close { justify-content:center;width:24px;height:24px;flex:0 0 24px;margin-left:0; }
+.ig-tree-action-btn:focus-visible { opacity:1; }
+.ig-tree-search-field::placeholder { color:var(--ig-text-muted,#a0a9c0); }
+/* Separate the readable task name from its technical ID and hover actions. */
+.ig-tree-task-item { display:grid;grid-template-columns:14px 16px 16px minmax(0,1fr) 20px 20px;gap:2px 4px; }
+.ig-tree-task-item > .ig-tree-task-check { grid-column:1;grid-row:1 / span 2;align-self:center; }
+.ig-tree-task-item > .ig-tree-caret-btn { grid-column:2;grid-row:1 / span 2; }
+.ig-tree-task-item > .ig-tree-icon { grid-column:3;grid-row:1 / span 2;align-self:center; }
+.ig-tree-task-item > .ig-tree-label { grid-column:4 / -1;grid-row:1; }
+.ig-tree-task-item > .ig-tree-task-id { grid-column:4;grid-row:2;margin-left:0;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+.ig-tree-task-item > .ig-tree-action-btn { grid-column:5;grid-row:2;margin-left:0; }
+.ig-tree-task-item > .ig-tree-action-danger { grid-column:6; }
+
+/* A long filename or several notices must not cover the entire workspace. */
+#shiny-notification-panel#shiny-notification-panel { width:min(360px,calc(100vw - 24px));max-height:55dvh;overflow:auto;right:12px;bottom:12px; }
+#shiny-notification-panel .shiny-notification { width:100%;margin:8px 0 0;padding:12px 36px 12px 16px;overflow-wrap:anywhere; }
+.shiny-notification-content { max-height:25dvh;overflow:auto;padding-right:6px; }
+.shiny-notification-close { display:grid;place-items:center;min-width:28px;min-height:28px; }
+.modal-dialog:not(.modal-fullscreen) { max-width:min(var(--bs-modal-width,500px),calc(100vw - 24px)); }
+.modal-content { max-height:calc(100dvh - 40px); }
+.modal-body { min-height:0;overflow-y:auto; }
+
+@media(max-width:1100px) {
+  .ig-app-header { gap:8px; }
+  .ig-tree-flow-header { flex-wrap:wrap; }
+  .ig-tree-flow-btns { flex-basis:100%;justify-content:flex-end; }
+  .ig-tree-select-flow { flex:1; }
+  .ig-tree-dataset-item { display:grid;grid-template-columns:16px minmax(0,1fr) 22px;gap:2px 6px; }
+  .ig-tree-dataset-item .ig-tree-icon { grid-column:1;grid-row:1 / span 2;align-self:center; }
+  .ig-tree-dataset-item .ig-tree-label { grid-column:2;grid-row:1; }
+  .ig-tree-dataset-item .ig-tree-node-role { grid-column:2;grid-row:2;margin-left:0; }
+  .ig-tree-dataset-item .ig-tree-action-btn { grid-column:3;grid-row:1 / span 2;margin-left:0; }
+  .ig-tree-task-id { min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+}
+@media(max-width:800px) {
+  .ig-app-header .ig-desktop-menu-controls { flex-basis:100%;margin-left:0 !important; }
+  .ig-app-header .ig-primary-actions { margin-left:auto; }
+  .ig-run-status { flex-wrap:wrap; }
+  .ig-app-heading { min-width:100px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .ig-splash-icon { animation:none; }
+  .ig-tab-pill,.ig-header-btn,.ig-add-task-btn { transition:none !important; }
+}

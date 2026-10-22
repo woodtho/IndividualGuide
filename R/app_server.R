@@ -1728,7 +1728,7 @@ app_server <- function(input, output, session) {
       easyClose = FALSE,
       size      = "m",
       div(class = "ig-splash",
-        div(class = "d-flex justify-content-center mb-3", ig_language_picker("ig-welcome-language")),
+        div(class = "ig-browser-only d-flex justify-content-center mb-3", ig_language_picker("ig-welcome-language")),
         div(class = "ig-splash-logo",
           icon("share-nodes", class = "ig-splash-icon"),
           h2(class = "ig-splash-title", "Individual Guide"),
@@ -1745,7 +1745,7 @@ app_server <- function(input, output, session) {
             icon  = icon("folder-open"),
             class = "btn btn-outline-secondary ig-splash-btn",
             width = "100%"),
-          tags$button(id = "splash_shiny_apps", type = "button", class = "btn btn-outline-secondary ig-splash-btn",
+          tags$button(id = "splash_shiny_apps", type = "button", class = "btn btn-outline-secondary ig-splash-btn ig-browser-only",
             icon("window-maximize"), "Open Shiny app")
         ),
         div(class = "ig-splash-fresh",

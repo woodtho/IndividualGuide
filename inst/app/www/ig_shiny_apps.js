@@ -24,6 +24,7 @@
     const panel=byId('ig-app-log-panel'),changed=panel.hidden===value;
     panel.hidden=!value;byId('ig-app-log').setAttribute('aria-expanded',String(value));
     if(changed&&connected())Shiny.setInputValue('app_host_log',value,{priority:'event'});
+    publish();
   }
   function action(name, extra) {
     if (!connected()) { byId('ig-app-error').textContent=text('Individual Guide is disconnected. Reconnect before opening another app.'); return; }
@@ -31,22 +32,25 @@
     Shiny.setInputValue('app_host_action', {action:name,...extra,nonce:pending}, {priority:'event'});
     render();
   }
-  function publish() { window.dispatchEvent(new CustomEvent('ig:app-host', {detail:{visible:!byId('ig-shiny-apps').hidden,running:active(),name:state.name||''}})); }
+  function publish() { window.dispatchEvent(new CustomEvent('ig:app-host', {detail:{visible:!byId('ig-shiny-apps').hidden,running:active(),name:state.name||'',logVisible:!byId('ig-app-log-panel').hidden}})); }
   function open() {
     if (!connected() || byId('recover_restore')) return;
+    if(byId('ig-app-confirm').open)byId('ig-app-confirm').close();
     if (byId('ig-shiny-apps').hidden) lastFocus=document.activeElement;
     byId('ig-shiny-apps').hidden=false;
     workspaceInert(true);
     document.body.classList.add('ig-host-active');
     Shiny.setInputValue('app_host_open',Date.now(),{priority:'event'});
-    render(); byId('ig-app-open').focus(); publish();
+    render();
+    (window.igDesktop ? (selecting ? byId('sf_shiny_app') : byId('ig-app-frame')) : byId('ig-app-open'))?.focus();
+    publish();
   }
   function leave() {
     if(byId('ig-app-confirm').open)byId('ig-app-confirm').close();
     byId('ig-shiny-apps').hidden=true;
     workspaceInert(false);
     document.body.classList.remove('ig-host-active');
-    (lastFocus?.isConnected ? lastFocus : byId('btn_shiny_apps')).focus(); publish();
+    (lastFocus?.isConnected && lastFocus.getClientRects().length ? lastFocus : byId(window.igDesktop?'btn_add_task':'btn_shiny_apps')).focus(); publish();
   }
   function close() {
     if (active()) byId('ig-app-confirm').showModal();
@@ -122,6 +126,10 @@
       setTimeout(retry,50);
     },true);
     window.addEventListener('ig:language-changed',render);
-    window.igShinyApps={open,back:leave,close:()=>{open();close();},get state(){return {...state};},get pending(){return Boolean(pending);}};
+    window.igShinyApps={open,back:leave,
+      choose:()=>{selecting=true;open();},
+      resume:()=>{if(active()){selecting=false;open();}},
+      toggleLog:()=>{const visible=!byId('ig-shiny-apps').hidden&&!byId('ig-app-log-panel').hidden;open();showLog(!visible);},
+      close:()=>{open();close();},get state(){return {...state};},get pending(){return Boolean(pending);}};
   });
 })();

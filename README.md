@@ -73,15 +73,19 @@ user data, dependency recovery, and the executable smoke test.
 
 ## Open other Shiny apps
 
-Choose **Open Shiny app** on the welcome screen, use the window icon in the
-workspace, or choose **File > Open Shiny app...** in the desktop menu. Select an
+In the desktop app, choose **Apps > Open Shiny app...**. In a normal browser,
+choose **Open Shiny app** on the welcome screen or use the workspace's window
+icon. Select an
 `app.R` file or a folder containing `ui.R` and `server.R`, check its path, then
 trust and run it. Keep the app's data and helper files in the same folder.
 
-The app runs in its own R process inside a mostly full-window view. Its top bar
-keeps **Individual Guide**, **Open app...**, **App log** and **Close app** within
-reach. **Individual Guide** returns to your project while the other app keeps
-running; opening its view again preserves its inputs. Only closing or replacing
+The app runs in its own R process inside a mostly full-window view. The desktop
+**Apps** menu provides **Return to running app**, **App log** and **Close Shiny
+app**. **View > Individual Guide workspace** (**Ctrl+Alt+I**) returns to your
+project; **Apps > Return to running app** (**Ctrl+Alt+A**) returns to the guest.
+A slim identity bar keeps the viewer recognizably inside Individual Guide.
+Normal browser sessions retain the full toolbar. Returning to your project
+keeps the other app running and preserves its inputs. Only closing or replacing
 the app stops it. A failed app leaves the main workspace and launcher available.
 
 Apps execute R code with your permissions. Extra packages and external software

@@ -2,6 +2,8 @@
   "locale": "fr-CA",
   "name": "Français (Canada)",
   "strings": {
+    "Apps": "Applications",
+    "Return to running app": "Revenir à l’application en cours",
     "Return to Shiny app": "Revenir à l’application Shiny",
     "Restarting also closes the loaded Shiny app. Save its work first.": "Le redémarrage ferme aussi l’application Shiny ouverte. Enregistrez d’abord son travail.",
     "Size": "Taille",

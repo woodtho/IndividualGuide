@@ -14,6 +14,10 @@ module.exports=async({window,pause,state,runtime,getProcess})=>{
  const mainPid=getProcess().pid;
  let guestURL='';
  await wait(()=>menu('shiny-apps').enabled&&js("Boolean(document.getElementById('splash_shiny_apps'))"),'startup');
+ assert.equal(await js("[...document.querySelectorAll('.ig-language-control,#btn_shiny_apps,#splash_shiny_apps')].every(e=>!e.getClientRects().length)"),true);
+ assert.ok(menu('language-en-CA')&&menu('language-fr-CA'));
+ assert.equal(menu('running-shiny-app').enabled,false);
+ checks.desktopControlsLiveInMenus=true;
  await js('window._hostSocket=Shiny.shinyapp.$socket');
  menu('shiny-apps').click();
  await wait(()=>js("!document.getElementById('ig-shiny-apps').hidden&&!document.getElementById('shiny-modal')"),'native opener');
@@ -42,6 +46,14 @@ module.exports=async({window,pause,state,runtime,getProcess})=>{
  assert.notEqual(frame().processId,window.webContents.mainFrame.processId,
    'The loaded app must not share the main workspace renderer.');
  checks.independentGuestRenderer=true;
+ assert.equal(await js("[...document.querySelectorAll('.ig-appbar > button')].every(e=>!e.getClientRects().length)&&document.querySelector('.ig-app-brand').getClientRects().length>0"),true);
+ assert.ok(menu('running-shiny-app').enabled&&menu('running-shiny-app').checked);
+ menu('shiny-app-log').click();
+ await wait(()=>js("!document.getElementById('ig-app-log-panel').hidden")&&menu('shiny-app-log').checked,'native app log');
+ menu('shiny-app-log').click();
+ await wait(()=>js("document.getElementById('ig-app-log-panel').hidden")&&!menu('shiny-app-log').checked,'native app log closes');
+ fs.writeFileSync(path.join(state,'shiny-viewer.png'),(await window.webContents.capturePage()).toPNG());
+ checks.nativeViewerMenusAndBranding=true;
  assert.equal(await guest("typeof window.igDesktop==='undefined'&&typeof require==='undefined'&&typeof process==='undefined'"),true);
  assert.equal(fs.readFileSync(marker,'utf8').trim(),'');checks.guestHasNoDesktopBridgeOrToken=true;
  await guest("document.getElementById('species').value='setosa';document.getElementById('species').dispatchEvent(new Event('change',{bubbles:true}))");
@@ -52,11 +64,16 @@ module.exports=async({window,pause,state,runtime,getProcess})=>{
   await wait(()=>js("document.getElementById('project_tree_ui').textContent.includes('example_source')"),'real main project with saved task results');
   await js("document.getElementById('ig-tree-search-input').value='keep my project'");
   const projectTree=await js("document.getElementById('project_tree_ui').textContent");
- menu('shiny-apps').click();
+ menu('running-shiny-app').click(menu('running-shiny-app'));
  await wait(()=>guest("document.getElementById('species').value==='setosa'&&document.getElementById('count').textContent==='50 flowers'"),'guest kept across switch');
  assert.equal(getProcess().pid,mainPid);assert.equal(await js('Shiny.shinyapp.$socket===_hostSocket'),true);
  checks.workspaceAndGuestPreserveProcessAndInput=true;
- await js("document.getElementById('ig-app-open').click()");
+ menu('running-shiny-app').checked=false; // Electron toggles a checkbox before invoking its callback.
+ menu('running-shiny-app').click(menu('running-shiny-app'));
+ await pause(100);
+ assert.equal(menu('running-shiny-app').checked,true,'Reopening the current view must retain its checked menu state.');
+ menu('shiny-apps').click();
+ await wait(()=>js("!document.getElementById('ig-app-empty').hidden"),'native choose another app');
  await choose(path.join(examples,'local-sales'),true);await run();
  await wait(()=>guest("document.getElementById('total')?.textContent==='Total: 450'"),'two-file app and relative helper/data');
   const download=path.join(state,'guest-sales.csv');
@@ -98,7 +115,7 @@ module.exports=async({window,pause,state,runtime,getProcess})=>{
  checks.workspaceSurvivesHungGuest=true;
  await choose(entry);await run();
  await wait(()=>guest("document.getElementById('count')?.textContent==='150 flowers'"),'new guest responds after closing the frozen app');
- await js("document.getElementById('ig-app-back').click()");
+ menu('workspace').click();
  assert.equal(await js("document.getElementById('ig-tree-search-input').value==='keep my project'"),true);
   assert.equal(await js("document.getElementById('project_tree_ui').textContent"),projectTree);
   checks.mainProjectAndSavedResultsPreserved=true;

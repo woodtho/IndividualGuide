@@ -39,17 +39,17 @@ app_ui <- function() bslib::page_sidebar(
   lang     = "en-CA",       # Updated in place by the selected presentation language.
   fillable = TRUE,
   title    = div(
-    class = "d-flex align-items-center gap-3 w-100",
+    class = "ig-app-header d-flex align-items-center w-100",
     strong("Individual Guide"),
     ig_language_picker(),
-    tags$button(id = "btn_shiny_apps", type = "button", class = "btn btn-sm ig-header-btn",
+    tags$button(id = "btn_shiny_apps", type = "button", class = "btn btn-sm ig-header-btn ig-browser-only",
       title = "Open Shiny apps", `aria-label` = "Open Shiny apps", icon("window-maximize")),
     div(id = "ig-run-status", class = "ig-run-status", hidden = NA,
       span(id = "ig-run-description", role = "status", `aria-live` = "polite"),
       tags$progress(id = "ig-run-progress", max = 1, value = 0, `aria-label` = "Run progress"),
       span(id = "ig-run-elapsed"),
       tags$button(id = "ig-stop-run", type = "button", class = "btn btn-sm btn-outline-danger", "Stop")),
-    div(class = "d-flex gap-2 ms-3",
+    div(class = "ig-primary-actions d-flex gap-2",
       actionButton("btn_add_task", "Add Task", icon = icon("plus"),
         class = "btn btn-sm btn-primary ig-add-task-btn")
     ),

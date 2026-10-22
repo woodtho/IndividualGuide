@@ -16,7 +16,8 @@ Subsequent launches reuse these files. Running Setup again updates the program;
 use the application shortcut for normal launches.
 
 Setup offers English and Français (Canada). Change language later with the
-Language menu, the app header, or Settings. The choice is remembered on this
+Language menu. Normal browser sessions retain their language selectors in the
+header, welcome screen and Settings. The choice is remembered on this
 computer. Switching language keeps the R session and typed values in place;
 data, project names, formulas and code retain their original spelling.
 The [English handbook](https://woodtho.github.io/IndividualGuide/) and its
@@ -30,10 +31,11 @@ profile. Closing the application stops its R processes.
 
 ## Other Shiny apps
 
-Choose File > Open Shiny app, then select app.R or a folder with ui.R and
+Choose Apps > Open Shiny app, then select app.R or a folder with ui.R and
 server.R. Keep data and helper files together. The loaded app uses its own R
-process inside an Individual Guide view, with controls to return to the main
-workspace, open another app, read its log, or close it. Returning to the workspace
+process inside a nearly full-window Individual Guide view. Apps provides Open,
+Return to running app (Ctrl+Alt+A), App log and Close. View > Individual Guide
+workspace (Ctrl+Alt+I) returns to the main project. Returning to the workspace
 keeps the other app running and preserves its inputs. Closing or replacing it
 stops it. Use trusted apps; their extra packages or external tools remain the app
 author's setup requirements. Opening an app does not install packages.

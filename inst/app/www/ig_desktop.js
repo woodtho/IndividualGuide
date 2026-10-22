@@ -10,7 +10,7 @@
   function publish() {
     var value = { connected: connected(), dirty: !!window._igDirty,
       projectName: project.name, projectPath: project.path, running: !!project.running,
-      appHost:appHost.visible, appHostRunning:appHost.running, hostName:appHost.name,
+      appHost:appHost.visible, appHostRunning:appHost.running, appHostLog:appHost.logVisible, hostName:appHost.name,
       canRun: !!project.canRun, recovery: project.recoveryPending === true, startupReady: project.startupReady === true,
       canUndo: !!document.getElementById('btn_undo') && !document.getElementById('btn_undo').disabled,
       pending: pending, modal: !!document.querySelector('.modal.show'), welcome: project.welcome === true,
@@ -100,7 +100,9 @@
       return;
     }
     if (action === 'stop') { document.getElementById('ig-stop-run')?.click(); return; }
-    if (action === 'shiny-apps') { window.igShinyApps?.open(); return; }
+    if (action === 'shiny-apps') { window.igShinyApps?.choose(); return; }
+    if (action === 'running-shiny-app') { window.igShinyApps?.resume(); return; }
+    if (action === 'shiny-app-log') { window.igShinyApps?.toggleLog(); return; }
     if (action === 'workspace') { window.igShinyApps?.back(); return; }
     if (action === 'close-shiny-app') { window.igShinyApps?.close(); return; }
     if (action === 'run') { flush(); Shiny.setInputValue('shortcut_run_flow', Date.now(), { priority: 'event' }); return; }

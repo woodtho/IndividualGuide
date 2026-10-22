@@ -130,6 +130,7 @@ ig_shiny_app_manager <- function(timeout = 120) {
 ig_shiny_apps_ui <- function() {
   tags$section(id = "ig-shiny-apps", hidden = NA, `aria-label` = "Shiny app browser",
     tags$header(class = "ig-appbar",
+      span(class = "ig-app-brand", icon("share-nodes"), "Individual Guide"),
       tags$button(type = "button", class = "btn btn-sm btn-outline-secondary", id = "ig-app-back", title = "Return to your workspace; keep this app running",
         icon("share-nodes"), "Individual Guide"),
       div(class = "ig-app-heading", strong(id = "ig-app-name", `data-ig-no-translate` = "", "Shiny apps"),
