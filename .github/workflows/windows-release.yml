@@ -80,8 +80,9 @@ jobs:
         shell: powershell
         run: |
           $ErrorActionPreference = 'Continue'
-          $tag = if ($env:GITHUB_REF_TYPE -eq 'tag') { $env:GITHUB_REF_NAME } else { @() }
-          Rscript --vanilla tools/verify-release.R build/release @tag
+          $releaseArgs = @('build/release')
+          if ($env:GITHUB_REF_TYPE -eq 'tag') { $releaseArgs += $env:GITHUB_REF_NAME }
+          Rscript --vanilla tools/verify-release.R @releaseArgs
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - uses: actions/upload-artifact@v4
         with:
