@@ -206,7 +206,7 @@ ig_run_begin <- function(store, task_id, task = NULL, tables = NULL, objects = N
   list(id = basename(tempfile(paste0(task_id, "-"))), task = task_id, flow = isolate(store$active_flow),
     started = format(Sys.time(), "%Y-%m-%dT%H:%M:%OS3%z"), start_time = as.numeric(Sys.time()),
     config = digest::digest(task[c("type", "params", "inputs", "output", "control_inputs")], algo = "sha256"),
-    inputs = fingerprints, environment = ig_environment_info(), seed = seed, rng_kind = RNGkind(),
+    inputs = fingerprints, environment = ig_environment_info(), r_options = lapply(ig_options_r_values(store), ig_options_value_text), seed = seed, rng_kind = RNGkind(),
     rng_state = if (exists(".Random.seed", globalenv(), inherits = FALSE)) get(".Random.seed", globalenv()) else NULL)
 }
 

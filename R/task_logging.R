@@ -88,6 +88,10 @@ ig_capture_task_log <- function(fn, config, meta, emit, outcome, started = Sys.t
 }
 
 ig_task_logged <- function(store, task_id, fn) {
+  ig_with_options(store, function() ig_task_logged_impl(store, task_id, fn))
+}
+
+ig_task_logged_impl <- function(store, task_id, fn) {
   task <- shiny::isolate(store$tasks[[task_id]])
   if (is.null(task) || isTRUE(shiny::isolate(store$review_mode))) return(fn())
   record <- ig_run_begin(store, task_id)

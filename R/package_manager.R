@@ -109,7 +109,9 @@ ig_package_change <- function(action, package = "", version = "", root = ig_pack
   }
   if (length(requests)) {
     if (is.null(installer)) installer <- function(requests, library, fallback, directory) {
-      old <- options(repos = c(CRAN = "https://cloud.r-project.org"), timeout = 600,
+      repositories <- getOption("repos")
+      if (!length(repositories) || any(repositories == "@CRAN@")) repositories <- c(CRAN = "https://cloud.r-project.org")
+      old <- options(repos = repositories, timeout = getOption("timeout", 600),
         renv.config.auto.snapshot = FALSE, renv.config.cache.enabled = FALSE)
       on.exit(options(old))
       .libPaths(c(library, fallback), include.site = FALSE)

@@ -24,7 +24,7 @@ app_server <- function(input, output, session) {
   startup_ready <- reactiveVal(FALSE)
   recovery_pending <- reactiveVal(file.exists(project_recovery_path()))
   workspace_welcome <- reactiveVal(TRUE)
-  ig_shiny_apps_server(input, session)
+  ig_shiny_apps_server(input, session, store)
   observeEvent(input$app_host_open, {
     if (isTRUE(isolate(recovery_pending()))) return()
     if (isTRUE(isolate(workspace_welcome()))) {
@@ -51,7 +51,7 @@ app_server <- function(input, output, session) {
     open   = PERMANENT_TABS,
     active = "flow"
   )
-  theme_mode <- reactiveVal("dark")
+  theme_mode <- reactiveVal(isolate(store$settings)$theme_mode %||% "dark")
 
   # Bulk-select set for the sidebar tree (task ids checked for bulk actions).
   # Server-side so it survives renderUI cycles; cleared on flow switch.
@@ -1823,7 +1823,7 @@ app_server <- function(input, output, session) {
   observe({
     store$tables; store$objects; store$sources; store$formats
     store$tasks; store$task_order; store$active_flow; store$project_name
-    store$settings; store$task_favourites; store$collaboration
+    store$settings; store$option_overrides; store$task_favourites; store$collaboration
     recovery_flows(); theme_mode()
     recovery_revision <<- recovery_revision + 1
   }, priority = -90)
@@ -1838,7 +1838,7 @@ app_server <- function(input, output, session) {
       if (!is.null(saved)) recovery_saved_revision <<- recovery_revision
     }
     # Schedule after I/O: a slow save must not immediately start another save.
-    invalidateLater(30000)
+    invalidateLater(as.integer(isolate(store$settings)$autosave_seconds %||% 30L) * 1000L)
   }, priority = -100)
 
   observeEvent(input$splash_import, {
@@ -2272,57 +2272,14 @@ app_server <- function(input, output, session) {
     session$sendCustomMessage("ig_dirty", isTRUE(store$dirty))
   })
 
-  show_settings_modal <- function() {
-    s <- isolate(store$settings) %||% ig_default_settings()
-    showModal(modalDialog(
-      title = div(icon("gear"), " Settings"),
-      size = "m",
-      footer = tagList(
-        actionButton("settings_packages", "R packages..."),
-        modalButton("Cancel"),
-        actionButton("settings_apply", "Apply", class = "btn btn-primary")
-      ),
-      selectInput("settings_language", "Language",
-        choices = c("English" = "en-CA", "Français (Canada)" = "fr-CA"),
-        selected = ig_language(), width = "100%"),
-      p(class = "small text-muted", "Language is saved on this computer, not in the project.",
-        " Language changes take effect immediately."),
-      radioButtons("settings_theme_mode", "Appearance",
-        choices = c("Dark" = "dark", "Light" = "light"),
-        selected = theme_mode(), inline = TRUE,
-        width = "100%"),
-      selectInput("settings_page_length", "Preview rows per page",
-        choices = c(10, 15, 25, 50, 100),
-        selected = s$page_length %||% 10L, width = "100%"),
-      bslib::layout_columns(
-        col_widths = c(6, 6),
-        selectInput("settings_plot_theme", "Default plot theme (new graphs)",
-          choices = c("Clean" = "clean", "Publication" = "publication",
-                      "Minimal" = "minimal", "Classic" = "classic",
-                      "Light" = "light", "Dark" = "dark"),
-          selected = s$plot_theme %||% "clean", width = "100%"),
-        selectInput("settings_palette", "Default palette (new graphs)",
-          choices = c("Individual Guide" = "ig", "Okabe-Ito" = "okabe_ito",
-                      "Tableau" = "tableau", "Viridis" = "viridis",
-                      "Grey" = "grey"),
-          selected = s$palette %||% "ig", width = "100%")
-      ),
-      checkboxInput("settings_stop_on_error",
-        "Stop Run Flow at the first failing task",
-        value = isTRUE(s$stop_on_error), width = "100%"),
-      checkboxInput("settings_confirm_delete",
-        "Ask for confirmation before deleting tasks and flows",
-        value = !isFALSE(s$confirm_delete), width = "100%"),
-      numericInput("settings_backup_versions", "Previous saved versions to keep (0–100)", value = s$backup_versions %||% 20L, min = 0L, max = 100L, step = 1L),
-      checkboxInput("settings_fixed_seed", "Use a fixed project random seed", value = !is.null(s$run_seed)),
-      numericInput("settings_run_seed", "Project random seed", value = s$run_seed %||% 123L, min = 0L, max = .Machine$integer.max, step = 1L),
-      checkboxInput("settings_background_tasks", "Run supported tasks in the background", value = !isFALSE(s$background_tasks)),
-      p(class = "text-muted small mb-0",
-        icon("circle-info"),
-        " Other settings are saved with the project and restored on load.")
-    ))
-  }
-
+  options_manager <- ig_options_server("preferences", store,
+    open_packages = function() packages$show(),
+    changed = function(value) {
+      theme_mode(value$app$theme_mode %||% "dark")
+      session$sendCustomMessage("ig_preferences", value)
+    })
+  show_settings_modal <- options_manager$show
+  observeEvent(input$ig_language_preference, options_manager$language_preference(input$ig_language_preference))
   show_shortcuts_modal <- function() {
     shortcut_row <- function(keys, action) {
       tags$tr(
@@ -2364,32 +2321,6 @@ app_server <- function(input, output, session) {
       )
     ))
   }
-
-  observeEvent(input$settings_apply, {
-    if (review_edit_blocked("change settings")) return()
-    count <- input$settings_backup_versions %||% 20L
-    seed <- input$settings_run_seed %||% 123L
-    if (length(count) != 1L || !is.finite(count) || count < 0 || count > 100 || count != floor(count) ||
-        (isTRUE(input$settings_fixed_seed) && (length(seed) != 1L || !is.finite(seed) || seed < 0 || seed > .Machine$integer.max || seed != floor(seed)))) {
-      showNotification("Enter a whole backup count from 0 to 100 and a valid nonnegative integer seed.", type = "error"); return()
-    }
-    old_settings <- isolate(store$settings)
-    theme_mode(input$settings_theme_mode %||% "dark")
-    store$settings <- list(
-      page_length    = as.integer(input$settings_page_length %||% 10L),
-      plot_theme     = input$settings_plot_theme %||% "clean",
-      palette        = input$settings_palette %||% "ig",
-      stop_on_error  = isTRUE(input$settings_stop_on_error),
-      confirm_delete = isTRUE(input$settings_confirm_delete),
-      backup_versions = as.integer(count),
-      run_seed = if (isTRUE(input$settings_fixed_seed)) as.integer(seed) else NULL,
-      background_tasks = !identical(input$settings_background_tasks, FALSE)
-    )
-    store$dirty <- TRUE
-    store_add_history(store, "settings", "project", "update",
-      "Project settings changed", before = old_settings, after = isolate(store$settings))
-    removeModal()
-  })
 
   # Canvas node click → open the task's panel
   handle_node_open <- function(node) {
@@ -2832,7 +2763,7 @@ app_server <- function(input, output, session) {
     selected_tasks(character(0)); undo_stack(list())
     preview_table_name(NULL); preview_object_name(NULL)
     store_close_connections(store); project_release_assets(store)
-    settings <- isolate(store$settings); favourites <- isolate(store$task_favourites)
+    favourites <- isolate(store$task_favourites)
     ig_background_retire_worker(store)
     background <- isolate(store$background)
     generation <- isolate(store$run_generation) + 1L
@@ -2840,7 +2771,7 @@ app_server <- function(input, output, session) {
     values$background <- background; values$console <- r_console$state
     for (name in names(values)) store[[name]] <- values[[name]]
     store$run_generation <- generation
-    store$settings <- settings; store$task_favourites <- favourites
+    store$task_favourites <- favourites
     fl <- make_flow("Flow 1")
     store$flows <- setNames(list(fl), fl$id); store$active_flow <- fl$id
     tabs_rv$open <- PERMANENT_TABS; tabs_rv$active <- "flow"

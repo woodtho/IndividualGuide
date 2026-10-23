@@ -18,6 +18,8 @@ sys.source(file.path(runtime, "package-library.R"), envir = bootstrap)
 bootstrap$ig_package_initialize(state, fallback = bundle_library)
 startup_log("library.paths", paste(.libPaths(), collapse = "; "))
 options(repos = c(CRAN = "https://cloud.r-project.org"), timeout = 600)
+sys.source(file.path(runtime, "options-bootstrap.R"), envir = bootstrap)
+bootstrap$ig_options_bootstrap(state)
 manifest <- read.csv(file.path(runtime, "packages.csv"), stringsAsFactors = FALSE)
 missing <- manifest$Package[!vapply(manifest$Package, function(name)
   file.exists(file.path(bundle_library, name, "DESCRIPTION")), logical(1))]

@@ -8,8 +8,10 @@
 # Returns: TRUE (success) or FALSE (error/skipped); side-effects on store.
 
 run_task_from_store <- function(store, task_id) {
-  if (ig_background_eligible(store, task_id)) return(ig_background_start(store, task_id))
-  ig_task_logged(store, task_id, function() run_task_from_store_impl(store, task_id))
+  ig_with_options(store, function() {
+    if (ig_background_eligible(store, task_id)) return(ig_background_start(store, task_id))
+    ig_task_logged(store, task_id, function() run_task_from_store_impl(store, task_id))
+  })
 }
 
 run_task_from_store_impl <- function(store, task_id, precomputed = NULL) {

@@ -44,6 +44,7 @@ ig_worker_loop <- function(request) {
   store <- make_store()
   store$tables <- request$tables; store$objects <- request$object_records
   store$sources <- request$sources; store$settings <- request$settings
+  store$runtime_r_options <- request$options
   store$flows <- request$flows; store$active_flow <- request$flow_id
   store$tasks <- request$tasks; store$task_order <- request$order
   store$branch_tokens <- request$branch_tokens; store$execution_context <- request$context

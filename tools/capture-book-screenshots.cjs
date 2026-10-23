@@ -268,7 +268,7 @@ module.exports=async({window,pause,state,rendererCommand})=>{
     await shot('task-list',{selector:'.modal.show .modal-dialog',zoom:1.5,description:'Search and open tasks without selecting canvas shapes',example:'iris'});await closeModal();
     menu('validate').click();await wait(()=>js("Boolean(document.querySelector('.modal.show .ig-preflight-row,.modal.show .alert-success'))"),'validation');
     await shot('validation',{selector:'.modal.show .modal-dialog',zoom:1.5,description:'Validate the flow before a run',example:'iris'});await closeModal();
-    menu('settings').click();await wait(()=>js("Boolean(document.querySelector('#settings_apply'))"),'Settings');
+    menu('settings').click();await wait(()=>js("Boolean(document.querySelector('#preferences-search'))"),'Settings');
     await shot('settings',{selector:'.modal.show .modal-dialog',description:'Settings for appearance, previews, saved versions, and task runs',example:'iris'});await closeModal();
     menu('review').click();await wait(()=>js("Boolean(document.querySelector('.modal.show .ig-review-dashboard'))"),'Review dashboard');
     await shot('review',{selector:'.modal.show .modal-dialog',zoom:1.5,description:'Review status, notes, and outstanding issues',example:'iris'});await closeModal();

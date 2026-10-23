@@ -8,6 +8,7 @@ main <- function() {
   dir.create(artifacts, recursive = TRUE)
   sandbox <- tempfile("ig-product-browser-"); dir.create(sandbox)
   writeLines(c("Sys.setlocale('LC_CTYPE', '.UTF-8')",
+    sprintf("Sys.setenv(IG_USER_DATA=%s)", deparse(file.path(sandbox, "user-data"))),
     sprintf(".libPaths(c(%s, .libPaths()))", deparse(file.path(root, "build/staging/runtime/R/library"))),
     "options(ig.recovery_dir=file.path(tempdir(),'recovery'),ig.catalogue_dir=file.path(tempdir(),'catalogue'),ig.examples_dir=file.path(tempdir(),'examples'))",
     "IndividualGuide::run_app()"), file.path(sandbox, "app.R"))
@@ -54,7 +55,7 @@ main <- function() {
   app$wait_for_js("document.getElementById('panel_console').classList.contains('ig-panel-active')")
   audit("console", "#panel_console")
   app$run_js("document.getElementById('btn_settings').click()")
-  app$wait_for_js("Boolean(document.getElementById('settings_backup_versions'))")
+  app$wait_for_js("Boolean(document.getElementById('preferences-search'))")
   audit("settings", ".modal.show"); close_modal()
   app$run_js("document.getElementById('btn_project_tools').click()")
   app$wait_for_js("Boolean(document.getElementById('project_tools-task_search'))")

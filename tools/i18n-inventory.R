@@ -1,4 +1,5 @@
 # Collect app-owned labels/help text for the Canadian French coverage gate.
+if (.Platform$OS.type == "windows") Sys.setlocale("LC_CTYPE", ".UTF-8")
 root <- normalizePath(getwd(), winslash = "/")
 records <- list()
 add <- function(value, file) {

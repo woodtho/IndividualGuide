@@ -18,8 +18,9 @@
 # expanding large datasets and histories into scalar JSON records.
 
 # Portable path markers require a loader that understands bundled inputs and
-# relocated exports. Earlier archives remain readable; older apps reject 0.5.
-PROJECT_VERSION <- "0.5.0"
+# relocated exports. Version 0.6 also retains typed global/project option scopes.
+# Earlier archives remain readable; older apps reject newer option semantics.
+PROJECT_VERSION <- "0.6.0"
 
 # ── JSON archive helpers ──────────────────────────────────────────────────────
 
@@ -176,6 +177,15 @@ project_unzip <- function(path) {
 project_save <- function(store, path, canvas_state = list(), theme = "dark",
                          update_identity = TRUE, portable = FALSE, compression_level = 9L) {
   store_sync_parameters(store)
+  ig_options_sync(store)
+  current_theme <- isolate(store$settings)$theme_mode %||% "dark"
+  if (!missing(theme) && !is.null(theme) && !identical(theme, current_theme)) {
+    overrides <- isolate(store$option_overrides)
+    overrides$app$theme_mode <- theme
+    store$option_overrides <- overrides
+    ig_options_refresh(store)
+  }
+  theme <- isolate(store$settings)$theme_mode %||% current_theme
   store_snapshot_flow(store, canvas_state)
 
   root <- tempfile("igpx_build_")
@@ -193,10 +203,12 @@ project_save <- function(store, path, canvas_state = list(), theme = "dark",
     # User preferences — restored on project load
     theme           = theme %||% "dark",
     task_favourites = as.list(isolate(store$task_favourites) %||% character(0)),
-    settings        = isolate(store$settings) %||% ig_default_settings()
+    settings        = isolate(store$settings) %||% ig_default_settings(),
+    options_schema  = 1L
   ))
 
   project_write_payload(file.path(root, "sources.json"), "sources", isolate(store$sources))
+  project_write_payload(file.path(root, "options.json"), "options", isolate(store$option_overrides) %||% ig_options_empty())
   project_write_payload(file.path(root, "formats.json"), "formats", isolate(store$formats))
   packed_flows <- project_pack_reports(root, isolate(store$flows))
   original <- isolate(store$project_path)
@@ -263,7 +275,7 @@ project_recovery_path <- function() {
 #' @param store Session reactive store created by make_store().
 #' @param canvas_state Optional saved canvas nodes and edges.
 #' @param theme Saved application appearance mode.
-project_autosave_recovery <- function(store, canvas_state = list(), theme = "dark") {
+project_autosave_recovery <- function(store, canvas_state = list(), theme = NULL) {
   path <- project_recovery_path()
   saved <- tryCatch(
     project_save(store, path, canvas_state = canvas_state, theme = theme,
@@ -394,12 +406,26 @@ project_load_staged <- function(store, path, source_path = path) {
   # Settings: merge over the defaults so projects saved by older versions
   # pick up keys that did not exist when they were written.
   saved_settings <- manifest$settings %||% list()
-  defaults <- ig_default_settings()
-  for (nm in names(saved_settings)) defaults[[nm]] <- saved_settings[[nm]]
+  defaults <- ig_options_app_values()
+  defaults <- ig_options_merge(defaults, saved_settings)
   defaults$page_length <- suppressWarnings(as.integer(defaults$page_length %||% 10L))
   if (length(defaults$page_length) != 1L || is.na(defaults$page_length) ||
       defaults$page_length < 5L) defaults$page_length <- 10L
-  store$settings <- defaults
+  if (identical(as.integer(manifest$options_schema %||% 0L), 1L)) {
+    option_file <- file.path(root, "options.json")
+    if (!file.exists(option_file)) stop("Invalid project: options.json is missing.")
+    store$option_overrides <- ig_options_validate_spec(project_read_payload(option_file)$value)
+    ig_options_refresh(store)
+  } else {
+    # Old files explicitly saved the whole settings list. Preserve that behavior
+    # as project overrides while new projects inherit current global defaults.
+    known <- names(ig_default_settings())
+    overrides <- ig_options_empty()
+    overrides$app <- defaults[intersect(names(saved_settings), known)]
+    if (!is.null(manifest$theme)) overrides$app$theme_mode <- manifest$theme
+    store$option_overrides <- overrides
+    ig_options_refresh(store)
+  }
 
   table_files <- list.files(file.path(root, "tables"), pattern = "\\.json$",
     full.names = TRUE)
@@ -450,7 +476,7 @@ project_load_staged <- function(store, path, source_path = path) {
       edges = active_flow_obj$canvas_edges
     ),
     # Saved UI preferences — caller applies these after load
-    theme  = manifest$theme %||% "dark"
+    theme  = isolate(store$settings)$theme_mode %||% manifest$theme %||% "dark"
   )
 }
 

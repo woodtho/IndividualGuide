@@ -14,8 +14,9 @@
 
 # ── Application settings ──────────────────────────────────────────────────────
 
-#' Default user settings (Settings modal). Saved in the project manifest and
-#' merged over these defaults on load so old projects pick up new keys.
+#' Built-in application defaults
+#'
+#' Global defaults and explicit project overrides are layered over these values.
 ig_default_settings <- function() {
   list(
     page_length    = 10L,      # preview table rows per page
@@ -25,7 +26,14 @@ ig_default_settings <- function() {
     confirm_delete = TRUE,     # ask before deleting tasks / flows
     backup_versions = 20L,
     run_seed = NULL,
-    background_tasks = TRUE
+    background_tasks = TRUE,
+    theme_mode = "dark", language = "en-CA", reduce_motion = FALSE,
+    editor_font_size = 13L, editor_tab_size = 2L, editor_soft_tabs = TRUE,
+    editor_wrap = FALSE, editor_line_numbers = TRUE, editor_show_invisibles = FALSE,
+    editor_highlight_line = TRUE, console_font_size = 13L,
+    console_max_chars = 300000L, console_auto_scroll = TRUE,
+    console_plot_width = 1000L, console_plot_height = 700L,
+    autosave_seconds = 30L
   )
 }
 
@@ -92,7 +100,9 @@ make_store <- function() {
     task_favourites = c("import_data", "query_builder", "script", "export"),
 
     # User settings (Settings modal) — see ig_default_settings()
-    settings = ig_default_settings()
+    option_overrides = ig_options_empty(),
+    r_options_discovered = list(),
+    settings = ig_options_app_values()
   )
 }
 
@@ -751,6 +761,10 @@ store_review_blocked <- function(store, action = "run tasks", notify = TRUE) {
 }
 
 store_run_guarded <- function(store, fn, action = "run tasks", task_id = NULL) {
+  ig_with_options(store, function() store_run_guarded_dispatch(store, fn, action, task_id))
+}
+
+store_run_guarded_dispatch <- function(store, fn, action = "run tasks", task_id = NULL) {
   state <- isolate(store$background)
   if (!is.null(state$job) && length(isolate(store$run_ids)) && !identical(task_id, state$job$task_id)) {
     ig_notify("The running flow is waiting for its current analysis.", type = "message")

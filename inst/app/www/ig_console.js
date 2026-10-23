@@ -152,11 +152,11 @@
     Shiny.addCustomMessageHandler('ig_console', function (message) {
       var transcript = document.getElementById(message.id + 'transcript');
       if (!transcript) return;
-      var root = transcript.closest('.ig-console'), history = entry(root), follow = history.follow;
+      var root = transcript.closest('.ig-console'), history = entry(root), follow = history.follow && window.igPreferences?.console_auto_scroll !== false;
       if (history.generation !== null && history.generation !== message.generation) {
         history.commands = []; history.index = 0; history.draft = ''; root.querySelector('.ig-console-editor').value = '';
         window.igConsoleTools?.reset(root);
-        fit(root.querySelector('.ig-console-editor')); follow = true;
+        fit(root.querySelector('.ig-console-editor')); follow = window.igPreferences?.console_auto_scroll !== false;
       }
       history.generation = message.generation;
       if (transcript._igText !== message.text) paint(transcript, message.text);

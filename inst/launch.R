@@ -29,6 +29,9 @@ local({
     }
   }
   options(ig.package.launch.fallback = fallback)
+  bootstrap <- new.env(parent = baseenv())
+  sys.source(system.file("options", "bootstrap.R", package = "IndividualGuide"), envir = bootstrap)
+  bootstrap$ig_options_bootstrap(state)
   app <- IndividualGuide::run_app()
   print(app)
 })

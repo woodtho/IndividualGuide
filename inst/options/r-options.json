@@ -1,0 +1,440 @@
+{
+  "R": "4.6.1",
+  "source": "R Core Team, base::options reference, https://stat.ethz.ch/R-manual/R-release/library/base/html/options.html",
+  "license": "Reference text: GPL-2 | GPL-3, copyright R Core Team. See R's COPYING file and https://www.r-project.org/Licenses/.",
+  "license_file": "R-COPYING",
+  "options": [
+    {
+      "name": "BioC_mirror",
+      "description": "The URL of a Bioconductor mirror for use by 'setRepositories', e.g. the default '\"https://bioconductor.org\"' or the European mirror '\"https://bioconductor.statistik.tu-dortmund.de\"'. Can be set by 'chooseBioCmirror'."
+    },
+    {
+      "name": "CBoundsCheck",
+      "description": "logical, controlling whether '.C' and '.Fortran' make copies to check for array over-runs on the atomic vector arguments. Initially set from value of the environment variable 'R_C_BOUNDS_CHECK' (set to 'yes' to enable)."
+    },
+    {
+      "name": "HTTPUserAgent",
+      "description": "string used as the 'user agent' in HTTP(S) requests by 'download.file', 'url' and 'curlGetHeaders', or 'NULL' when requests will be made without a user agent header. The default is '\"R (<version> <platform> <arch> <os>)\"' except when 'libcurl' is used when it is '\"libcurl/<version>\"' for the 'libcurl' version in use. With 'libcurl', the '\"R \"' prefix is reserved: 'HTTPUserAgent' with the prefix will be ignored and the default will be used."
+    },
+    {
+      "name": "Ncpus",
+      "description": "an integer n >= 1, used in 'install.packages' as default for the number of CPUs to use in a potentially parallel installation, as 'Ncpus = getOption(\"Ncpus\", 1L)', i.e., when unset is equivalent to a setting of 1."
+    },
+    {
+      "name": "OutDec",
+      "description": "character string containing a single character. The preferred character to be used as the decimal point in output conversions, that is in printing, plotting, 'format', 'formatC' and 'as.character' but not when deparsing nor by 'sprintf' (which is sometimes used prior to printing)."
+    },
+    {
+      "name": "PCRE_limit_recursion",
+      "description": "Logical: should 'grep(perl = TRUE)' and similar limit the maximal recursion allowed when matching? Only relevant for PCRE1 and PCRE2 <= 10.23. PCRE can be built not to use a recursion stack (see 'pcre_config'), but it uses recursion by default with a recursion limit of 10000000 which potentially needs a very large C stack: see the discussion at <https://www.pcre.org/original/doc/html/pcrestack.html>. If true, the limit is reduced using R's estimate of the C stack size available (if known), otherwise 10000. If 'NA', the limit is imposed only if any input string has 1000 or more bytes. The limit has no effect when PCRE's Just-in-Time compiler is used."
+    },
+    {
+      "name": "PCRE_study",
+      "description": "Logical or integer: should 'grep(perl = TRUE)' and similar 'study' the patterns? Either logical or a numerical threshold for the minimum number of strings to be matched for the pattern to be studied (the default is '10')). Missing values and negative numbers are treated as false. This option is ignored with PCRE2 (PCRE version >= 10.00) which does not have a separate study phase and patterns are automatically optimized when possible."
+    },
+    {
+      "name": "PCRE_use_JIT",
+      "description": "Logical: should 'grep(perl = TRUE)', 'strsplit(perl = TRUE)' and similar make use of PCRE's Just-In-Time compiler if available? (This applies only to studied patterns with PCRE1.) Default: true. Missing values are treated as false."
+    },
+    {
+      "name": "SweaveHooks",
+      "description": "see 'Sweave'."
+    },
+    {
+      "name": "SweaveSyntax",
+      "description": "see 'Sweave'."
+    },
+    {
+      "name": "add.smooth",
+      "description": "typically logical, defaulting to 'TRUE'. Could also be set to an integer for specifying how many (simulated) smooths should be added. This is currently only used by 'plot.lm'."
+    },
+    {
+      "name": "askYesNo",
+      "description": "a function (typically set by a front-end) to ask the user binary response functions in a consistent way, or a vector of strings used by 'askYesNo' to use as default responses for such questions."
+    },
+    {
+      "name": "bitmapType",
+      "description": "(Unix only, incl. macOS) character. The default type for the bitmap devices such as 'png'. Defaults to '\"cairo\"' on systems where that is available, or to '\"quartz\"' on macOS where that is available."
+    },
+    {
+      "name": "browser",
+      "description": "The HTML browser to be used by 'browseURL'. This sets the default browser on UNIX or a non-default browser on Windows. Alternatively, an R function that is called with a URL as its argument. See 'browseURL' for further details."
+    },
+    {
+      "name": "browserNLdisabled",
+      "description": "logical: whether newline is disabled as a synonym for '\"n\"' in the browser."
+    },
+    {
+      "name": "catch.script.errors",
+      "description": "logical, false by default. If true _and_ 'interactive()' is false, e.g., when an R script is run by 'R CMD BATCH <script>.R', then errors do _not_ stop execution of the script. Rather evaluation continues after printing the error (and jumping to top level). Also, 'traceback()' would provide info about the error. Do use with care!"
+    },
+    {
+      "name": "ccaddress",
+      "description": "default Cc: address used by 'create.post' (and hence 'bug.report' and 'help.request'). Can be 'FALSE' or '\"\"'."
+    },
+    {
+      "name": "check.bounds",
+      "description": "logical, defaulting to 'FALSE'. If true, a warning is produced whenever a vector (atomic or 'list') is extended, by something like 'x <- 1:3; x[5] <- 6'."
+    },
+    {
+      "name": "checkPackageLicense",
+      "description": "logical, not set by default. If true, 'loadNamespace' asks a user to accept any non-standard license at first load of the package."
+    },
+    {
+      "name": "citation.bibtex.max",
+      "description": "default 1; the maximal number of bibentries ('bibentry') in a 'citation' for which the BibTeX version is printed in addition to the text one."
+    },
+    {
+      "name": "conflicts.policy",
+      "description": "character string or list controlling handling of conflicts found in calls to 'library' or 'require'. See 'library' for details."
+    },
+    {
+      "name": "continue",
+      "description": "a non-empty string setting the prompt used for lines which continue over one line."
+    },
+    {
+      "name": "contrasts",
+      "description": "the default 'contrasts' used in model fitting such as with 'aov' or 'lm'. A character vector of length two, the first giving the function to be used with unordered factors and the second the function to be used with ordered factors. By default the elements are named 'c(\"unordered\", \"ordered\")', but the names are unused."
+    },
+    {
+      "name": "de.cellwidth",
+      "description": "integer: the cell widths (number of characters) to be used in the data editor 'dataentry'. If this is unset (the default), 0, negative or 'NA', variable cell widths are used."
+    },
+    {
+      "name": "defaultPackages",
+      "description": "the packages that are attached by default when R starts up. Initially set from the value of the environment variable 'R_DEFAULT_PACKAGES', or if that is unset to 'c(\"datasets\", \"utils\", \"grDevices\", \"graphics\", \"stats\", \"methods\")'. (Set 'R_DEFAULT_PACKAGES' to 'NULL' or a comma-separated list of package names.) This option can be changed in a '.Rprofile' file, but it will not work to exclude the 'methods' package at this stage, as the value is screened for 'methods' before that file is read."
+    },
+    {
+      "name": "demo.ask",
+      "description": "default for the 'ask' argument of 'demo'."
+    },
+    {
+      "name": "deparse.cutoff",
+      "description": "integer value controlling the printing of language constructs which are 'deparse'd. Default '60'."
+    },
+    {
+      "name": "deparse.max.lines",
+      "description": "controls the number of lines used when deparsing in 'browser', upon entry to a function whose debugging flag is set, and if option 'traceback.max.lines' is unset, of 'traceback()'. Initially unset, and only used if set to a positive integer."
+    },
+    {
+      "name": "device",
+      "description": "a character string giving the name of a function, or the function object itself, which when called creates a new graphics device of the default type for that session. The value of this option defaults to the normal screen device (e.g., 'X11', 'windows' or 'quartz') for an interactive session, and 'pdf' in batch use or if a screen is not available. If set to the name of a device, the device is looked for first from the global environment (that is down the usual search path) and then in the 'grDevices' namespace. The default values in interactive and non-interactive sessions are configurable via environment variables 'R_INTERACTIVE_DEVICE' and 'R_DEFAULT_DEVICE' respectively. The search logic for 'the normal screen device' is that this is 'windows' on Windows, and 'quartz' if available on macOS (running at the console, and compiled into the build). Otherwise 'X11' is used if environment variable 'DISPLAY' is set."
+    },
+    {
+      "name": "device.ask.default",
+      "description": "logical. The default for 'devAskNewPage(\"ask\")' when a device is opened."
+    },
+    {
+      "name": "digits",
+      "description": "controls the number of _significant_ (see 'signif') digits to print when printing numeric values. It is a suggestion only. Valid values are 1...22 with default 7. See the note in 'print.default' about values greater than 15."
+    },
+    {
+      "name": "digits.secs",
+      "description": "controls the maximum number of digits to print when formatting time values in seconds. Valid values are 0...6 with default 0 (equivalent to 'NULL' which is used when it is undefined as on vanilla startup). See 'strftime'."
+    },
+    {
+      "name": "download.file.extra",
+      "description": "Extra command-line argument(s) for non-default methods: see 'download.file'."
+    },
+    {
+      "name": "download.file.method",
+      "description": "Method to be used for 'download.file'. Currently download methods '\"internal\"', '\"wininet\"' (Windows only), '\"libcurl\"', '\"wget\"' and '\"curl\"' are available. If not set, 'method = \"auto\"' is chosen: see 'download.file'."
+    },
+    {
+      "name": "dvipscmd",
+      "description": "character string giving a command to be used in the (deprecated) off-line printing of help pages _via_ PostScript. Defaults to '\"dvips\"'."
+    },
+    {
+      "name": "echo",
+      "description": "logical. Only used in non-interactive mode, when it controls whether input is echoed. Command-line option '--no-echo' sets this to 'FALSE', but otherwise it starts the session as 'TRUE'."
+    },
+    {
+      "name": "editor",
+      "description": "a non-empty character string or an R function that sets the default text editor, e.g., for 'edit' and 'file.edit'. Set from the environment variable 'EDITOR' on UNIX, or if unset 'VISUAL' or 'vi'. As a string it should specify the name of or path to an external command."
+    },
+    {
+      "name": "encoding",
+      "description": "The name of an encoding, default '\"native.enc\"'. See 'connections'."
+    },
+    {
+      "name": "error",
+      "description": "either a function or an expression governing the handling of non-catastrophic errors such as those generated by 'stop' as well as by signals and internally detected errors. If the option is a function, a call to that function, with no arguments, is generated as the expression. By default the option is not set: see 'stop' for the behaviour in that case. The functions 'dump.frames' and 'recover' provide alternatives that allow post-mortem debugging. Note that these need to specified as e.g. 'options(error = utils::recover)' in startup files such as '.Rprofile'."
+    },
+    {
+      "name": "example.ask",
+      "description": "default for the 'ask' argument of 'example'."
+    },
+    {
+      "name": "expressions",
+      "description": "sets a limit on the number of nested expressions that will be evaluated. Valid values are 25...500000 with default 5000. If you increase it, you may also want to start R with a larger protection stack; see '--max-ppsize' in 'Memory'. Note too that you may cause a segfault from overflow of the C stack, and on OSes where it is possible you may want to increase that. Once the limit is reached an error is thrown. The current number under evaluation can be found by calling 'Cstack_info'."
+    },
+    {
+      "name": "help.htmlmath",
+      "description": "default for the 'texmath' argument of 'Rd2HTML', controlling how LaTeX-like mathematical equations are displayed in R help pages (if enabled). Useful values are '\"katex\"' (equivalent to 'NULL', the default) and '\"mathjax\"'; for all other values basic substitutions are used."
+    },
+    {
+      "name": "help.htmltoc",
+      "description": "logical: whether a table of contents should be included in dynamic help pages."
+    },
+    {
+      "name": "help.ports",
+      "description": "optional integer vector for setting ports of the internal HTTP server, see 'startDynamicHelp'."
+    },
+    {
+      "name": "help.search.types",
+      "description": "default types of documentation to be searched by 'help.search' and '??'."
+    },
+    {
+      "name": "help.try.all.packages",
+      "description": "default for an argument of 'help'."
+    },
+    {
+      "name": "help_type",
+      "description": "default for an argument of 'help', used also as the help type by '?'."
+    },
+    {
+      "name": "install.lock",
+      "description": "logical: should per-directory package locking be used by 'install.packages'? Most useful for binary installs on macOS and Windows, but can be used in a startup file for source installs _via_ 'R CMD INSTALL'. For binary installs, can also be the character string '\"pkglock\"'."
+    },
+    {
+      "name": "install.packages.check.source",
+      "description": "Used by 'install.packages' (and indirectly 'update.packages') on platforms which support binary packages. Possible values '\"yes\"' and '\"no\"', with unset being equivalent to '\"yes\"'."
+    },
+    {
+      "name": "install.packages.compile.from.source",
+      "description": "Used by 'install.packages(type = \"both\")' (and indirectly 'update.packages') on platforms which support binary packages. Possible values are '\"never\"', '\"interactive\"' (which means ask in interactive use and '\"never\"' in batch use) and '\"always\"'. The default is taken from environment variable 'R_COMPILE_AND_INSTALL_PACKAGES', with default '\"interactive\"' if unset. However, 'install.packages' uses '\"never\"' unless a 'make' program is found, consulting the environment variable 'MAKE'."
+    },
+    {
+      "name": "internet.info",
+      "description": "The minimum level of information to be printed on URL downloads etc, using the '\"internal\"' and '\"libcurl\"' methods. Default is 2, for failure causes. Set to 1 or 0 to get more detailed information (for the '\"internal\"' method 0 provides more information than 1)."
+    },
+    {
+      "name": "interrupt",
+      "description": "a function taking no arguments to be called on a user interrupt if the interrupt condition is not otherwise handled."
+    },
+    {
+      "name": "keep.parse.data",
+      "description": "When internally storing source code ('keep.source' is TRUE), also store parse data. Parse data can then be retrieved with 'getParseData()' and used e.g. for spell checking of string constants or syntax highlighting. The value has effect only when internally storing source code (see 'keep.source'). The default is 'TRUE'."
+    },
+    {
+      "name": "keep.parse.data.pkgs",
+      "description": "As for 'keep.parse.data', used only when packages are installed. Defaults to 'FALSE' unless the environment variable 'R_KEEP_PKG_PARSE_DATA' is set to 'yes'. The space overhead of parse data can be substantial even after compression and it causes performance overhead when loading packages."
+    },
+    {
+      "name": "keep.source",
+      "description": "When 'TRUE', the source code for functions (newly defined or loaded) is stored internally allowing comments to be kept in the right places. Retrieve the source by printing or using 'deparse(fn, control = \"useSource\")'. The default is 'interactive()', i.e., 'TRUE' for interactive use."
+    },
+    {
+      "name": "keep.source.pkgs",
+      "description": "As for 'keep.source', used only when packages are installed. Defaults to 'FALSE' unless the environment variable 'R_KEEP_PKG_SOURCE' is set to 'yes'."
+    },
+    {
+      "name": "locatorBell",
+      "description": "logical. Should selection in 'locator' and 'identify' be confirmed by a bell? Default 'TRUE'. Honoured at least on 'X11' and 'windows' devices."
+    },
+    {
+      "name": "mailer",
+      "description": "default emailing method used by 'create.post' and hence 'bug.report' and 'help.request'."
+    },
+    {
+      "name": "matprod",
+      "description": "a string selecting the implementation of the matrix products '%*%', 'crossprod', and 'tcrossprod' for double and complex vectors: '\"internal\"' uses an unoptimized 3-loop algorithm which correctly propagates 'NaN' and 'Inf' values and is consistent in precision with other summation algorithms inside R like 'sum' or 'colSums' (which now means that it uses a 'long double' accumulator for summation if available and enabled, see 'capabilities'). '\"default\"' uses BLAS to speed up computation, but to ensure correct propagation of 'NaN' and 'Inf' values it uses an unoptimized 3-loop algorithm for inputs that may contain 'NaN' or 'Inf' values. When deemed beneficial for performance, '\"default\"' may call the 3-loop algorithm unconditionally, i.e., without checking the input for 'NaN'/'Inf' values. The 3-loop algorithm uses (only) a 'double' accumulator for summation, which is consistent with the reference BLAS implementation. '\"blas\"' uses BLAS unconditionally without any checks and should be used with extreme caution. BLAS libraries do not propagate 'NaN' or 'Inf' values correctly and for inputs with 'NaN'/'Inf' values the results may be undefined. '\"default.simd\"' is experimental and will likely be removed in future versions of R. It provides the same behavior as '\"default\"', but the check whether the input contains 'NaN'/'Inf' values is faster on some SIMD hardware. On older systems it will run correctly, but may be much slower than '\"default\"'."
+    },
+    {
+      "name": "max.contour.segments",
+      "description": "positive integer, defaulting to '25000' if not set. A limit on the number of segments in a single contour line in 'contour' or 'contourLines'."
+    },
+    {
+      "name": "max.print",
+      "description": "integer, defaulting to '99999'. 'print' or 'show' methods can make use of this option, to limit the amount of information that is printed, to something in the order of (and typically slightly less than) 'max.print' _entries_."
+    },
+    {
+      "name": "mc.cores",
+      "description": "an integer giving the maximum allowed number of _additional_ R processes allowed to be run in parallel to the current R process. Defaults to the setting of the environment variable 'MC_CORES' if set. Most applications which use this assume a limit of '2' if it is unset."
+    },
+    {
+      "name": "menu.graphics",
+      "description": "Logical: should graphical menus be used if available? Defaults to 'TRUE'. Currently applies to 'select.list', 'chooseCRANmirror', 'setRepositories' and to select from multiple (text) help files in 'help'."
+    },
+    {
+      "name": "na.action",
+      "description": "the name of a function for treating missing values ('NA''s) for certain situations, see 'na.action' and 'na.pass'."
+    },
+    {
+      "name": "netrc",
+      "description": "character string. Path to netrc file with user credentials for URLs requiring authentication. The file, if it exists, will be used by 'libcurl' in 'download.file', 'url' and 'curlGetHeaders'. By default unset, but can be set from environment variable 'R_DEFAULT_NETRC'."
+    },
+    {
+      "name": "nwarnings",
+      "description": "the limit for the number of warnings kept when 'warn = 0', default 50. This will discard messages if called whilst they are being collected. If you increase this limit, be aware that the current implementation pre-allocates the equivalent of a named list for them, i.e., do not increase it to more than say a million."
+    },
+    {
+      "name": "pager",
+      "description": "the command used for displaying text files by 'file.show', details depending on the platform: On a unix-alike defaults to '<R_HOME>/bin/pager', which is a shell script running the command-line specified by the environment variable 'PAGER' whose default is set at configuration, usually to 'less'. On Windows defaults to '\"internal\"', which uses a pager similar to the GUI console. Another possibility is '\"console\"' to use the console itself. Can be a character string or an R function, in which case it needs to accept the arguments '(files, header, title, delete.file)' corresponding to the first four arguments of 'file.show'."
+    },
+    {
+      "name": "papersize",
+      "description": "the default paper format used by 'postscript'; set by environment variable 'R_PAPERSIZE' when R is started: if that is unset or invalid it defaults platform dependently on a unix-alike to a value derived from the locale category 'LC_PAPER', or if that is unavailable to a default set when R was built. on Windows to '\"a4\"', or '\"letter\"' in US and Canadian locales."
+    },
+    {
+      "name": "pdfviewer",
+      "description": "default PDF viewer. The default is set from the environment variable 'R_PDFVIEWER', the default value of which on a unix-alike is set when R is configured, and on Windows is the full path to 'open.exe', a utility supplied with R."
+    },
+    {
+      "name": "pkgType",
+      "description": "The default type of packages to be downloaded and installed - see 'install.packages'. Possible values are platform dependently on Windows '\"win.binary\"', '\"source\"' and '\"both\"' (the default). on Unix-alikes '\"source\"' (the default except under a CRAN macOS build), build-specific variants of '\"mac.binary\"' (e.g., '\"mac.binary.big-sur-arm64\"') or '\"both\"' (the default for CRAN macOS builds). Value '\"binary\"' is a synonym for the native binary type (if there is one); '\"both\"' is used by 'install.packages' to choose between source and binary installs."
+    },
+    {
+      "name": "printcmd",
+      "description": "the command used by 'postscript' for printing; set by environment variable 'R_PRINTCMD' when R is started. This should be a command that expects either input to be piped to 'stdin' or to be given a single filename argument. Usually set to '\"lpr\"' on a Unix-alike."
+    },
+    {
+      "name": "prompt",
+      "description": "a non-empty string to be used for R's prompt; should usually end in a blank ('\" \"')."
+    },
+    {
+      "name": "quiet",
+      "description": "logical. Should R be (more) \"quiet\", notably on startup report? Set to 'TRUE' by the command-line option '--quiet'. Note that 'quiet' and 'verbose' _can_ both be true."
+    },
+    {
+      "name": "repos",
+      "description": "character vector of repository URLs for use by 'available.packages' and related functions. Initially set from entries marked as default in the 'repositories' file, whose path is configurable via environment variable 'R_REPOSITORIES' (set this to 'NULL' to skip initialization at startup). The 'factory-fresh' setting from the file in 'R.home(\"etc\")' is 'c(CRAN=\"@CRAN@\")', a value that causes some utilities to prompt for a CRAN mirror. To avoid this do set the CRAN mirror, by something like local({ r <- getOption(\"repos\") r[\"CRAN\"] <- \"https://my.local.cran\" options(repos = r) }) in your '.Rprofile', or use a personal 'repositories' file. Note that you can add more repositories (Bioconductor, R-Forge, RForge.net, ...) for the current session using 'setRepositories'."
+    },
+    {
+      "name": "rl_word_breaks",
+      "description": "(Unix only:) Used for the readline-based terminal interface. Default value '\" \\t\\n\\\"\\\\'`><=;,|&{()}\"'. This is the set of characters use to break the input line into tokens for object- and file-name completion. Those who do not use spaces around operators may prefer '\" \\t\\n\\\"\\\\'`><=+-*;,|&{()}\"'"
+    },
+    {
+      "name": "save.defaults",
+      "description": "see 'save'."
+    },
+    {
+      "name": "save.image.defaults",
+      "description": "see 'save'."
+    },
+    {
+      "name": "scipen",
+      "description": "integer. A penalty to be applied when deciding to print numeric values in fixed or exponential notation. Positive values bias towards fixed and negative towards scientific notation: fixed notation will be preferred unless it is more than 'scipen' digits wider. The default is '0'. Valid values are between -9 and 9999 where \"relevant\" values (for double precision accuracy) are in '-6:319'. Some invalid values currently signal a 'warning' and are set to legal boundaries if finite. These may signal an error in a future version of R."
+    },
+    {
+      "name": "setWidthOnResize",
+      "description": "a logical. If set and 'TRUE', R run in a terminal using a recent 'readline' library will set the 'width' option when the terminal is resized."
+    },
+    {
+      "name": "show.coef.Pvalues",
+      "description": "logical, affecting whether P values are printed in summary tables of coefficients. See 'printCoefmat'."
+    },
+    {
+      "name": "show.error.locations",
+      "description": "Should source locations of errors be printed? If set to 'TRUE' or '\"top\"', the source location that is highest on the stack (the most recent code with source information) will be printed."
+    },
+    {
+      "name": "show.error.messages",
+      "description": "a logical. Should error messages be printed? Intended for use with 'try' or a user-installed error handler."
+    },
+    {
+      "name": "show.nls.convergence",
+      "description": "logical, should 'nls' convergence messages be printed for successful fits? Initially unset, which means 'TRUE'."
+    },
+    {
+      "name": "show.signif.stars",
+      "description": "logical, should stars be printed on summary tables of coefficients? See 'printCoefmat'."
+    },
+    {
+      "name": "showErrorCalls",
+      "description": "a logical. Should warning and error messages produced by the default handlers show a summary of the call stack? By default error call stacks are shown in non-interactive sessions. When 'warning' or 'stop' are called on a condition object the call stacks are only shown if the value returned by 'conditionCall' for the condition object is not 'NULL'."
+    },
+    {
+      "name": "showNCalls",
+      "description": "integer. Controls how long the sequence of calls must be (in bytes) before ellipses are used. Defaults to 50 and should be at least 30 and no more than 500."
+    },
+    {
+      "name": "showWarnCalls",
+      "description": "a logical. Should warning and error messages produced by the default handlers show a summary of the call stack? By default error call stacks are shown in non-interactive sessions. When 'warning' or 'stop' are called on a condition object the call stacks are only shown if the value returned by 'conditionCall' for the condition object is not 'NULL'."
+    },
+    {
+      "name": "str",
+      "description": "a list of options controlling the default 'str' display. Defaults to 'strOptions()'."
+    },
+    {
+      "name": "str.dendrogram.last",
+      "description": "see 'str.dendrogram'."
+    },
+    {
+      "name": "texi2dvi",
+      "description": "used by functions 'texi2dvi' and 'texi2pdf' in package 'tools'. unix-alike only: Set at startup from the environment variable 'R_TEXI2DVICMD', which defaults first to the value of environment variable 'TEXI2DVI', and then to a value set when R was installed (the full path to a 'texi2dvi' script if one was found). If necessary, that environment variable can be set to '\"emulation\"'."
+    },
+    {
+      "name": "timeout",
+      "description": "positive integer. The timeout for some Internet operations, in seconds. Default 60 (seconds) but can be set from environment variable 'R_DEFAULT_INTERNET_TIMEOUT'. (Invalid values of the option or the variable are silently ignored: non-integer numeric values will be truncated.) See 'download.file' and 'connections'."
+    },
+    {
+      "name": "topLevelEnvironment",
+      "description": "see 'topenv' and 'sys.source'."
+    },
+    {
+      "name": "traceback.max.lines",
+      "description": "controls the number of lines used when deparsing in 'traceback', if set. Initially unset, and only used if set to a positive integer."
+    },
+    {
+      "name": "ts.S.compat",
+      "description": "logical. Used to select S compatibility for plotting time-series spectra. See the description of argument 'log' in 'plot.spec'."
+    },
+    {
+      "name": "ts.eps",
+      "description": "the relative tolerance for certain time series ('ts') computations. Default '1e-05'."
+    },
+    {
+      "name": "unzip",
+      "description": "a character string used by 'unzip': the path of the external program 'unzip' or '\"internal\"'. Defaults (platform dependently) on unix-alikes to the value of 'R_UNZIPCMD', which is set in 'etc/Renviron' to the path of the 'unzip' command found during configuration and otherwise to '\"\"'. on Windows to '\"internal\"' when the internal unzip code is used."
+    },
+    {
+      "name": "url.method",
+      "description": "character string: the default method for 'url'. Normally unset, which is equivalent to '\"default\"', which is '\"internal\"' except on Windows."
+    },
+    {
+      "name": "useFancyQuotes",
+      "description": "controls the use of directional quotes in 'sQuote', 'dQuote' and in rendering text help (see 'Rd2txt' in package 'tools'). Can be 'TRUE', 'FALSE', '\"TeX\"' or '\"UTF-8\"'."
+    },
+    {
+      "name": "verbose",
+      "description": "logical. Should R report extra information on progress? Set to 'TRUE' by the command-line option '--verbose'."
+    },
+    {
+      "name": "warn",
+      "description": "integer value to set the handling of warning messages by the default warning handler. In the future, this value is checked to be one of '-1, 0, 1, 2'. For now, setting environment variable 'R_WARN_BOUNDS_OPT' to '\"yes\"' activates that check. If 'warn' is negative all warnings are ignored. If 'warn' is zero (the default) warnings are stored until the top-level function returns. If 10 or fewer warnings were signalled they will be printed otherwise a message saying how many were signalled. An object called 'last.warning' is created and can be printed through the function 'warnings'. If 'warn' is one, warnings are printed as they occur. If 'warn' is two (or larger, coercible to integer), all warnings are turned into errors. While sometimes useful for debugging, turning warnings into errors may trigger bugs and resource leaks that would not have been triggered otherwise."
+    },
+    {
+      "name": "warn.FPU",
+      "description": "logical, by default undefined. If true, a warning is produced whenever dyn.load repairs the control word damaged by a buggy DLL."
+    },
+    {
+      "name": "warnPartialMatchArgs",
+      "description": "logical. If true, warns if partial matching is used in argument matching."
+    },
+    {
+      "name": "warnPartialMatchAttr",
+      "description": "logical. If true, warns if partial matching is used in extracting attributes via 'attr'."
+    },
+    {
+      "name": "warnPartialMatchDollar",
+      "description": "logical. If true, warns if partial matching is used for extraction by '$'."
+    },
+    {
+      "name": "warning.expression",
+      "description": "an R code expression to be called if a warning is generated, replacing the standard message. If non-null it is called irrespective of the value of option 'warn'."
+    },
+    {
+      "name": "warning.length",
+      "description": "sets the truncation limit in bytes for error and warning messages. A non-negative integer, with allowed values 100...8170, default 1000."
+    },
+    {
+      "name": "width",
+      "description": "controls the maximum number of columns on a line used in printing vectors, matrices and arrays, and when filling by 'cat'. Columns are normally the same as characters except in East Asian languages. You may want to change this if you re-size the window that R is running in. Valid values are 10...10000 with default normally 80. (The limits on valid values are in file 'Print.h' and can be changed by re-compiling R.) Some R consoles automatically change the value when they are resized. See the examples on Startup for one way to set this automatically from the terminal width when R is started."
+    },
+    {
+      "name": "windowsTimeouts",
+      "description": "(Windows-only) integer vector of length 2 representing two times in milliseconds. These control the double-buffering of 'windows' devices when that is enabled: the first is the delay after plotting finishes (default 100) and the second is the update interval during continuous plotting (default 500). The values at the time the device is opened are used."
+    }
+  ]
+}

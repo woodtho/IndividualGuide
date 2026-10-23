@@ -48,13 +48,13 @@ const showMessageBoxSync = (window, options) => dialog.showMessageBoxSync(window
 const showOpenDialog = (window, options) => dialog.showOpenDialog(window,localizedDialog(options));
 const showSaveDialog = (window, options) => dialog.showSaveDialog(window,localizedDialog(options));
 function languageState() { return {locale:localization.locale,strings:languageSupport.catalog.strings}; }
-function setLanguage(locale) {
+function setLanguage(locale, persist = true) {
   if(!languageSupport.supported.includes(locale))return false;
   localization.setLanguage(locale);
-  preferences.saveLanguage(locale,installation?.installation || preferences.installation);
+  if (persist) preferences.saveLanguage(locale,installation?.installation || preferences.installation);
   eventLog('desktop.language',{locale});
   refreshMenus();
-  if(window&&!window.isDestroyed())window.webContents.send('ig:language',languageState());
+  if(persist&&window&&!window.isDestroyed())window.webContents.send('ig:language',languageState());
   if(window&&!window.isDestroyed())window.webContents.send('ig:backend-state',{...backendState,localizedMessage:translate(backendState.message)});
   return true;
 }
@@ -139,6 +139,7 @@ function refreshMenus() {
 }
 let backendState = { phase: 'starting', message: 'Starting your workspace...' };
 let restartPromise, leavingForRestart = false;
+let ignoreGlobalOptions = process.argv.includes('--default-r-options');
 const expectedStops = new WeakSet();
 const loadingFile = path.join(__dirname, 'loading.html');
 const runtime = process.env.IG_RUNTIME_OVERRIDE || path.join(process.resourcesPath, 'runtime');
@@ -196,7 +197,7 @@ async function recovery(error) {
   finally { leavingForRestart = false; }
   if (!stopping) setBackendState('stopped', error.message);
 }
-async function requestRestart() {
+async function requestRestart(defaultOptions = false) {
   if (stopping || restartPromise || backendState.phase === 'starting') { eventLog('restart.ignored', { phase: backendState.phase }); return false; }
   eventLog('restart.request', { rPid: rProcess?.pid, alive: Boolean(alive()), attempt });
   // Serialize the confirmation too so repeated clicks cannot spawn extra servers.
@@ -210,6 +211,7 @@ async function requestRestart() {
       if (response !== 1 || stopping) { eventLog('restart.cancelled'); return false; }
       eventLog('restart.confirmed');
     }
+    ignoreGlobalOptions = defaultOptions === true;
     return launchR();
   })();
   try { return await restartPromise; } finally { restartPromise = undefined; }
@@ -298,7 +300,7 @@ async function saveDiagnosticLog() {
 async function start() {
   eventLog('desktop.ready', { elapsedMs: Date.now() - startedAt, appPath: app.getAppPath() });
   updateMenu = require('./menus.cjs')({ command: sendCommand,
-    translate, setLanguage,
+    translate, setLanguage, activeLanguage: () => localization.locale,
     preferences, openProject: queueProject,
     about: async () => {
       let info = {};
@@ -311,7 +313,7 @@ async function start() {
     pinProject: () => { preferences.pin(workspace.projectPath); refreshMenus(); },
     unpinProject: file => { preferences.pin(file); refreshMenus(); },
     clearRecent: () => { preferences.clear(); refreshMenus(); },
-    restart: () => requestRestart().catch(recovery),
+    restart: (defaults = false) => requestRestart(defaults === true).catch(recovery),
     openLog: () => openLocal(logPath), openLogs: () => openLocal(path.dirname(logPath)),
     saveLog: () => saveDiagnosticLog().catch(async error => {
       eventLog('diagnostics.export.failed', error.message, 'ERROR');
@@ -354,7 +356,13 @@ async function start() {
   ipcMain.handle('ig:backend-state', event => trustedSender(event) ? {...backendState,localizedMessage:translate(backendState.message)} : undefined);
   ipcMain.handle('ig:language', event => trustedSender(event) ? languageState() : undefined);
   ipcMain.handle('ig:set-language', (event, locale) => trustedSender(event) ? setLanguage(locale) : false);
+  ipcMain.handle('ig:presentation-language', (event, locale) => trustedSender(event) ? setLanguage(locale, false) : false);
+  ipcMain.handle('ig:default-language', (event, locale) => {
+    if (!trustedSender(event) || !languageSupport.supported.includes(locale)) return false;
+    preferences.saveLanguage(locale,installation?.installation || preferences.installation); return true;
+  });
   ipcMain.handle('ig:restart-r', event => trustedSender(event) ? requestRestart() : false);
+  ipcMain.handle('ig:restart-r-default-options', event => trustedSender(event) ? requestRestart(true) : false);
   ipcMain.handle('ig:open-log', event => trustedSender(event) ? openLocal(logPath) : undefined);
   ipcMain.handle('ig:project-dialog', (event, request) => trustedSender(event) ? chooseProjectFile(request) : undefined);
   ipcMain.handle('ig:confirm-changes', async (event, action) => {
@@ -611,6 +619,7 @@ async function launchR() {
         path.join(process.env.SystemRoot, 'System32'), process.env.SystemRoot].join(';'),
       LC_ALL: 'English_Canada.utf8', LANG: 'English_Canada.utf8', IG_LANGUAGE: localization.locale, IG_RUNTIME_DIR: runtime,
       IG_USER_DATA: state, IG_WORK_DIR: app.getPath('documents'), IG_STOP_FILE: stopFile, IG_PORT: String(port), IG_DESKTOP_TOKEN: desktopToken,
+      IG_IGNORE_GLOBAL_OPTIONS: ignoreGlobalOptions ? '1' : '0',
       IG_SMOKE_TEST: smoke && !startupOnly && !restartTest && !menuTest && !lifecycleTest && !consoleTest && !examplesTest && !productTest && !shinyAppsTest ? '1' : '0', IG_RUNTIME_RESULT: runtimeResult });
     if (smoke) {
       for (const name of Object.keys(environment)) if (/^(https?_proxy|all_proxy|no_proxy)$/i.test(name)) delete environment[name];

@@ -1,6 +1,6 @@
 'use strict';
 const { Menu } = require('electron');
-module.exports = function desktopMenus({ command, restart, openLog, openLogs, saveLog, close, about, preferences, openProject, pinProject, unpinProject, clearRecent, translate = value=>value, setLanguage = ()=>{} }) {
+module.exports = function desktopMenus({ command, restart, openLog, openLogs, saveLog, close, about, preferences, openProject, pinProject, unpinProject, clearRecent, translate = value=>value, setLanguage = ()=>{}, activeLanguage = () => preferences.language }) {
   const roles = {undo:'Undo',redo:'Redo',cut:'Cut',copy:'Copy',paste:'Paste',selectAll:'Select all',resetZoom:'Actual Size',zoomIn:'Zoom In',zoomOut:'Zoom Out',togglefullscreen:'Toggle Full Screen'};
   const localize = entry => ({...entry,
     ...(entry.label || roles[entry.role] ? {label:translate(entry.label || roles[entry.role])} : {}),
@@ -9,7 +9,7 @@ module.exports = function desktopMenus({ command, restart, openLog, openLogs, sa
   let recentSnapshot;
   function install() {
   const recent = preferences.recent;
-  recentSnapshot = JSON.stringify([recent,preferences.language]);
+  recentSnapshot = JSON.stringify([recent,preferences.language,activeLanguage()]);
   const recentItems = [...recent.filter(x => x.pinned), ...recent.filter(x => !x.pinned)].map((entry, index) => ({
     id: 'recent-' + index, label: (entry.pinned ? '★ ' : '') + entry.path.replace(/&/g, '&&'), enabled: false,
     click: () => openProject(entry.path)
@@ -45,18 +45,19 @@ module.exports = function desktopMenus({ command, restart, openLog, openLogs, sa
       item('run','Run active flow','CmdOrCtrl+Alt+R'), item('stop','Stop run','CmdOrCtrl+Shift+F5')] },
     { label: 'Session', submenu: [item('packages','R packages...'),
       { id: 'restart-r', label: 'Restart R server...', accelerator: 'CmdOrCtrl+Shift+R', enabled: false, click: restart },
+      { id: 'restart-r-default-options', label: 'Restart with default R options...', enabled: false, click: () => restart(true) },
       { type: 'separator' }, { label: 'Open startup log', click: openLog },
       { label: 'Open logs folder', click: openLogs }, { label: 'Save diagnostic log...', click: saveLog }] },
     { label: 'Help', submenu: [item('help','Application help','F1'), item('shortcuts','Keyboard shortcuts...'), {type:'separator'}, { id:'about', label:'About Individual Guide...', click:about }] },
     { label:'Language', submenu:[
-      {id:'language-en-CA',label:'English',type:'radio',checked:preferences.language !== 'fr-CA',click:()=>setLanguage('en-CA')},
-      {id:'language-fr-CA',label:'Français (Canada)',type:'radio',checked:preferences.language === 'fr-CA',click:()=>setLanguage('fr-CA')}
+      {id:'language-en-CA',label:'English',type:'radio',checked:activeLanguage() !== 'fr-CA',click:()=>setLanguage('en-CA')},
+      {id:'language-fr-CA',label:'Français (Canada)',type:'radio',checked:activeLanguage() === 'fr-CA',click:()=>setLanguage('fr-CA')}
     ]}
   ].map(localize)));
   }
   install();
   return function update(state, backend) {
-    if (recentSnapshot !== JSON.stringify([preferences.recent,preferences.language])) install();
+    if (recentSnapshot !== JSON.stringify([preferences.recent,preferences.language,activeLanguage()])) install();
     const menu = Menu.getApplicationMenu();
     const ready = state.connected && state.startupReady && backend.phase === 'ready' && !state.pending;
     for (const id of ['new','close-project','open','save','save-as','settings','undo','search','flow','code','console','tasks','versions','files','runs','validate','history','comments','review','add-task','help','shortcuts','run','stop']) {
@@ -87,5 +88,6 @@ module.exports = function desktopMenus({ command, restart, openLog, openLogs, sa
       menu.getMenuItemById(id).label = translate((id === 'comments' ? 'Comments' : 'Review dashboard') + count + '...');
     }
     menu.getMenuItemById('restart-r').enabled = backend.phase !== 'starting';
+    menu.getMenuItemById('restart-r-default-options').enabled = backend.phase !== 'starting';
   };
 };

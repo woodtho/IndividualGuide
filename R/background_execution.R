@@ -53,15 +53,19 @@ ig_background_tables <- function(store, p, track = FALSE, task_id = NULL) {
   tables[names]
 }
 
-ig_background_options <- function() {
+ig_background_options <- function(store = NULL) {
   keys <- c("contrasts", "na.action", "digits", "scipen", "OutDec", "matprod", "warn", "width", "max.print")
   settings <- stats::setNames(lapply(keys, getOption), keys)
-  if (any(vapply(settings, function(x) !is.null(x) && !is.atomic(x), logical(1)))) return(NULL)
+  managed <- ig_options_r_values(store)
+  inherited <- settings[setdiff(names(settings), names(managed))]
+  if (any(vapply(inherited, function(x) !is.null(x) && !is.atomic(x), logical(1)))) return(NULL)
   # User-defined contrast/missing-value functions and nonlinear expressions
   # can depend on the parent process's global environment.
-  if (length(settings$contrasts) && any(!settings$contrasts %in%
+  if (!"contrasts" %in% names(managed) && length(settings$contrasts) && any(!settings$contrasts %in%
       c("contr.treatment", "contr.SAS", "contr.sum", "contr.helmert", "contr.poly"))) return(NULL)
-  if (length(settings$na.action) && !settings$na.action %in% c("na.omit", "na.exclude", "na.fail", "na.pass")) return(NULL)
+  if (!"na.action" %in% names(managed) && length(settings$na.action) && !settings$na.action %in% c("na.omit", "na.exclude", "na.fail", "na.pass")) return(NULL)
+  settings <- ig_options_merge(settings, managed)
+  if (!ig_transferable(settings)) return(NULL)
   settings
 }
 
@@ -75,7 +79,7 @@ ig_background_eligible <- function(store, task_id, params = NULL, register = TRU
   reader <- isolate(store$params_fns[[task_id]])
   p <- if (!is.null(params)) params else if (is.function(reader))
     tryCatch(isolate(reader()), error = function(error) NULL) else task$params
-  if (is.null(p) || is.null(ig_background_options())) return(FALSE)
+  if (is.null(p) || is.null(ig_background_options(store))) return(FALSE)
   input <- p[["input_table"]] %||% ""
   if (length(input) > 1L || anyNA(input)) return(FALSE)
   if (length(input) && nzchar(input) && !input %in% names(isolate(store$tables))) return(FALSE)
@@ -108,6 +112,10 @@ ig_background_current <- function(store, job, track = FALSE) {
 # This function's environment is changed to baseenv() before serialization, so
 # a development namespace need not be installed to deserialize the request.
 ig_background_worker <- function(request, app_path, source) {
+  configured <- c(request$options, list(IndividualGuide.report_root = request$artifacts))
+  old_options <- stats::setNames(lapply(names(configured), getOption), names(configured))
+  on.exit(options(old_options), add = TRUE)
+  options(configured)
   if (source && !"IndividualGuide" %in% loadedNamespaces()) pkgload::load_all(app_path, export_all = FALSE, helpers = FALSE, attach_testthat = FALSE)
   else loadNamespace("IndividualGuide")
   for (table in request$tables) {
@@ -115,8 +123,6 @@ ig_background_worker <- function(request, app_path, source) {
     if (any(vapply(table, function(column) inherits(column, "haven_labelled"), logical(1)))) loadNamespace("haven")
   }
   ns <- asNamespace("IndividualGuide")
-  old_options <- options(c(request$options, list(IndividualGuide.report_root = request$artifacts)))
-  on.exit(options(old_options), add = TRUE)
   old_seed <- if (exists(".Random.seed", globalenv(), inherits = FALSE)) get(".Random.seed", globalenv()) else NULL
   if (length(request$rng_kind)) suppressWarnings(do.call(RNGkind, as.list(request$rng_kind)))
   if (!is.null(request$seed)) {
@@ -351,7 +357,7 @@ ig_background_start <- function(store, task_id, params = NULL, register = TRUE,
   job$context <- isolate(store$execution_context); job$branch_tokens <- isolate(store$branch_tokens)
   job$artifacts <- tempfile("ig_task_results_"); dir.create(job$artifacts)
   state$artifacts <- c(state$artifacts, job$artifacts)
-  job$options <- ig_background_options(); job$rng_kind <- RNGkind()
+  job$options <- ig_background_options(store); job$rng_kind <- RNGkind()
   job$started <- Sys.time()
   if (!length(isolate(store$run_ids))) {
     store$run_started <- job$started; store$run_total <- 1L

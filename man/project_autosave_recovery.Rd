@@ -5,7 +5,7 @@
 \title{Write a recovery snapshot without touching the project's identity/dirty flag.
 Best-effort: never errors out into the reactive cycle.}
 \usage{
-project_autosave_recovery(store, canvas_state = list(), theme = "dark")
+project_autosave_recovery(store, canvas_state = list(), theme = NULL)
 }
 \arguments{
 \item{store}{Session reactive store created by make_store().}

@@ -56,7 +56,7 @@ ig_shiny_app_manager <- function(timeout = 120) {
   }
   list(
     active = alive,
-    start = function(path, trusted = FALSE) {
+    start = function(path, trusted = FALSE, r_options = list()) {
       if (!isTRUE(trusted)) stop("Only run an app you trust.", call. = FALSE)
       entry <- ig_shiny_app_path(path) # Invalid choices leave the current app running.
       stop_process()
@@ -73,16 +73,17 @@ ig_shiny_app_manager <- function(timeout = 120) {
       state <<- list(phase = "starting", name = entry$name, path = entry$directory,
         url = "", message = "Starting the Shiny app...", pid = NULL)
       tryCatch({
-        process <<- callr::r_bg(function(directory, port, host) {
+        process <<- callr::r_bg(function(directory, port, host, r_options) {
           # Inherit package libraries, not the desktop's authentication/recovery
           # environment. Profiles are disabled just as for the main desktop R.
           Sys.unsetenv(grep("^IG_", names(Sys.getenv()), value = TRUE))
           Sys.setenv(no_proxy = paste(Sys.getenv("no_proxy"), host, sep = ","))
           setwd(directory)
           options(shiny.autoreload = FALSE)
+          if (length(r_options)) options(r_options)
           shiny::runApp(directory, host = host, port = port,
             launch.browser = FALSE, display.mode = "normal")
-        }, args = list(entry$directory, port, host), libpath = .libPaths(),
+        }, args = list(entry$directory, port, host, r_options), libpath = .libPaths(),
           stdout = stdout, stderr = stderr, supervise = TRUE, cleanup_tree = TRUE,
           system_profile = FALSE, user_profile = FALSE)
         state$pid <<- process$get_pid()
@@ -165,7 +166,7 @@ ig_shiny_apps_ui <- function() {
         tags$button(id = "ig-app-confirm-close", type = "button", class = "btn btn-danger", "Close app"))))
 }
 
-ig_shiny_apps_server <- function(input, session) {
+ig_shiny_apps_server <- function(input, session, store = NULL) {
   manager <- ig_shiny_app_manager()
   session$onSessionEnded(manager$dispose)
   selected <- NULL
@@ -198,7 +199,7 @@ ig_shiny_apps_server <- function(input, session) {
         if (length(hostname) && nzchar(hostname) && !hostname %in% c("localhost", "127.0.0.1", "::1", "[::1]"))
           stop("Open local Shiny apps from a browser on this computer.", call. = FALSE)
         if (is.null(selected)) stop("Choose an app first.", call. = FALSE)
-        value <- manager$start(selected$path, trusted = isTRUE(request$trusted))
+        value <- manager$start(selected$path, trusted = isTRUE(request$trusted), r_options = ig_options_r_values(store))
       } else if (request$action == "stop") value <- manager$stop() else return()
       notify(list(ack = request$nonce, state = value))
       changed(shiny::isolate(changed()) + 1L)

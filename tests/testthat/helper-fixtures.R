@@ -1,5 +1,6 @@
 # helper-fixtures.R — shared data and store fixtures for the test suite.
 options(ig.backup_dir = file.path(tempdir(), "IndividualGuide-test-backups"))
+options(ig.options.file = file.path(tempdir(), "IndividualGuide-test-global-options.rds"))
 # Headless/module unit fixtures run deterministically without dispatching R
 # processes. Worker tests explicitly enable the real scheduler; browser and
 # packaged acceptance use the normal application defaults.

@@ -15,8 +15,8 @@
     '.sF-fileList .sF-file:not(.sF-file-header),.sF-fileList .sF-directory,'+
     '.sF-dirList .sF-file-name,.sF-dirContent .sF-file-name,.sF-breadcrumps,'+
     '[data-ig-user-content],[data-ig-no-translate]';
-  const metadataTables='#history_dt,#global_search_dt,#project_tools-files,#project_tools-runs,#packages-packages';
-  function metadataHeader(element){return Boolean((element?.closest('.dataTable thead')&&element.closest(metadataTables))||element?.closest('.sF-file-header'));}
+  const metadataTables='#history_dt,#global_search_dt,#project_tools-files,#project_tools-runs,#packages-packages,#preferences-options';
+  function metadataHeader(element){return Boolean((element?.closest('.dataTable thead')&&element.closest(metadataTables))||element?.closest('#preferences-options td[data-ig-option-meta="true"],.sF-file-header'));}
   let engine, frame, applying = false, observer;
   let canvasTypes = {};
   const canvasStates=new WeakMap(),canvasImages=new Map();
@@ -192,9 +192,13 @@
       else if (field.value !== engine.locale) field.value=engine.locale;
     }
   }
-  async function setLanguage(value, fromDesktop) {
+  async function setLanguage(value, fromDesktop, config = {}) {
     const locale = IGLocale.normalize(value);
-    engine.setLanguage(locale); save(locale);
+    engine.setLanguage(locale);
+    if (config.persist !== false) {
+      save(locale);
+      if (window.Shiny?.setInputValue) Shiny.setInputValue('ig_language_preference',{locale,initial:config.initial === true,nonce:Date.now()},{priority:'event'});
+    }
     document.documentElement.lang=locale;
     applying=true; try { apply(document.body); controls(); localizeCanvases(); } finally { applying=false; }
     for(const id of ['task_search','help_task_search']){
@@ -202,7 +206,7 @@
       if(field?.value)field.dispatchEvent(new Event('input',{bubbles:true}));
     }
     if (window.Shiny?.setInputValue) Shiny.setInputValue('ig_language',locale,{priority:'event'});
-    if (!fromDesktop && window.igDesktop?.setLanguage) await window.igDesktop.setLanguage(locale);
+    if (config.persist !== false && !fromDesktop && window.igDesktop?.setLanguage) await window.igDesktop.setLanguage(locale);
     window.dispatchEvent(new CustomEvent('ig:language-changed',{detail:{locale}}));
     return locale;
   }
@@ -215,8 +219,9 @@
     const language = desktop?.locale || stored() || navigator.languages?.[0] || navigator.language;
     engine=IGLocale.create(catalog,language);
     window.igI18n={translate:value=>engine.translate(value),setLanguage,
+      setDefaultLanguage:async locale=>{save(locale);await window.igDesktop?.saveDefaultLanguage?.(locale);},
       get locale(){return engine.locale;},refresh:()=>queue(document.body)};
-    await setLanguage(engine.locale,true);
+    await setLanguage(engine.locale,true,{initial:true});
     observer=new MutationObserver(records=>{
       if (applying) return;
       for (const record of records) {
@@ -231,7 +236,7 @@
       if (event.target.matches('.ig-language-picker')) setLanguage(event.target.value);
     });
     window.jQuery?.(document).on('change','#settings_language',function(){setLanguage(this.value);});
-    window.jQuery?.(document).on('shiny:connected',()=>setLanguage(engine.locale,true));
+    window.jQuery?.(document).on('shiny:connected',()=>setLanguage(engine.locale,true,{initial:true}));
     window.jQuery?.(document).on('shiny:bound',event=>queue(event.target.closest?.('[data-ig-choice-labels]') || event.target));
     window.igDesktop?.onLanguage?.(value=>setLanguage(value.locale,true));
   }

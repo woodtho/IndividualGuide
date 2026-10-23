@@ -71,10 +71,54 @@ checked by `tools/desktop/startup.R`. See
 [desktop build instructions](tools/desktop/BUILD-README.md) for paths, retained
 user data, dependency recovery, and the executable smoke test.
 
+## Global and project options
+
+Open **File > Settings...** in the desktop app or use the browser's Settings
+button. Options are grouped into General, Appearance, Code editing, Console,
+Execution, Data and results, Plots and reports, Files and recovery, and R options.
+Search by name, label, description or package prefix, then choose **Edit** beside an option.
+
+Choose **Global defaults** for settings that apply across projects, or **This
+project** for an explicit override. Projects otherwise inherit the current global
+value. **Use global default** removes an individual override; the reset command
+clears the selected scope. Global defaults live in IG's application-data folder;
+project overrides are saved inside the `.igpx` file, with their R value types intact.
+New projects start with global defaults rather than retaining the previous project's
+overrides. Older project settings are migrated into explicit project overrides.
+
+The R-options view includes the complete reference shipped with the bundled R
+version, every option registered in the application session, and options discovered
+by the active R console. **Refresh R options** updates that list. **Add R option**
+accepts any R or package option name, including options from packages that have not
+been loaded. Values can be text, logicals, numbers, vectors, lists, expressions or
+functions; an explicit `NULL` unsets an option rather than inheriting it. The R
+expression editor evaluates only when **Save option** is pressed. Live connections
+and external pointers cannot be retained as saved settings.
+
+Global R defaults apply to the application runtime. Each foreground/background
+task and console command uses its project's effective R options, and new hosted
+Shiny apps receive the same values. Existing guest apps retain their startup options
+until reopened. Generated R scripts and run records include the effective configured
+R options. Base R and individual packages determine which options take effect
+immediately and which are consulted at initialization or device creation.
+The desktop runtime and browser launcher load global R defaults before the app's
+packages. If a saved R setting prevents startup, use **Session > Restart with
+default R options...** or the corresponding recovery-screen button. This pauses
+saved R overrides for that recovery session so they can be edited or reset;
+restart normally to apply them again. Browser launches can use
+`Sys.setenv(IG_IGNORE_GLOBAL_OPTIONS = "1")` before sourcing the launcher for the
+same recovery behavior.
+
+Application preferences include editor font, indentation, wrapping, line numbers,
+whitespace and active-line display; console font, retained output and scrolling;
+plot dimensions and defaults; execution behavior, seeds, backups and recovery timing.
+Appearance and language can also inherit or override global settings. A project
+language override changes the presentation without replacing the global preference.
+
 ## Manage R packages
 
 Choose **Session > R packages...** in the desktop app, or **Settings > R
-packages...** in a local browser. IG keeps its own writable library under its
+package manager** in the Options dialog in a local browser. IG keeps its own writable library under its
 application data folder, separated by R major/minor version. This library takes
 priority over bundled packages and does not change your ordinary R libraries.
 

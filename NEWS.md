@@ -1,5 +1,14 @@
 # Development
 
+- Replace the compact Settings dialog with categorized, searchable global and
+  project options. Add editor, console, plotting and recovery preferences;
+  inherit global defaults unless a project explicitly overrides a value.
+- Present the documented R options and dynamically registered application and
+  console options. Support arbitrary package option names and typed values,
+  including functions, with consistent task/console/guest execution and code export.
+- Save typed project overrides in project format 0.6; retain migration support
+  for older project archives and their existing appearance/settings values.
+
 - Add an IG-specific R package library and a package manager for installing,
   pinning and restoring exact CRAN package versions. Validate changes in a
   separate library, apply them after restarting R, and retain rollback profiles.

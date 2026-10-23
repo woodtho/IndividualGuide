@@ -1,4 +1,5 @@
-ig_package_job <- function(request, app_path, source) {
+ig_package_job <- function(request, app_path, source, r_options = list()) {
+  if (length(r_options)) options(r_options)
   if (source) pkgload::load_all(app_path, quiet = TRUE, export_all = FALSE) else loadNamespace("IndividualGuide")
   ns <- asNamespace("IndividualGuide")
   probe <- function(paths, packages) {
@@ -117,7 +118,7 @@ ig_package_manager_server <- function(id, store) {
         source <- !file.exists(file.path(app_path, "R", "IndividualGuide.rdb"))
         worker <- ig_package_job; environment(worker) <- baseenv()
         unlink(log_file)
-        process <<- callr::r_bg(worker, args = list(request, app_path, source), libpath = .libPaths(),
+        process <<- callr::r_bg(worker, args = list(request, app_path, source, ig_options_r_values(store)), libpath = .libPaths(),
           stdout = log_file, stderr = "2>&1", system_profile = FALSE, user_profile = FALSE, supervise = TRUE)
         status("Preparing package changes. You can keep using the current workspace.")
         log("")

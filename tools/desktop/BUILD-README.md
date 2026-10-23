@@ -68,6 +68,12 @@ The window remains available after a backend failure. Restarting stops running
 work and can lose unsaved changes; reopen a saved project or restore recovery
 when offered. Repeated requests are guarded and failed starts can be retried.
 
+Use **File > Settings...** for categorized application and R options. Global
+defaults apply across projects; explicit project overrides travel with `.igpx`
+files. Search the R reference and registered options, or add package options by
+name with typed values. **Session > Restart with default R options...** pauses
+saved R overrides so a setting that prevents startup can be repaired.
+
 Session can open or export diagnostic logs. These record timestamped startup
 stages, runtime versions, connection events, conditions and shutdown/restart.
 Rotation keeps five previous files, each capped at 5 MiB. Review diagnostics for

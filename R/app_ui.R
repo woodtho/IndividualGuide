@@ -137,6 +137,7 @@ app_ui <- function() bslib::page_sidebar(
     tags$script(src = "www/ig_run.js"),
     tags$script(src = "www/ig_console_tools.js"),
     tags$script(src = "www/ig_console.js"),
+    tags$script(src = "www/ig_preferences.js"),
     # Built-in busy feedback: spinners on recalculating outputs and a pulse
     # banner during long computations (no-op on shiny versions without it)
     if ("useBusyIndicators" %in% getNamespaceExports("shiny"))

@@ -2,12 +2,10 @@
 % Please edit documentation in R/store.R
 \name{ig_default_settings}
 \alias{ig_default_settings}
-\title{Default user settings (Settings modal). Saved in the project manifest and
-merged over these defaults on load so old projects pick up new keys.}
+\title{Built-in application defaults}
 \usage{
 ig_default_settings()
 }
 \description{
-Default user settings (Settings modal). Saved in the project manifest and
-merged over these defaults on load so old projects pick up new keys.
+Global defaults and explicit project overrides are layered over these values.
 }

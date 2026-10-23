@@ -16,6 +16,7 @@ main <- function() {
     group = rep(c("a", "b"), 6)), file.path(fixtures, "input.csv"), row.names = FALSE)
   sandbox <- tempfile("ig-workflow-"); dir.create(sandbox)
   writeLines(c("Sys.setlocale('LC_CTYPE', '.UTF-8')",
+    sprintf("Sys.setenv(IG_USER_DATA=%s)", deparse(file.path(sandbox, "user-data"))),
     sprintf("pkgload::load_all(%s, export_all = FALSE, helpers = FALSE, attach_testthat = FALSE)", deparse(root)),
     sprintf("options(ig.file_roots = c(Audit = %s), ig.catalogue_dir = file.path(tempdir(), 'workflow-catalogue'), ig.recovery_dir = file.path(tempdir(), 'workflow-recovery'))", deparse(fixtures)),
     "IndividualGuide::run_app()"), file.path(sandbox, "app.R"))
@@ -160,9 +161,19 @@ main <- function() {
   wait_success("script_1")
   cat("Model, script failure diagnostics and corrected rerun passed.\n")
   click("btn_settings")
-  app$wait_for_js("document.getElementById('settings_apply') !== null")
-  app$set_inputs(settings_theme_mode = "light", settings_confirm_delete = FALSE, settings_page_length = 25)
-  click("settings_apply")
+  app$wait_for_js("document.getElementById('preferences-search') !== null")
+  for (name in c("theme_mode", "confirm_delete", "page_length")) {
+    app$set_inputs(`preferences-search` = name)
+    app$wait_for_js(sprintf("document.querySelector('#preferences-options tbody tr td')?.textContent==='%s'", name))
+    app$run_js("document.querySelector('#preferences-options tbody tr button').click()")
+    app$wait_for_js(sprintf("document.querySelector('.ig-option-editor > code')?.textContent==='%s'&&Boolean(document.getElementById('preferences-input')?.classList.contains('shiny-bound-input'))", name))
+    value <- switch(name, theme_mode = "light", confirm_delete = "FALSE", page_length = 25)
+    app$set_inputs(`preferences-input` = value)
+    click("preferences-save")
+    app$wait_for_js(sprintf("window.igPreferences.%s===%s", name, switch(name, theme_mode = "'light'", confirm_delete = "false", page_length = "25")))
+  }
+  app$run_js("document.querySelector('.modal-footer [data-bs-dismiss=modal],.modal-footer [data-dismiss=modal]').click()")
+  app$wait_for_js("!document.querySelector('.modal.show')")
   app$wait_for_js("document.documentElement.getAttribute('data-ig-theme') === 'light'")
   app$run_js("document.querySelector('#panel_script_1 [onclick*=\"panel_delete_task\"]').click()")
   app$wait_for_js("document.getElementById('panel_script_1') === null")

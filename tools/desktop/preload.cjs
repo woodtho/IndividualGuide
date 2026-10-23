@@ -4,6 +4,8 @@ const { ipcRenderer, contextBridge } = require('electron');
 contextBridge.exposeInMainWorld('igDesktop', {
   getLanguage: () => ipcRenderer.invoke('ig:language'),
   setLanguage: locale => ipcRenderer.invoke('ig:set-language', locale),
+  setPresentationLanguage: locale => ipcRenderer.invoke('ig:presentation-language', locale),
+  saveDefaultLanguage: locale => ipcRenderer.invoke('ig:default-language', locale),
   onLanguage: callback => { ipcRenderer.on('ig:language', (_event, value) => callback({locale:value.locale})); },
   publishState: value => ipcRenderer.send('ig:workspace-state', value),
   releaseShinyApp: url => ipcRenderer.invoke('ig:release-shiny-app', url),
@@ -18,7 +20,7 @@ let state, language = {locale:'en-CA',strings:{}};
 const translate = value => typeof value === 'string' && language.locale === 'fr-CA' ? language.strings[value.trim()] || value : value;
 ipcRenderer.on('ig:language', (_event, value) => {language=value;render();});
 ipcRenderer.on('ig:backend-state', (_event, value) => { state = value; render(); });
-let panel, message, restart, logButton, title, detail;
+let panel, message, restart, defaultsButton, logButton, title, detail;
 function render() {
   if (!panel || !state) return;
   document.documentElement.lang=language.locale;
@@ -26,6 +28,7 @@ function render() {
   title.textContent=translate('Reconnect your workspace');
   detail.textContent=translate('Restarting stops running tasks. Unsaved changes may be lost. You can reopen a saved project or restore the latest available autosave after restarting.');
   restart.textContent=translate('Restart R server');
+  defaultsButton.textContent=translate('Restart with default R options');
   logButton.textContent=translate('Open startup log');
   const disconnected = Boolean(document.getElementById('shiny-disconnected-overlay'));
   const loading = document.body.dataset.desktopLoading === 'true';
@@ -33,6 +36,7 @@ function render() {
   panel.hidden = !show;
   message.textContent = state.phase === 'stopped' ? state.localizedMessage || translate(state.message) : translate('The workspace lost its connection to R.');
   restart.disabled = state.phase === 'starting';
+  defaultsButton.disabled = state.phase === 'starting';
   if (loading) {
     document.getElementById('desktop-status').textContent = state.phase === 'starting' ? state.localizedMessage || translate(state.message) : translate('The R server is unavailable.');
     document.querySelector('.spinner').setAttribute('aria-label',translate('Starting'));
@@ -51,6 +55,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   detail = document.createElement('p');
   detail.textContent = 'Restarting stops running tasks. Unsaved changes may be lost. You can reopen a saved project or restore the latest available autosave after restarting.';
   restart = document.createElement('button'); restart.id = 'ig-restart-r'; restart.type = 'button'; restart.textContent = 'Restart R server';
+  defaultsButton = document.createElement('button'); defaultsButton.id = 'ig-restart-r-default-options'; defaultsButton.type = 'button'; defaultsButton.textContent = 'Restart with default R options';
   logButton = document.createElement('button'); logButton.type = 'button'; logButton.textContent = 'Open startup log';
   restart.addEventListener('click', async () => {
     restart.disabled = true;
@@ -58,7 +63,12 @@ window.addEventListener('DOMContentLoaded', async () => {
     finally { restart.disabled = false; }
   });
   logButton.addEventListener('click', () => ipcRenderer.invoke('ig:open-log'));
-  panel.append(title, message, detail, restart, logButton); document.body.append(panel);
+  defaultsButton.addEventListener('click', async () => {
+    defaultsButton.disabled = true;
+    try { await ipcRenderer.invoke('ig:restart-r-default-options'); }
+    finally { defaultsButton.disabled = false; }
+  });
+  panel.append(title, message, detail, restart, defaultsButton, logButton); document.body.append(panel);
   // Shiny adds/removes its overlay on disconnection/reconnection. This does not
   // poll R, reload the workspace, or interrupt a busy but connected server.
   new MutationObserver(records => {

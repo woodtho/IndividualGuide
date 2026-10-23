@@ -1,6 +1,17 @@
 # A console belongs to one Shiny session and uses a separate, persistent R
 # process. Nothing from its workspace is committed to the pipeline store.
-ig_console_worker <- function(code, snapshot, directory, output, working_directory) {
+ig_console_worker <- function(code, snapshot, directory, output, working_directory, r_options = list(), app_options = list()) {
+  # Keep unmanaged options explicitly set by console commands, but update every
+  # managed global/project option at the start of the next command.
+  previous <- getOption("ig.console.managed_options", list())
+  removed <- setdiff(names(previous), names(r_options))
+  if (length(removed)) options(previous[removed])
+  original <- options()[intersect(names(r_options), names(options()))]
+  absent <- setdiff(names(r_options), names(original))
+  if (length(absent)) original[absent] <- rep(list(NULL), length(absent))
+  for (name in intersect(names(previous), names(original))) original[name] <- previous[name]
+  if (length(r_options)) options(r_options)
+  options(ig.console.managed_options = original)
   if (!is.null(working_directory)) setwd(working_directory)
   if (!is.null(snapshot)) {
     old <- getOption("ig.console.project_names", character())
@@ -47,7 +58,8 @@ ig_console_worker <- function(code, snapshot, directory, output, working_directo
   tryCatch(withCallingHandlers({
     expressions <- parse(text = code, keep.source = FALSE)
     if (length(expressions)) {
-      grDevices::png(file.path(directory, "plot-%03d.png"), width = 1000, height = 700)
+      grDevices::png(file.path(directory, "plot-%03d.png"), width = if (is.null(app_options$console_plot_width)) 1000 else app_options$console_plot_width,
+        height = if (is.null(app_options$console_plot_height)) 700 else app_options$console_plot_height)
       device <- grDevices::dev.cur()
       grDevices::dev.control(displaylist = "enable")
       initial_plot <- grDevices::recordPlot()
@@ -87,7 +99,18 @@ ig_console_worker <- function(code, snapshot, directory, output, working_directo
         fields[[paste0(".project$tables$", paste(deparse(as.name(name), backtick = TRUE), collapse = ""))]] <- attr(project$tables[[name]], "names", exact = TRUE)
     }
   }
-  list(status = status, symbols = list(words = utils::head(words, 2000L), fields = fields, kinds = kinds))
+  portable_option <- function(value) {
+    if (is.function(value) || typeof(value) %in% c("environment", "externalptr", "weakref")) return(FALSE)
+    if (is.list(value)) return(all(vapply(value, portable_option, logical(1))))
+    is.atomic(value) || is.null(value)
+  }
+  registered <- lapply(options(), function(value) {
+    small <- as.numeric(utils::object.size(value)) <= 1000000
+    text <- if (small) paste(suppressWarnings(deparse(value, width.cutoff = 90L, nlines = 4L)), collapse = "\n") else paste("<large", typeof(value), "option>")
+    safe <- small && portable_option(value)
+    list(text = substr(text, 1L, 1000L), has_value = safe, value = if (safe) value else NULL)
+  })
+  list(status = status, symbols = list(words = utils::head(words, 2000L), fields = fields, kinds = kinds), registered_options = registered)
 }
 
 ig_console_snapshot <- function(store) {
@@ -118,6 +141,7 @@ ig_console_state <- function(store, session, changed = function() NULL) {
   state$prefix <- paste0("ig-console-", basename(state$directory))
   shiny::addResourcePath(state$prefix, state$directory)
   state$changed <- changed
+  state$max_chars <- isolate(store$settings)$console_max_chars %||% 300000L
   session$onSessionEnded(function() {
     if (state$closed) return()
     state$closed <- TRUE
@@ -130,9 +154,10 @@ ig_console_state <- function(store, session, changed = function() NULL) {
 
 ig_console_append <- function(state, text) {
   state$text <- paste0(state$text, text)
-  if (nchar(state$text, type = "chars") > 300000L)
+  limit <- state$max_chars %||% 300000L
+  if (nchar(state$text, type = "chars") > limit)
     state$text <- paste0("[Earlier console output trimmed]\n", substr(state$text,
-      nchar(state$text) - 250000L, nchar(state$text)))
+      nchar(state$text) - as.integer(limit * .85), nchar(state$text)))
 }
 
 ig_console_reset <- function(state, notify = TRUE) {
@@ -177,10 +202,11 @@ ig_console_submit <- function(state, store, code = "", refresh = FALSE) {
   if (!is.null(snapshot) && length(snapshot$skipped)) ig_console_append(state,
     paste0("Not copied (live handles): ", paste(snapshot$skipped, collapse = ", "), "\n"))
   working_directory <- if (!alive) getwd() else NULL
+  state$max_chars <- isolate(store$settings)$console_max_chars %||% 300000L
   directory <- tempfile("command-", tmpdir = state$directory); dir.create(directory)
   state$pending <- list(code = code, snapshot = snapshot, directory = directory,
     output = file.path(directory, "output.txt"), offset = 0, sent = FALSE, working_directory = working_directory,
-    started = Sys.time())
+    r_options = ig_options_r_values(store), app_options = isolate(store$settings), started = Sys.time())
   if (nzchar(trimws(code))) ig_console_append(state, paste0("> ", gsub("\n", "\n+ ", code, fixed = TRUE), "\n"))
   else ig_console_append(state, "[Refresh project data]\n")
   state$status <- if (alive) "Running" else "Starting R"
@@ -207,7 +233,8 @@ ig_console_submit <- function(state, store, code = "", refresh = FALSE) {
         worker <- ig_console_worker; environment(worker) <- baseenv()
         job <- state$pending
         process$call(worker, args = list(code = job$code, snapshot = job$snapshot,
-          directory = job$directory, output = job$output, working_directory = job$working_directory))
+          directory = job$directory, output = job$output, working_directory = job$working_directory,
+          r_options = job$r_options, app_options = job$app_options))
         state$pending$sent <- TRUE; state$status <- "Running"
       }
       ig_console_output(state)
@@ -216,6 +243,7 @@ ig_console_submit <- function(state, store, code = "", refresh = FALSE) {
         if (!is.null(result$error)) stop(result$error)
         state$status <- result$result$status %||% "Ready"
         state$symbols <- result$result$symbols %||% list(words = character(), fields = list(), kinds = list())
+        store$r_options_discovered <- result$result$registered_options %||% list()
         plots <- list.files(state$pending$directory, pattern = "[.]png$", full.names = TRUE)
         state$plots <- c(state$plots, plots)
         retired <- head(state$plots, max(0L, length(state$plots) - 12L))

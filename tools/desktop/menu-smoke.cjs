@@ -73,7 +73,7 @@ module.exports = async ({ window, pause, state, logPath, sendCommand, saveDiagno
     await wait(() => js("Boolean(document.getElementById('panel_script_1')?.dataset.igReadyToken)"), 'reopened task');
     assert.equal(await js("ace.edit('scr_script_1-code').getValue()"),'menu_rows <- data.frame(value = 99)');
     checks.nativeOpenPreservesImmediateEdits = true;
-    for (const [id,selector] of [['settings','#settings_apply'],['help','#help_task_search'],['shortcuts','.ig-shortcuts-modal'],['history','#history_dt'],['comments','#shiny-modal'],['review','#shiny-modal']]) {
+    for (const [id,selector] of [['settings','#preferences-search'],['help','#help_task_search'],['shortcuts','.ig-shortcuts-modal'],['history','#history_dt'],['comments','#shiny-modal'],['review','#shiny-modal']]) {
       await idle(); command(id); await wait(() => js(`Boolean(document.querySelector(${JSON.stringify(selector)}))`), id+' modal'); await closeModal();
     }
     checks.globalMenuCommands = true;

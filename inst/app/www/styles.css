@@ -3150,6 +3150,26 @@ html:not([data-ig-theme="light"]) .modal-footer .btn-primary { color: #fff; back
   margin-left:auto;
   margin-right:auto;
 }
+#shiny-modal.ig-options-modal .modal-dialog { width:min(1180px,calc(100vw - 24px));max-width:calc(100vw - 24px);margin-left:auto;margin-right:auto; }
+.ig-options-layout { display:grid;grid-template-columns:210px minmax(0,1fr);gap:24px; }
+.ig-options-sidebar { border-right:1px solid var(--bs-border-color);padding-right:16px; }
+.ig-options-sidebar .shiny-options-group { display:flex;flex-direction:column;gap:6px; }
+.ig-options-sidebar .form-check { padding-block:3px; }
+.ig-options-content,.ig-options-content .dataTables_wrapper { min-width:0;max-width:100%; }
+.ig-options-content .dataTables_wrapper { overflow-x:auto;margin-bottom:18px; }
+.ig-options-tools { display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px; }
+.ig-option-editor { min-width:0;overflow-wrap:anywhere;padding:16px;border:1px solid var(--bs-border-color);border-radius:8px;margin:16px 0; }
+.ig-options-content code { overflow-wrap:anywhere; }
+.ig-option-editor h3 { font-size:1rem; }
+.ig-option-editor textarea { font-family:'JetBrains Mono',monospace; }
+.ig-option-editor pre { max-height:200px;overflow:auto;white-space:pre-wrap; }
+.ig-console-transcript,.ig-console-editor,.ig-console-highlight { font-size:var(--ig-console-font-size,13px) !important; }
+html[data-ig-reduce-motion="true"] *,html[data-ig-reduce-motion="true"] *::before,html[data-ig-reduce-motion="true"] *::after { animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important;scroll-behavior:auto !important; }
+@media(max-width:800px) {
+  .ig-options-layout { grid-template-columns:minmax(0,1fr);gap:12px; }
+  .ig-options-sidebar { border-right:0;border-bottom:1px solid var(--bs-border-color);padding:0 0 12px; }
+  .ig-options-sidebar .shiny-options-group { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:3px 12px; }
+}
 .ig-package-manager .dataTables_wrapper { min-width:0;max-width:100%;overflow-x:auto; }
 .ig-package-manager .modal-footer { flex-wrap:wrap;gap:8px; }
 .ig-app-brand { display:none; }
