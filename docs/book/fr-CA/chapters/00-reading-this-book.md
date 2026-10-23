@@ -4,7 +4,7 @@ Vous pouvez utiliser Individual Guide sans connaître R. L’application vous ai
 
 Un projet ressemble à une recette. Vos données sont les ingrédients. Chaque **tâche** est une étape, comme trier des lignes ou tracer un graphique. Un **flux**, aussi appelé pipeline, relie ces étapes. Vous pouvez enregistrer la recette et la réutiliser.
 
-Ce guide porte sur **Individual Guide 0.6.0**, qui offre **58 types de tâches** et **22 projets d’exemple**. Commencez par l’installation et le premier projet. Ensuite, consultez les tâches dont vous avez besoin. Vous n’avez pas à lire le guide du début à la fin.
+Ce guide porte sur **Individual Guide 0.7.0**, qui offre **58 types de tâches** et **22 projets d’exemple**. Commencez par l’installation et le premier projet. Ensuite, consultez les tâches dont vous avez besoin. Vous n’avez pas à lire le guide du début à la fin.
 
 ## Trouver votre point de départ
 
@@ -54,7 +54,7 @@ Pour la plupart des utilisateurs de Windows, le programme d’installation Setup
 Il vous faut un ordinateur avec Windows 10 ou Windows 11 en 64 bits. Prévoyez environ 1,5 Go pour le programme, plus de l’espace pour vos projets. Une connexion Internet est nécessaire pour télécharger Setup. Une fois installés, l’application et ses exemples fonctionnent hors ligne. Les tâches qui utilisent une base de données en ligne ont toujours besoin de cette connexion.
 
 1. Ouvrez la [page des versions publiques](https://github.com/woodtho/IndividualGuide/releases/latest).
-2. Sous **Assets**, téléchargez **IndividualGuide-0.6.0-Setup-Windows-x64.exe** pour cette édition. Si une version plus récente est affichée, lisez ses notes avant de la choisir. Le programme qui correspond à ce guide se trouve sur la [page de la version 0.6.0](https://github.com/woodtho/IndividualGuide/releases/tag/v0.6.0).
+2. Sous **Assets**, téléchargez **IndividualGuide-0.7.0-Setup-Windows-x64.exe** pour cette édition. Si une version plus récente est affichée, lisez ses notes avant de la choisir. Le programme qui correspond à ce guide se trouve sur la [page de la version 0.7.0](https://github.com/woodtho/IndividualGuide/releases/tag/v0.7.0).
 3. Fermez toute copie ouverte d’Individual Guide. Les fichiers nommés **Source code** ne sont pas nécessaires pour utiliser l’application de bureau.
 4. Double-cliquez sur le fichier Setup téléchargé. Choisissez **English** ou **Français (Canada)** lorsque la langue est demandée, puis suivez les instructions. L’installation habituelle utilise votre propre compte Windows.
 5. Ouvrez **Individual Guide** dans le menu Démarrer ou avec le raccourci du Bureau.
@@ -76,7 +76,7 @@ Si le démarrage s’arrête avec une erreur, choisissez **Ouvrir le journal de 
 L’application offre l’anglais et le français canadien. Le programme d’installation Windows transmet votre choix à l’application. Vous pouvez le changer plus tard sans redémarrer R ni rouvrir le projet.
 
 1. Choisissez **English** ou **Français (Canada)** dans la liste des langues à l’accueil ou près du nom de l’application.
-2. Dans l’application de bureau, vous pouvez aussi utiliser le menu **Langue**. **Paramètres > Langue** offre le même choix.
+2. Dans l’application de bureau, vous pouvez aussi utiliser le menu **Langue**. Dans **Paramètres**, recherchez **Langue de l’interface**, puis sélectionnez **Édition** et **Enregistrer l’option** pour une valeur globale ou un remplacement du projet.
 3. Vérifiez que les boutons et les menus sont dans la langue choisie. L’application la conserve sur cet ordinateur.
 
 La langue est distincte du projet. Ouvrir un autre projet ne la change pas. Vos données, noms de colonnes, chemins de fichiers, formules et noms saisis restent tels quels. Les commandes R et les identifiants techniques gardent l’orthographe que R exige.

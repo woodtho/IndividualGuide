@@ -47,14 +47,24 @@ Undo can restore supported project changes, but it does not rewind every action.
 # Make the app comfortable to use {#settings}
 
 1. Open a project, then choose **File > Settings...** in the desktop app. In a browser, select **Settings** in the app header.
-2. Change one setting at a time. Start with **Appearance** or **Preview rows per page** if the workspace is hard to read.
-3. Select **Apply**. Check the workspace, then save the project to keep its settings.
+2. Choose **Global defaults** or **This project**, then search for a setting or select a category. Start with **Appearance** or **Preview rows per page** if the workspace is hard to read.
+3. Select **Edit** beside the option, change its value, then select **Save option**. Check the workspace. Save the project to keep project overrides.
 
-![Settings controls appearance, preview size, saved versions, and run behaviour. Apply a change, check it, and save the project.](assets/ui-settings.png){#fig-settings}
+![Options groups appearance, code editing, the console, execution and recovery settings. Choose a scope, find an option, then select Edit.](assets/ui-settings.png){#fig-settings}
+
+## Global defaults and project overrides
+
+Global defaults apply to projects that inherit them. **This project** saves only the values you override. Select **Use global default** to remove one project override. An explicit `NULL` R value removes an option; it does not mean inheritance. Older projects keep their saved preferences when opened.
+
+The R-options categories list the bundled R reference and options registered by the app or console. Use **Add R option** for a package option that is not listed. Enter its name, choose a value type, and select **Save option**. The expression editor accepts vectors, lists and functions; expressions run when you save. Use the option's documentation to choose a valid value. Some R options need a restart. If a saved R setting prevents startup, choose **Session > Restart with default R options...**, repair the setting, then restart normally.
+
+## Package versions
+
+Choose **Session > R packages...**, or **R package manager** in Options. IG uses its own library. Enter a package name and an exact version, or leave the version empty for the latest available version. **Pin installed version** keeps the selected version. Export a lockfile to record the package profile; restore it to request those versions again. Save your project and restart R after package changes. The manager can restore a previous profile or return to bundled packages.
 
 ## Display and navigation
 
-Use **Appearance** to choose Dark or Light. **Default plot theme (new graphs)** and **Default palette (new graphs)** affect newly added charts; they do not restyle every existing chart. Use the desktop View menu's zoom controls if text is too small. For a large flow, combine **Fit view** with **Task list**.
+Use **Appearance** to choose Dark or Light. **Default plot theme** and **Default plot palette** affect newly added charts; they do not restyle every existing chart. Code-editing and console categories control fonts, wrapping and other display choices. Use the desktop View menu's zoom controls if text is too small. For a large flow, combine **Fit view** with **Task list**.
 
 Keyboard navigation can help when a diagram is difficult to use. Tab moves focus through controls. The [shortcut guide](#working-reference) lists common desktop keys.
 
@@ -62,7 +72,7 @@ Keyboard navigation can help when a diagram is difficult to use. Tab moves focus
 
 **Previous saved versions to keep** sets the number of earlier explicit saves retained for a project. The default is 20; zero turns these versions off. Crash recovery is separate. Keep your own backups for important projects.
 
-Leave **Stop Run Flow at the first failing task** on while learning, so an error does not pass unnoticed. **Run supported tasks in the background** helps keep the interface available during supported work; it does not make every task run at once.
+Enable **Stop the flow after the first error** while learning, so an error does not pass unnoticed. **Run supported tasks in background workers** helps keep the interface available during supported work; it does not make every task run at once. **Recovery autosave interval (seconds)** defaults to 30.
 
 Leave useful confirmations on while learning. Read any warning about unsaved work before opening another project or example. Saving takes a moment and is easier than rebuilding changes later.
 

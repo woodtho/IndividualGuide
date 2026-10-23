@@ -15,7 +15,7 @@ Keep the folder together. If it came in a ZIP file, extract it first. Selecting 
 
 ## Try the practice apps
 
-1. Download the [Shiny practice apps for this release](https://github.com/woodtho/IndividualGuide/releases/download/v0.6.0/IndividualGuide-Shiny-Examples-0.6.0.zip).
+1. Download the [Shiny practice apps for this release](https://github.com/woodtho/IndividualGuide/releases/download/v0.7.0/IndividualGuide-Shiny-Examples-0.7.0.zip).
 2. Right-click the ZIP in Windows and choose **Extract All**. Choose a folder you can find again.
 3. Follow the steps below. Select **iris-explorer/app.R** for the flower app. Select the **local-sales** folder for the two-file app, which reads a CSV and can download a filtered copy. Both use packages included with Individual Guide.
 

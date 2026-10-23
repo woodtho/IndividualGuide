@@ -59,7 +59,7 @@ paths <- c(list.files("R", full.names = TRUE, pattern = "[.]R$"), "DESCRIPTION",
   list.files("inst/shiny-apps", full.names = TRUE, recursive = TRUE),
   list.files("inst/app/www",full.names=TRUE,recursive=TRUE,pattern="[.](js|json|css)$"),
   paste0("tools/desktop/",c("menus.cjs","main.cjs","hosted-renderers.cjs","preload.cjs","preferences.cjs","i18n.cjs","package.json","loading.html","assets/installer.nsh","BUILD-README.md")), "tools/example-recipes.R")
-metadata <- list(title = "Individual Guide: A Friendly Guide", edition = paste0("Beginner edition for release ",getNamespaceVersion("IndividualGuide"),", 2026-10-20"),
+metadata <- list(title = "Individual Guide: A Friendly Guide", edition = paste0("Beginner edition for release ",getNamespaceVersion("IndividualGuide"),", 2026-10-23"),
   package_version = as.character(getNamespaceVersion("IndividualGuide")), project_format = get_ig("PROJECT_VERSION"),
   R = R.version.string, task_count = length(registry), registry = registry, examples = examples,
   settings = get_ig("ig_default_settings")(), export_formats = get_ig("IG_EXPORT_FORMATS"),

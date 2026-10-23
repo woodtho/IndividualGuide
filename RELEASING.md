@@ -45,3 +45,9 @@ Do not run `test-clean-machine.ps1` in your normal account. Installation, file-a
 The package builder stages package inputs before calling R so ignored multi-gigabyte local runtimes are never copied into the R source package. Local logs, audit notes, profiles, credentials, build outputs and earlier private history stay outside the published tree. `build/` and `artifacts/` are ignored; retain them locally as needed.
 
 Code signing and an in-app automatic updater are not configured. GitHub Releases provides download hosting; upgrading uses the new Setup installer.
+
+Keep downloaded and built installers locally under `build/releases/<version>/`.
+These ignored files remain in the repository folder and must be preserved during
+local cleanup. Copy each public installer and its checksums there after release;
+keep older versions alongside the current one. Do not commit executable binaries
+to Git.

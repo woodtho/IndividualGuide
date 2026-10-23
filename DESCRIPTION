@@ -1,6 +1,6 @@
 Package: IndividualGuide
 Title: Low-Code Analytical Pipeline Builder
-Version: 0.6.0
+Version: 0.7.0
 URL: https://github.com/woodtho/IndividualGuide
 BugReports: https://github.com/woodtho/IndividualGuide/issues
 Authors@R:

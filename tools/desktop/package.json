@@ -1,7 +1,7 @@
 {
   "name": "individual-guide-desktop",
   "productName": "Individual Guide",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "private": true,
   "description": "Standalone Individual Guide Shiny desktop application",
   "author": "Thomas Wood",
@@ -31,7 +31,10 @@
       {
         "from": "../../inst/app/www/i18n",
         "to": "i18n",
-        "filter": ["*.js", "*.json"]
+        "filter": [
+          "*.js",
+          "*.json"
+        ]
       },
       "security.cjs",
       "menus.cjs",
@@ -81,7 +84,10 @@
       "artifactName": "IndividualGuide-${version}-Setup-Windows-x64.exe",
       "oneClick": true,
       "displayLanguageSelector": true,
-      "installerLanguages": ["en_US", "fr_FR"],
+      "installerLanguages": [
+        "en_US",
+        "fr_FR"
+      ],
       "include": "assets/installer.nsh",
       "perMachine": false,
       "allowElevation": false,

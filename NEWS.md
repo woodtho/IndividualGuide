@@ -1,4 +1,4 @@
-# Development
+# IndividualGuide 0.7.0
 
 - Replace the compact Settings dialog with categorized, searchable global and
   project options. Add editor, console, plotting and recovery preferences;

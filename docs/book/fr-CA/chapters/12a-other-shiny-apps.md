@@ -15,7 +15,7 @@ Gardez le dossier complet. S’il provient d’un fichier ZIP, extrayez-le d’a
 
 ## Essayer les applications de pratique
 
-1. Téléchargez les [applications Shiny de pratique pour cette version](https://github.com/woodtho/IndividualGuide/releases/download/v0.6.0/IndividualGuide-Shiny-Examples-0.6.0.zip).
+1. Téléchargez les [applications Shiny de pratique pour cette version](https://github.com/woodtho/IndividualGuide/releases/download/v0.7.0/IndividualGuide-Shiny-Examples-0.7.0.zip).
 2. Faites un clic droit sur le ZIP dans Windows, puis choisissez **Extraire tout**. Choisissez un dossier facile à retrouver.
 3. Suivez les étapes ci-dessous. Choisissez **iris-explorer/app.R** pour l’application sur les fleurs. Choisissez le dossier **local-sales** pour l’application à deux fichiers, qui lit un CSV et peut télécharger une copie filtrée. Les deux utilisent des paquets inclus dans Individual Guide.
 

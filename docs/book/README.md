@@ -4,7 +4,7 @@ You do not need to know R to use Individual Guide. This book starts with the
 public Windows download and an example you can explore without writing code.
 It uses short steps, explains new terms, and helps you find the task you need.
 
-The guide covers release **0.5.0**, all **58 task types**, and all **22 example
+The guide covers release **0.7.0**, all **58 task types**, and all **22 example
 projects**. It includes saving and recovery, cleaning data, charts, models,
 reports, custom logs, exporting files, and troubleshooting. R installation,
 the console, and code exports are optional sections.
