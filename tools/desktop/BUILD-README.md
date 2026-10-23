@@ -1,6 +1,6 @@
 # Individual Guide for Windows
 
-Download `IndividualGuide-0.6.0-Setup-Windows-x64.exe` from
+Download `IndividualGuide-0.7.0-Setup-Windows-x64.exe` from
 https://github.com/woodtho/IndividualGuide/releases/latest.
 Run Setup once, then use the Start menu or desktop shortcut. Windows 10/11 x64
 is required; allow approximately 1.5 GB for the program, plus your project data.

@@ -79,7 +79,7 @@ The app supports English and Canadian French. The Windows installer passes your 
 2. In the desktop app, you can also use the **Language** menu. In **Settings**, search for **Interface language**, then select **Edit** and **Save option** for a global default or project override.
 3. Check that the buttons and menus use your chosen language. The app remembers it on this computer.
 
-Language is separate from the project. Opening another project does not change it. Your data, column names, file paths, formulas, and names you entered stay as you typed them. R commands and technical identifiers keep the spelling that R needs.
+The Language menu sets your global language. A project can override it in Settings. Your data, column names, file paths, formulas, and names you entered stay as you typed them. R commands and technical identifiers keep the spelling that R needs.
 
 ## Update the app
 

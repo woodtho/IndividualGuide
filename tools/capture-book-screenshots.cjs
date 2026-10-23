@@ -33,17 +33,27 @@ module.exports=async({window,pause,state,rendererCommand})=>{
   };
   const menu=id=>Menu.getApplicationMenu().getMenuItemById(id);
   const hash=bytes=>crypto.createHash('sha256').update(bytes).digest('hex');
+  function saveCaptures(){
+    const taskPanels=new Set(panels.map(panel=>panel.type)).size;
+    fs.writeFileSync(path.join(book,'data/screenshots.json'),JSON.stringify({packageVersion:reference.package_version,language,referenceSha256:hash(fs.readFileSync(path.join(root,'docs/book/data/app-reference.json'))),source:'Real application captures with public tutorial data',screenshots:records,reviewedTaskPanels:panels},null,2)+'\n');
+    return{ok:true,checks:{screenshots:true,allTaskPanels:taskPanels===58},screenshots:records.length,taskPanels};
+  }
   let openedExample=false;
   async function wait(test,label){
-    const deadline=Date.now()+120000;
+    const deadline=Date.now()+300000;
     while(Date.now()<deadline){
       try{if(await test())return;}catch(error){
         if(!/Execution context.*destroyed|Cannot execute JavaScript before document|Capture JavaScript context unavailable/i.test(error.message))throw error;
       }
       await pause(100);
     }
-    fs.writeFileSync(path.join(evidence,'capture-failure.png'),(await window.webContents.capturePage()).toPNG());
-    fs.writeFileSync(path.join(evidence,'capture-failure.txt'),await js('document.body.innerText'));
+    // A failed compositor capture must not hide the original wait condition.
+    const diagnostics=[];
+    try{fs.writeFileSync(path.join(evidence,'capture-failure.png'),(await window.webContents.capturePage()).toPNG());}
+    catch(error){diagnostics.push('Screenshot: '+error.message);}
+    try{fs.writeFileSync(path.join(evidence,'capture-failure.txt'),await js('document.body.innerText'));}
+    catch(error){diagnostics.push('Page text: '+error.message);}
+    fs.writeFileSync(path.join(evidence,'capture-failure.json'),JSON.stringify({label,diagnostics},null,2)+'\n');
     throw Error('Book capture timed out: '+label);
   }
   const idle=()=>wait(()=>menu('save').enabled,'editable workspace');
@@ -76,7 +86,7 @@ module.exports=async({window,pause,state,rendererCommand})=>{
       region.width=Math.min(region.width,size.width-region.x);region.height=Math.min(region.height,size.height-region.y);
       image=source.thumbnail.crop(region);
       // Keep the real native menu and its title bar; omit the distant canvas.
-      const crop={x:0,y:0,width:Math.min(french?800:620,image.getSize().width),height:Math.min(nativeMenu==='File'?1060:440,image.getSize().height)};
+      const crop={x:0,y:0,width:Math.min(french?800:620,image.getSize().width),height:Math.min(nativeMenu==='File'?1060:620,image.getSize().height)};
       image=image.crop(crop);region={...region,menuCrop:crop};
       item.submenu.closePopup(window);
     }else{
@@ -187,6 +197,10 @@ module.exports=async({window,pause,state,rendererCommand})=>{
     await shot('workspace',{description:'Project tree, active flow, and task navigation',example:'iris'});
     await shot('file-menu',{description:'Actual Windows File menu with Save and Save As',example:'iris',nativeMenu:'File'});
     await shot('session-menu',{description:'Actual Windows Session menu with restart and diagnostic commands',example:'iris',nativeMenu:'Session'});
+    if(process.env.IG_BOOK_NATIVE_MENUS_ONLY==='1'){
+      if(!resume||panels.length!==58||records.length<38)throw Error('Complete the full capture before recapturing native menus.');
+      return saveCaptures();
+    }
     menu('help').click();await wait(()=>js("Boolean(document.getElementById('help_example_iris'))"),'Help');
     await js("document.querySelector('[data-value=\"examples\"]').click();const t=document.getElementById('ig-example-type');t.value='summary_stats';t.dispatchEvent(new Event('change'))");
     await shot('examples',{selector:'.modal.show .modal-dialog',description:'Find working projects with the Task type filter',example:'iris'});await closeModal();
@@ -269,7 +283,8 @@ module.exports=async({window,pause,state,rendererCommand})=>{
     menu('validate').click();await wait(()=>js("Boolean(document.querySelector('.modal.show .ig-preflight-row,.modal.show .alert-success'))"),'validation');
     await shot('validation',{selector:'.modal.show .modal-dialog',zoom:1.5,description:'Validate the flow before a run',example:'iris'});await closeModal();
     menu('settings').click();await wait(()=>js("Boolean(document.querySelector('#preferences-search'))"),'Settings');
-    await shot('settings',{selector:'.modal.show .modal-dialog',description:'Settings for appearance, previews, saved versions, and task runs',example:'iris'});await closeModal();
+    await wait(()=>js("Boolean(window.jQuery?.fn?.dataTable?.isDataTable(document.querySelector('#preferences-options table'))&&$('#preferences-options table').DataTable().page.info().recordsTotal>108)"),'Options catalogue');
+    await shot('settings',{selector:'.modal.show .modal-dialog',description:'Categorized global and project options, with searchable R and package settings',example:'iris'});await closeModal();
     menu('review').click();await wait(()=>js("Boolean(document.querySelector('.modal.show .ig-review-dashboard'))"),'Review dashboard');
     await shot('review',{selector:'.modal.show .modal-dialog',zoom:1.5,description:'Review status, notes, and outstanding issues',example:'iris'});await closeModal();
     menu('code').click();await wait(()=>js("Boolean(document.querySelector('#code-dl_bundle')?.getClientRects().length)"),'Code export');
@@ -298,7 +313,6 @@ module.exports=async({window,pause,state,rendererCommand})=>{
     await js("document.getElementById('ig-app-close').click();document.getElementById('ig-app-confirm-close').click()");
     await wait(()=>js("igShinyApps.state.phase==='idle'&&!igShinyApps.pending"),'practice app closed');
     await js("document.getElementById('ig-app-back').click()");
-    fs.writeFileSync(path.join(book,'data/screenshots.json'),JSON.stringify({packageVersion:reference.package_version,language,referenceSha256:hash(fs.readFileSync(path.join(root,'docs/book/data/app-reference.json'))),source:'Real application captures with public tutorial data',screenshots:records,reviewedTaskPanels:panels},null,2)+'\n');
-    return{ok:true,checks:{screenshots:true,allTaskPanels:seen.size===58},screenshots:records.length,taskPanels:seen.size};
+    return saveCaptures();
   }finally{window.setAlwaysOnTop(false);dialog.showMessageBox=originalMessage;dialog.showSaveDialog=originalSave;}
 };

@@ -60,7 +60,7 @@ Les catégories d’options R présentent la référence R incluse et les option
 
 ## Versions des paquets
 
-Choisissez **Session > Paquets R...**, ou **Gestionnaire de paquets R** dans les Options. IG utilise sa propre bibliothèque. Entrez le nom du paquet et une version exacte, ou laissez la version vide pour la dernière version disponible. **Verrouiller la version installée** conserve la version choisie. Exportez un fichier de verrouillage pour conserver le profil de paquets; restaurez-le pour demander ces versions de nouveau. Enregistrez le projet et redémarrez R après les changements de paquets. Le gestionnaire permet de restaurer un profil précédent ou de revenir aux paquets inclus.
+Choisissez **Session > Paquets R...**, ou **Gestionnaire de paquets R** dans les Options. IG utilise sa propre bibliothèque. Entrez le nom du paquet et une version exacte, ou laissez la version vide pour la dernière version disponible. **Fixer la version installée** conserve la version choisie. Exportez un fichier de verrouillage pour conserver le profil de paquets; restaurez-le pour demander ces versions de nouveau. Enregistrez le projet et redémarrez R après les changements de paquets. Le gestionnaire permet de restaurer un profil précédent ou de revenir aux paquets inclus.
 
 ## Affichage et navigation
 
@@ -72,7 +72,7 @@ Le clavier aide si le diagramme est difficile à utiliser. Tab déplace le focus
 
 **Versions enregistrées précédentes à conserver** définit le nombre d’enregistrements antérieurs gardés pour un projet. La valeur par défaut est 20; zéro les désactive. La récupération après un arrêt est distincte. Gardez vos propres copies de sauvegarde des projets importants.
 
-Activez **Arrêter le flux après la première erreur** pendant votre apprentissage pour remarquer les erreurs. **Exécuter les tâches compatibles en arrière-plan** aide à garder l’interface disponible pendant certains travaux. Ce réglage n’exécute pas toutes les tâches en même temps. **Intervalle de sauvegarde de récupération (secondes)** vaut 30 par défaut.
+Activez **Arrêter le flux après la première erreur** pendant votre apprentissage pour remarquer les erreurs. **Exécuter les tâches compatibles en arrière-plan** aide à garder l’interface disponible pendant certains travaux. Ce réglage n’exécute pas toutes les tâches en même temps. **Intervalle d’enregistrement automatique de récupération (secondes)** vaut 30 par défaut.
 
 Gardez les confirmations utiles pendant votre apprentissage. Lisez tout avertissement de travail non enregistré avant d’ouvrir un autre projet ou exemple. Enregistrer prend peu de temps et évite de refaire les changements.
 

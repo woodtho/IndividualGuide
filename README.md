@@ -49,7 +49,7 @@ run_app()
 
 ## Standalone Windows executable
 
-Download the latest **Setup-Windows-x64.exe** from [GitHub Releases](https://github.com/woodtho/IndividualGuide/releases/latest). Run Setup once, choose **English** or **Français (Canada)**, then launch **Individual Guide** from its Start menu or desktop shortcut. The 0.6.0 installer includes the current Shiny app, reduced R runtime/packages, Pandoc and Electron browser. Windows 10/11 x64 is required; allow roughly 1.5 GB for installation. No separate R installation, administrator access or dependency download is needed for normal use.
+Download the latest **Setup-Windows-x64.exe** from [GitHub Releases](https://github.com/woodtho/IndividualGuide/releases/latest). Run Setup once, choose **English** or **Français (Canada)**, then launch **Individual Guide** from its Start menu or desktop shortcut. The 0.7.0 installer includes the current Shiny app, reduced R runtime/packages, Pandoc and Electron browser. Windows 10/11 x64 is required; allow roughly 1.5 GB for installation. No separate R installation, administrator access or dependency download is needed for normal use.
 
 Change the language later in **Language / Langue** or the app's language selector.
 Your choice is remembered on this computer. Switching keeps the R connection,

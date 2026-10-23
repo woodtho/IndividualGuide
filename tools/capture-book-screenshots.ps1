@@ -3,9 +3,12 @@ param(
   [string]$PracticeParent = '',
   [ValidateSet('en-CA','fr-CA')][string]$Language = 'en-CA',
   [ValidateRange(0,65535)][int]$DebugPort = 0,
+  [ValidateRange(1,60)][int]$TimeoutMinutes = 45,
+  [switch]$NativeMenusOnly,
   [switch]$Resume
 )
 $ErrorActionPreference = 'Stop'
+if ($NativeMenusOnly -and !$Resume) { throw 'NativeMenusOnly requires a completed capture and -Resume.' }
 $root = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 if (!$PracticeParent) { $PracticeParent = [System.IO.Path]::GetPathRoot($root) }
 $runtimePath = (Resolve-Path -LiteralPath $Runtime).Path
@@ -51,6 +54,7 @@ $env:IG_BOOK_ROOT = $root
 $env:IG_BOOK_LANGUAGE = $Language
 $env:IG_BOOK_PRACTICE = $practice
 $env:IG_BOOK_RESUME = if ($Resume) {'1'} else {'0'}
+$env:IG_BOOK_NATIVE_MENUS_ONLY = if ($NativeMenusOnly) {'1'} else {'0'}
 $env:IG_AUTHOR = 'Guide reader'
 Remove-Item Env:ELECTRON_RUN_AS_NODE -ErrorAction SilentlyContinue
 $arguments = @($appDirectory,'--smoke-product',"--smoke-result=$result","--data-dir=$profile","--language=$Language") | ForEach-Object {'"' + $_ + '"'}
@@ -58,7 +62,7 @@ if ($DebugPort) { $arguments += "--remote-debugging-port=$DebugPort" }
 $process = Start-Process -FilePath $electron -ArgumentList $arguments -WorkingDirectory $root -WindowStyle Hidden -PassThru `
   -RedirectStandardOutput (Join-Path $scratch 'stdout.log') -RedirectStandardError (Join-Path $scratch 'stderr.log')
 $null = $process.Handle
-if (!$process.WaitForExit(600000)) {
+if (!$process.WaitForExit($TimeoutMinutes * 60000)) {
   & (Join-Path $env:SystemRoot 'System32/taskkill.exe') /PID $process.Id /T /F | Out-Null
   throw "Capture process did not shut down. Inspect $scratch"
 }

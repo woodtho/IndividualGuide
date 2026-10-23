@@ -67,6 +67,7 @@ check('all_internal_HTML_links_resolve',missing.length===0,missing);
 check('HTML_is_offline',!/<(?:script|link|img)\b[^>]*(?:src|href)=["']https?:\/\//i.test(html));
 check('no_unresolved_template_variables',!html.includes('$table-of-contents$')&&!html.includes('$body$'));
 check('release_edition_identity',book.includes(meta.package_version+'-Setup-Windows-x64.exe')&&meta.package_version===JSON.parse(fs.readFileSync(path.join(root,'tools/desktop/package.json'),'utf8')).version);
+check('release_links_match_edition',Array.from(book.matchAll(/https:\/\/github[.]com\/woodtho\/IndividualGuide\/releases\/(?:tag|download)\/v([^/\s)]+)/g),match=>match[1]).every(version=>version===meta.package_version));
 check('no_todo_or_placeholder_sections',!/^\s*(?:TODO|TBD|FIXME|Coming soon|Chapter placeholder)\b/im.test(book));
 for(const [relative,expected]of Object.entries(meta.source_md5))check('source_'+relative,hash(path.join(root,relative),'md5')===expected);
 for(const chapter of manifest.chapters)check('chapter_'+chapter.name,hash(path.join(source,'chapters',chapter.name))===chapter.sha256);

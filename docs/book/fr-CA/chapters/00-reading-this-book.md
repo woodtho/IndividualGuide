@@ -79,7 +79,7 @@ L’application offre l’anglais et le français canadien. Le programme d’ins
 2. Dans l’application de bureau, vous pouvez aussi utiliser le menu **Langue**. Dans **Paramètres**, recherchez **Langue de l’interface**, puis sélectionnez **Édition** et **Enregistrer l’option** pour une valeur globale ou un remplacement du projet.
 3. Vérifiez que les boutons et les menus sont dans la langue choisie. L’application la conserve sur cet ordinateur.
 
-La langue est distincte du projet. Ouvrir un autre projet ne la change pas. Vos données, noms de colonnes, chemins de fichiers, formules et noms saisis restent tels quels. Les commandes R et les identifiants techniques gardent l’orthographe que R exige.
+Le menu Langue définit la langue globale. Un projet peut la remplacer dans Paramètres. Vos données, noms de colonnes, chemins de fichiers, formules et noms saisis restent tels quels. Les commandes R et les identifiants techniques gardent l’orthographe que R exige.
 
 ## Mettre à jour l’application
 

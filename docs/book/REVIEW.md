@@ -1,6 +1,6 @@
 ﻿# English and Canadian French handbook review
 
-This review covers the matching beginner handbooks for Individual Guide 0.6.0.
+This review covers the matching beginner handbooks for Individual Guide 0.7.0.
 The guide assumes no R knowledge and starts with the public Windows installer.
 Optional R instructions use CRAN and the public GitHub release tag. Development
 instructions remain in [BUILDING.md](BUILDING.md).
@@ -24,24 +24,23 @@ identities match between languages.
 Project-authored names, sample data, R code, raw console output and saved log
 messages retain their original text. The guide explains this distinction.
 Captures use isolated profiles and public practice data. Records include hashes
-and a live inventory of all 58 task forms. Focused recaptures corrected affected
-views after text and validation-contrast fixes; unchanged captures retain their
-original provenance. See BUILDING.md for that workflow.
+and a live inventory of all 58 task forms. All 38 application captures in each
+language were refreshed on 23 October 2026 using the built 0.7.0 runtime. The
+Session menu was recaptured at a larger height to include package management
+and recovery with default R options. Records retain actual capture times and
+checksums. See BUILDING.md for that workflow.
 
-The new chapter covers opening complete Shiny app folders, the public practice
-ZIP, trust, returning to the main workspace, switching, closing and reading app
-logs. Both new figures show the actual app browser. The French running view uses
-the practice app's own French language choice. The app chooser was recaptured
-after improving its button contrast. A later backend correction assigned fresh
-loopback sites and added native renderer cleanup; no pictured controls or styles
-changed. Compatible pictures retain their actual capture times and checksums.
-The Resume driver exercises the final installed app before refreshing the app
-reference association. See BUILDING.md for that compatibility workflow.
+The settings chapter covers the IG-specific package library, version pins,
+global defaults, project overrides, manual R options and startup recovery.
+The Shiny chapter covers opening complete app folders, the public practice ZIP,
+trust, returning to the main workspace, switching, closing and reading app logs.
+Its figures show the actual app browser. The French running view uses the
+practice app's own French language choice.
 
 ## Verification
 
-- English: 25,585 words, 106 PDF pages and 713 publication checks passed.
-- Canadian French: 27,631 words, 112 PDF pages and 715 checks passed, including
+- English: 25,850 words, 102 PDF pages and 720 publication checks passed.
+- Canadian French: 27,944 words, 107 PDF pages and 722 checks passed, including
   matching English structure and translated figures.
 - All 22 example archives were checked for integrity and coverage, including
   165 saved successful task steps. This does not mean every saved step was
@@ -51,11 +50,12 @@ reference association. See BUILDING.md for that compatibility workflow.
   appendix, reopening projects and running exported code without the app.
 - HTML was checked at widths of 1440, 1024 and 390 pixels, with offline resources,
   working navigation, internal links and no horizontal overflow.
-- All PDF pages were rasterized and inspected in contact sheets. Actual EPUB
+- All figure pages and selected text pages were rasterized and visually reviewed.
+  Actual EPUB
   chapters were rendered in a browser in both languages. PDF fonts, text,
   navigation and captions, EPUB resources, and Word media and bookmarks passed.
-- English prose has an estimated Flesch-Kincaid grade of 6.18. French prose
-  averages 11.06 words per sentence; the English grade formula is not applied to
+- English prose has an estimated Flesch-Kincaid grade of 6.21. French prose
+  averages 11.08 words per sentence; the English grade formula is not applied to
   French. Editorial review informed the wording in both languages.
 - The base language interface passed 23 real-browser checks for release 0.5.0, including
   retained input/caret, preserved user data, French search, reversible canvas
